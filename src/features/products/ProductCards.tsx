@@ -13,25 +13,26 @@ interface ProductCardsProps {
   onCardClick?: (product: Product) => void;
 }
 
-// Componente para mostrar productos en tarjetas cuadradas
 export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick }) => {
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-10 justify-center cursor-pointer">
+    <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-10 justify-center">
       {products.map((product) => (
         <div
           key={product.id}
-          className="bg-white border border-gray-300 rounded-lg p-4 flex flex-col items-center shadow hover:shadow-lg transition w-40 h-50"
+          className="bg-white rounded-lg p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-55 cursor-pointer" // altura fija
           onClick={() => onCardClick && onCardClick(product)}
         >
           {/* Imagen del producto */}
           <img src={product.image} alt={product.name} className="h-20 mb-3 object-contain" />
-          
+
           {/* Nombre y precio */}
-          <h3 className="text-center font-bold text-sm text-gray-800">{product.name}</h3>
-          <p className="text-gray-600 text-sm">${product.price}</p>
-          
-          {/* Botón para agregar al carrito (a futuro se puede conectar con el contexto) */}
-          <button className="mt-2 bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer">
+          <h3 className="font-primary text-center font-bold text-sm text-gray-800 line-clamp-2 min-h-[2.5rem]">
+            {product.name}
+          </h3>
+          <p className="font-primary text-gray-600 text-sm mb-2">${product.price}</p>
+
+          {/* Botón para agregar al carrito */}
+          <button className="mt-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer">
             Añadir
           </button>
         </div>

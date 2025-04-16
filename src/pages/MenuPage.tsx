@@ -283,7 +283,7 @@ export const MenuPage: React.FC = () => {
 
       <div className="flex flex-col items-center">
         {/* Categorías */}
-        <h3 className="text-4xl font-bowlby-one-sc text-[#FF9D3A] text-center mb-4 uppercase">
+        <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
           Explorar categorías
         </h3>
         <Categories
@@ -295,7 +295,7 @@ export const MenuPage: React.FC = () => {
         {/* Productos */}
         {/* Mostrar título solo si no hay categoría seleccionada */}
         {!selectedCategory && !searchTerm && (
-          <h2 className="text-4xl font-bowlby-one-sc text-[#9e1c1c] mb-4">
+          <h2 className="text-4xl font-tertiary text-[#9e1c1c] mb-4">
             Novedades Populares
           </h2>
         )}
