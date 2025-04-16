@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Logo centrado absolutamente */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
         <img
-          src="src\\assets\\el_buen_sabor_logo.png"
+          src="src\assets\img\BuenSaborLogo.png"
           alt="Logo El Buen Sabor"
           className="h-20 w-auto"
         />
