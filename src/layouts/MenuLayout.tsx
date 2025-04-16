@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { IconArrowLeft, IconShoppingCart, IconAdjustmentsHorizontal, IconSearch } from '@tabler/icons-react';
+import { IconAdjustmentsHorizontal, IconSearch } from '@tabler/icons-react';
+import { Header } from '../components/Header';
 
 interface MenuLayoutProps {
   children: React.ReactNode;
@@ -18,31 +19,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch }) =>
 
   return (
     <div className="bg-[#FFF4E0] min-h-screen px-5 py-3">
-      <header className="flex items-center justify-between mb-5">
-        {/* Botón Volver */}
-        <div className="flex items-center space-x-2 cursor-pointer">
-          <div className="bg-orange-400 rounded-full p-0.5">
-            <IconArrowLeft color="white" />
-          </div>
-          <span className="font-bowlby-one-sc text-black text-base">VOLVER</span>
-        </div>
-
-        {/* Logo */}
-        <div className="flex-grow flex justify-center">
-          <img
-            src="src\assets\el_buen_sabor_logo.png" // Reemplazá con la ruta de tu logo
-            alt="Logo El Buen Sabor"
-            className="h-20 w-auto"
-          />
-        </div>
-
-        {/* Usuario + Carrito */}
-        <div className="flex items-center space-x-3">
-          <span className="font-bebas-neue text-black text-base">GERONIMO</span>
-          <div className="h-5 border-l border-black"></div>
-          <IconShoppingCart color="black" fill="" />
-        </div>
-      </header>
+      <Header />
 
       {/* Título */}
       <h2 className="font-bowlby-one-sc text-center text-4xl text-black mb-10 pt-8">MENÚ</h2>
