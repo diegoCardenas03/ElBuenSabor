@@ -4,7 +4,7 @@ import iconInstagram from "../assets/icons/instagram.svg";
 import iconTwitter from "../assets/icons/twitter.svg";
 
 
-const Footer: React.FC = () => {
+export const Footer: React.FC = () => {
   const iconsRedes = [
     { icon: iconInstagram, text: "Icono Instagram"},
     { icon: iconTwitter, text: "Icono Twitter"},
@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="w-screen bg-primary flex flex-col justify-center items-center gap-5 pt-4">
+      <footer className="w-full bg-primary flex flex-col justify-center items-center gap-5 pt-4 relative z-10">
         <div className="bg-transparent flex flex-col justify-center items-center gap-5 mt-4">
           <img src={LogoIcon} alt="" className="w-15 h-15" />
           <p className="font-semibold">Av Belgrano 671, Mendoza, Argentina</p>
@@ -23,12 +23,10 @@ const Footer: React.FC = () => {
             ))}
           </div>
         </div>
-        <div className="bg-[#D3C9B9] w-screen p-10 text-center flex flex-col justify-center items-center gap-5 mt-4">
+        <div className="bg-[#D3C9B9] w-full p-10 text-center flex flex-col justify-center items-center gap-5 mt-4">
           <p className="font-tertiary">El buen sabor. ©Designed byteam</p>
         </div>
       </footer>
     </>
   )
 }
-
-export default Footer
