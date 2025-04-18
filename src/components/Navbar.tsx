@@ -28,8 +28,8 @@ const Navbar: React.FC = () => {
   ]
 
   const Logearse = (): void => {
-    // setUsuarioLogeado(true); // Abre el modal de login
-    setAbrirModalLogin(true); // Abre el modal de login
+    setUsuarioLogeado(true); // Abre el modal de login
+    // setAbrirModalLogin(true); // Abre el modal de login
   };
 
   const cerrarModalLogin = (): void => {
