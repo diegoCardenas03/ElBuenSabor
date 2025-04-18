@@ -6,14 +6,15 @@ import pizzaCarrusel from "../assets/img/pizzaCarrusel.png"
 import burger1 from "../assets/img/burger1.png"
 import PapasCheddar from "../assets/img/PapasCheddar.png"
 import PizzanuestroMenu from "../assets/img/pizzanuestromenu.png"
+import ProductosPopularesImg from "../assets/img/imagen-productos-populares.png";
 const items = [
   {id: 1, titulo:"Hamburguesas", imagen: burger1 },
    {id: 2, titulo:"Pizzas", imagen: pizzaCarrusel},
-{id: 3, titulo:"Lomos", imagen: ""},
-{id: 4, titulo:"Panchos", imagen: ""},
+{id: 3, titulo:"Lomos", imagen: pizzaCarrusel},
+{id: 4, titulo:"Panchos", imagen: pizzaCarrusel},
 {id: 5, titulo:"Papas Fritas", imagen: PapasCheddar},
-{ id: 6, titulo: "Bebidas", imagen: ""},
-{ id: 7, titulo: "Postres", imagen: "" },
+{ id: 6, titulo: "Bebidas", imagen: pizzaCarrusel},
+{ id: 7, titulo: "Postres", imagen: pizzaCarrusel},
 ]
 const Landing = () => {
   return (
@@ -70,11 +71,23 @@ const Landing = () => {
             </div>
           </div>
         </main>
+        {/* Productos populares */}
+                  <div className="flex items-center justify-center gap-6 relative mb-12">
+            <h2 className="font-(family-name:--font-tertiary) text-7xl text-center leading-tight">
+              PRODUCTOS<br />POPULARES
+            </h2>
+            <img
+              src={ProductosPopularesImg}
+              alt="Pizza"
+              className="w-[15vh] md:w-[25vh] lg:w-[30vh] object-contain"
+            />
+          </div>
+
         {/* Nuestro menu */}
         <div>
           <h2 className="font-(family-name:--font-tertiary) text-7xl text-center py-30">NUESTRO MENÚ</h2>
           <CardLanding items={items}></CardLanding>
-          <img src={PizzanuestroMenu} alt="Pizza" className="w-[30vh] md:w-[60vh]" />
+          <img src={PizzanuestroMenu} alt="Pizza" className="w-[15vh] md:w-[25vh] lg:w-[30vh]" />
 
 
         </div>
