@@ -19,7 +19,7 @@ const Footer: React.FC = () => {
           <p className="font-semibold">Av Belgrano 671, Mendoza, Argentina</p>
           <div className="flex gap-5 justify-center items-center">
             {iconsRedes.map((icon, index) => (
-              <img src={icon.icon} key={index} alt={icon.text} className="w-8 h-8" />
+              <img src={icon.icon} key={index} alt={icon.text} className="w-8 h-8 cursor-pointer" />
             ))}
           </div>
         </div>

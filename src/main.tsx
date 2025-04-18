@@ -6,5 +6,6 @@ import Footer from './components/Footer'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Navbar></Navbar>
   </StrictMode>,
 )
