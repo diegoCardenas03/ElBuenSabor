@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="w-full bg-primary flex flex-col justify-center items-center gap-5 pt-4 relative z-10">
+      <footer className="w-full bg-primary flex flex-col justify-center items-center gap-5 pt-4 relative ">
         <div className="bg-transparent flex flex-col justify-center items-center gap-5 mt-4">
           <img src={LogoIcon} alt="" className="w-15 h-15" />
           <p className="font-semibold">Av Belgrano 671, Mendoza, Argentina</p>

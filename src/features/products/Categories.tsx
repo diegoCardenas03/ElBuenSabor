@@ -14,7 +14,7 @@ export const Categories: React.FC<CategoriesProps> = ({
   onSelectCategory,
 }) => {
   return (
-    <div className="flex gap-8 overflow-x-auto mb-5">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6 md:gap-8 mb-5">
       {/* Mapeamos cada categoría y creamos un botón cuadrado */}
       {categories.map((cat) => (
         <button

@@ -3,6 +3,7 @@ import { MenuLayout } from '../layouts/MenuLayout';
 import { Categories } from '../features/products/Categories';
 import { ProductCards } from '../features/products/ProductCards';
 import { ProductModal } from '../features/products/ProductModal';
+import { products } from '../utils/products/productsData';
 
 export const MenuPage: React.FC = () => {
   // Lista de categorías (nombre + imagen)
@@ -17,255 +18,34 @@ export const MenuPage: React.FC = () => {
 
   // Estado de categoría seleccionada
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>(''); // Estado para el término de búsqueda
-  // Estado para el modal y producto seleccionado
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filters, setFilters] = useState<{ order: string; bestseller: boolean }>({ order: '', bestseller: false });
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  
 
-  // Lista de productos de ejemplo con categoría asociada
-  const products = [
-    {
-      id: 1,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 2,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 3,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 4,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 5,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 6,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 7,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 8,
-      name: 'Mega Crunch Bite',
-      price: 1200,
-      category: 'Hamburguesas',
-      image: 'src\\assets\\hamburguesa.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 9,
-      name: 'Bebida Generica',
-      price: 1200,
-      category: 'Bebidas',
-      image: 'src\\assets\\bebida.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 10,
-      name: 'Bebida Generica',
-      price: 1200,
-      category: 'Bebidas',
-      image: 'src\\assets\\bebida.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 11,
-      name: 'Bebida Generica',
-      price: 1200,
-      category: 'Bebidas',
-      image: 'src\\assets\\bebida.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 12,
-      name: 'Bebida Generica',
-      price: 1200,
-      category: 'Bebidas',
-      image: 'src\\assets\\bebida.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 13,
-      name: 'Papas genericas',
-      price: 1200,
-      category: 'Papas',
-      image: 'src\\assets\\papas-fritas.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 14,
-      name: 'Papas genericas',
-      price: 1200,
-      category: 'Papas',
-      image: 'src\\assets\\papas-fritas.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 15,
-      name: 'Papas genericas',
-      price: 1200,
-      category: 'Papas',
-      image: 'src\\assets\\papas-fritas.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 16,
-      name: 'Papas genericas',
-      price: 1200,
-      category: 'Papas',
-      image: 'src\\assets\\papas-fritas.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 17,
-      name: 'Pizza generica',
-      price: 1200,
-      category: 'Pizzas',
-      image: 'src\\assets\\pizza.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 18,
-      name: 'Pizza generica',
-      price: 1200,
-      category: 'Pizzas',
-      image: 'src\\assets\\pizza.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 19,
-      name: 'Pizza generica',
-      price: 1200,
-      category: 'Pizzas',
-      image: 'src\\assets\\pizza.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 20,
-      name: 'Pizza generica',
-      price: 1200,
-      category: 'Pizzas',
-      image: 'src\\assets\\pizza.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 21,
-      name: 'Pancho generico',
-      price: 1200,
-      category: 'Panchos',
-      image: 'src\\assets\\pancho.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 22,
-      name: 'Pancho generico',
-      price: 1200,
-      category: 'Panchos',
-      image: 'src\\assets\\pancho.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 23,
-      name: 'Pancho generico',
-      price: 1200,
-      category: 'Panchos',
-      image: 'src\\assets\\pancho.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 24,
-      name: 'Pancho generico',
-      price: 1200,
-      category: 'Panchos',
-      image: 'src\\assets\\pancho.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 25,
-      name: 'Bebida Alcoholica',
-      price: 1200,
-      category: 'Bebidas Alcoholicas',
-      image: 'src\\assets\\fernet.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 26,
-      name: 'Bebida Alcoholica',
-      price: 1200,
-      category: 'Bebidas Alcoholicas',
-      image: 'src\\assets\\fernet.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 27,
-      name: 'Bebida Alcoholica',
-      price: 1200,
-      category: 'Bebidas Alcoholicas',
-      image: 'src\\assets\\fernet.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
-    {
-      id: 28,
-      name: 'Bebida Alcoholica',
-      price: 1200,
-      category: 'Bebidas Alcoholicas',
-      image: 'src\\assets\\fernet.png',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.'
-    },
 
-  ];
-
-  // Filtramos los productos según la categoría seleccionada
-  const filteredProducts = products.filter((product) => {
+  // Filtrado de productos
+  let filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesBestseller = filters.bestseller ? product.isTopSeller : true;
+    return matchesCategory && matchesSearch && matchesBestseller;
   });
+
+  // Ordenar productos
+  if (filters.order === 'asc') {
+    filteredProducts = filteredProducts.sort((a, b) => a.price - b.price);
+  } else if (filters.order === 'desc') {
+    filteredProducts = filteredProducts.sort((a, b) => b.price - a.price);
+  }
 
   // Manejar la selección de categorías
   const handleSelectCategory = (category: string) => {
     setSelectedCategory((prevCategory) => (prevCategory === category ? null : category));
   };
 
-   // Función para abrir el modal con el producto seleccionado
-   const handleCardClick = (product: any) => {
+  // Función para abrir el modal con el producto seleccionado
+  const handleCardClick = (product: any) => {
     setSelectedProduct({
       ...product
     });
@@ -279,8 +59,10 @@ export const MenuPage: React.FC = () => {
   };
 
   return (
-    <MenuLayout onSearch={setSearchTerm}>
-
+    <MenuLayout
+      onSearch={setSearchTerm}
+      onFiltersChange={setFilters}
+    >
       <div className="flex flex-col items-center">
         {/* Categorías */}
         <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
@@ -293,9 +75,8 @@ export const MenuPage: React.FC = () => {
         />
 
         {/* Productos */}
-        {/* Mostrar título solo si no hay categoría seleccionada */}
         {!selectedCategory && !searchTerm && (
-          <h2 className="text-4xl font-tertiary text-[#9e1c1c] mb-4">
+          <h2 className="text-4xl font-tertiary text-center text-[#9e1c1c] mb-4">
             Novedades Populares
           </h2>
         )}
@@ -306,8 +87,8 @@ export const MenuPage: React.FC = () => {
         ) : (
           <ProductCards products={filteredProducts} onCardClick={handleCardClick} />
         )}
-         {/* Modal de producto */}
-         {selectedProduct && (
+        {/* Modal de producto */}
+        {selectedProduct && (
           <ProductModal
             product={selectedProduct}
             isOpen={modalOpen}

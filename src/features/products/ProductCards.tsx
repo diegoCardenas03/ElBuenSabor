@@ -15,11 +15,11 @@ interface ProductCardsProps {
 
 export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick }) => {
   return (
-    <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-4 gap-10 justify-center">
+    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-10 justify-center">
       {products.map((product) => (
         <div
           key={product.id}
-          className="bg-white rounded-lg p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-55 cursor-pointer" // altura fija
+          className="bg-white rounded-lg p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-55 w-42 cursor-pointer" // altura fija
           onClick={() => onCardClick && onCardClick(product)}
         >
           {/* Imagen del producto */}
