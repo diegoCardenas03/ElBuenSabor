@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="w-screen h-17 bg-primary flex justify-between items-center px-4 z-10 lg:px-10">
+      <nav className="w-screen h-17  flex justify-between items-center px-4 z-10 lg:px-10">
         <img src={Logo} alt="Logo Buen Sabor" />
         <div className="flex items-center gap-5">
           {UsuarioLogeado ? (

@@ -1,12 +1,14 @@
 import React from "react";
 import pizza from "../assets/img/pizza-landing.png";
-import BuenSaborLogo from "../assets/img/BuenSaborLogo.png";
+// import BuenSaborLogo from "../assets/img/BuenSaborLogo.png";
 import CardLanding from "../components/CardLanding";
 import pizzaCarrusel from "../assets/img/pizzaCarrusel.png"
 import burger1 from "../assets/img/burger1.png"
 import PapasCheddar from "../assets/img/PapasCheddar.png"
 import PizzanuestroMenu from "../assets/img/pizzanuestromenu.png"
 import ProductosPopularesImg from "../assets/img/imagen-productos-populares.png";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 const items = [
   {id: 1, titulo:"Hamburguesas", imagen: burger1 },
    {id: 2, titulo:"Pizzas", imagen: pizzaCarrusel},
@@ -26,7 +28,7 @@ const Landing = () => {
       {/* Contenido principal en capa superior */}
       <div className="relative z-10">
         {/* Header */}
-        <header className="flex justify-between items-center p-6">
+        {/* <header className="flex justify-between items-center p-6">
           <div>
             <img src={BuenSaborLogo} alt="Logo" className="w-16" />
           </div>
@@ -47,7 +49,9 @@ const Landing = () => {
               />
             </svg>
           </div>
-        </header>
+          
+        </header> */}
+        <Navbar></Navbar>
 
         {/* Main */}
         <main className="flex flex-col md:flex-row items-center justify-start px-6 md:px-16 pt-4 pb-8">
@@ -123,8 +127,9 @@ const Landing = () => {
 
         </div>
       </div>
-
+      <Footer></Footer>
     </div>
+
   );
 };
 
