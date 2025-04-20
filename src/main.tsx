@@ -1,11 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-// import Navbar from './components/Navbar'
-// import Footer from './components/Footer'
-import Landing from './pages/Landing'
+// import App from './App.tsx'
+import { MenuPage } from './pages/MenuPage.tsx'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-<Landing />
+    <MenuPage />
   </StrictMode>,
 )
