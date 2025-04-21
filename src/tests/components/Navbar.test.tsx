@@ -28,7 +28,7 @@ describe('Navbar', () => {
 
   test('llama a onClose al hacer click en el icono de cerrar', () => {
     render(<Navbar {...defaultProps} />);
-    const closeBtn = screen.getByAltText(/cerrar navbar/i);
+    const closeBtn = screen.getByLabelText(/cerrar navbar/i);
     fireEvent.click(closeBtn);
     expect(defaultProps.onClose).toHaveBeenCalled();
   });

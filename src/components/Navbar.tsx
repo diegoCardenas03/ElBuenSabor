@@ -64,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <>
       <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex justify-end">
-          <IconX stroke={2} color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" />
+          <IconX stroke={2} color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar" />
         </div>
         <div className="p-4 pt-0 flex align-top justify-between">
           <img src={usuarioImg} alt="Usuario" className="w-12 h-12 rounded-full mx-auto" />
