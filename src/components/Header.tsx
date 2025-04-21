@@ -6,17 +6,19 @@ interface HeaderProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
   whiteUserBar?: boolean;
+  nombreUsuario?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   onBackClick,
   whiteUserBar = false,
+  nombreUsuario = "Tung Tung Sahur",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
 
   const usuarioLogeado = true;
-  const nombreUsuario = "Tung Tung Sahur";
+  
 
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
