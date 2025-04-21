@@ -1,14 +1,14 @@
 import React from "react";
 import pizza from "../assets/img/pizza-landing.png";
-// import BuenSaborLogo from "../assets/img/BuenSaborLogo.png";
 import CardLanding from "../components/CardLanding";
 import pizzaCarrusel from "../assets/img/pizzaCarrusel.png"
 import burger1 from "../assets/img/burger1.png"
 import PapasCheddar from "../assets/img/PapasCheddar.png"
 import PizzanuestroMenu from "../assets/img/pizzanuestromenu.png"
 import ProductosPopularesImg from "../assets/img/imagen-productos-populares.png";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
+import ProdPopulares from "../components/prodPopulares";
 const items = [
   {id: 1, titulo:"Hamburguesas", imagen: burger1 },
    {id: 2, titulo:"Pizzas", imagen: pizzaCarrusel},
@@ -28,30 +28,8 @@ const Landing = () => {
       {/* Contenido principal en capa superior */}
       <div className="relative z-10">
         {/* Header */}
-        {/* <header className="flex justify-between items-center p-6">
-          <div>
-            <img src={BuenSaborLogo} alt="Logo" className="w-16" />
-          </div>
-          <div className="flex items-center gap-4 text-[#FFF4E0] font-bold text-sm">
-            <span>GERONIMO</span>
-            <span className="text-xl">|</span>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1 5h12l-1-5M9 21a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4z"
-              />
-            </svg>
-          </div>
-          
-        </header> */}
-        <Navbar></Navbar>
+        <Header whiteUserBar={true} showBackButton={false}/>
+
 
         {/* Main */}
         <main className="flex flex-col md:flex-row items-center justify-start px-6 md:px-16 pt-4 pb-8">
@@ -76,7 +54,8 @@ const Landing = () => {
           </div>
         </main>
         {/* Productos populares */}
-                  <div className="flex items-center justify-center gap-6 relative mb-12">
+        <div className="flex flex-col items-center justify-center mt-10 mb-10 p-20">
+          <div className="flex items-center justify-center gap-6 relative mb-12">
             <h2 className="font-(family-name:--font-tertiary) text-7xl text-center leading-tight">
               PRODUCTOS<br />POPULARES
             </h2>
@@ -85,6 +64,9 @@ const Landing = () => {
               alt="Pizza"
               className="w-[15vh] md:w-[25vh] lg:w-[30vh] object-contain"
             />
+           
+          </div>
+          <ProdPopulares />
           </div>
 
         {/* Nuestro menu */}
@@ -127,7 +109,7 @@ const Landing = () => {
 
         </div>
       </div>
-      <Footer></Footer>
+      <Footer />
     </div>
 
   );
