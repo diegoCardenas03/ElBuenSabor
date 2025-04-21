@@ -65,7 +65,16 @@ export const ProductFilterModal: React.FC<ProductFilterModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
+                {/* Botón X para cerrar */}
+                <button
+                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none cursor-pointer"
+                    onClick={onClose}
+                    aria-label="Cerrar"
+                    type="button"
+                >
+                    ×
+                </button>
                 <h2 className="text-2xl font-bold mb-4 text-[#FF9D3A]">Filtrar productos</h2>
                 <div className="flex flex-wrap gap-2 mb-6">
                     {chips.map((chip, idx) => (
