@@ -6,7 +6,8 @@ export const products = [
       category: 'Hamburguesas',
       image: 'src\\assets\\hamburguesa.png',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.',
-      isTopSeller: true
+      isTopSeller: true,
+      tag: 'OFERTA',
     },
     {
       id: 2,
@@ -16,6 +17,7 @@ export const products = [
       image: 'src\\assets\\hamburguesa.png',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.',
       isTopSeller: false
+  
     },
     {
       id: 3,
@@ -24,7 +26,8 @@ export const products = [
       category: 'Hamburguesas',
       image: 'src\\assets\\hamburguesa.png',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.',
-      isTopSeller: false
+      isTopSeller: false,
+      tag: 'NOVEDAD',
     },
     {
       id: 4,
@@ -187,6 +190,7 @@ export const products = [
       image: 'src\\assets\\pancho.png',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.',
       isTopSeller: true
+      
     },
     {
       id: 22,
