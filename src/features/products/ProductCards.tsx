@@ -15,7 +15,7 @@ interface ProductCardsProps {
 
 export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-10 justify-center">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-center">
       {products.map((product) => (
         <div
           key={product.id}
