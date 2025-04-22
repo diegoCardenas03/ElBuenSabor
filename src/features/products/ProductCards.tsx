@@ -23,17 +23,17 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
       {products.map((product) => (
         <div
           key={product.id}
-          className="relative bg-white rounded-lg p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-55 w-42 cursor-pointer"
+          className="relative bg-white p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-55 w-42 cursor-pointer"
           onClick={() => onCardClick && onCardClick(product)}
         >
           {/* Cintas solo si showBadges */}
           {showBadges && product.isOffer && (
-            <div className="absolute top-0 left-0 w-full bg-[#BD1E22] text-white text-center text-[12px] font-tertiary py-[1px] rounded-t-lg z-10">
+            <div className="absolute top-0 left-0 w-full bg-[#BD1E22] text-white text-center text-[13px] font-tertiary py-[1px]  z-10">
               OFERTA
             </div>
           )}
           {showBadges && product.isNew && !product.isOffer && (
-            <div className="absolute top-0 left-0 w-full bg-[#FF9D3A] text-white text-center text-[12px] font-tertiary py-[1px] rounded-t-lg z-10">
+            <div className="absolute top-0 left-0 w-full bg-[#FF9D3A] text-white text-center text-[12px] font-tertiary py-[1px]  z-10">
               NOVEDAD
             </div>
           )}
