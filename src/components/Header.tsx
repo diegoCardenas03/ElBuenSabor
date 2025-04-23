@@ -22,7 +22,29 @@ export const Header: React.FC<HeaderProps> = ({
   const handleCloseNavbar = () => setNavbarOpen(false);
 
   return (
-    <header className="relative flex items-center justify-between mb-5 h-20">
+    <header className={whiteUserBar
+      ? "w-full h-24 flex items-center justify-between px-10"
+      : "relative flex items-center justify-between mb-5 h-20"
+    }>
+      {whiteUserBar ? (
+        // Logo a la izquierda
+        <div className="flex items-center">
+          <img
+            src="src\\assets\\el_buen_sabor_logo.png"
+            alt="Logo El Buen Sabor"
+            className="h-20 w-auto"
+          />
+        </div>
+      ) : (
+        // Logo centrado
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <img
+            src="src\\assets\\el_buen_sabor_logo.png"
+            alt="Logo El Buen Sabor"
+            className="h-20 w-auto"
+          />
+        </div>
+      )}
       {/* Izquierda */}
       <div className="flex-shrink-0 flex items-center z-10">
         {!whiteUserBar && showBackButton ? (
@@ -37,14 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
 
-      {/* Logo centrado absolutamente */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-        <img
-          src="src\\assets\\el_buen_sabor_logo.png"
-          alt="Logo El Buen Sabor"
-          className="h-20 w-auto"
-        />
-      </div>
 
       {/* Derecha */}
       <div className="flex-shrink-0 flex items-center space-x-3 z-10">
