@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { IconArrowLeft, IconShoppingCart } from '@tabler/icons-react';
 import { Navbar } from './Navbar';
+import CarritoLateral from './CarritoLateral';
+
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -16,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   nombreUsuario = "Tung Tung Sahur",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
+  const [carritoAbierto, setCarritoAbierto] = useState(false);
 
   const usuarioLogeado = true;
   
@@ -68,7 +71,8 @@ export const Header: React.FC<HeaderProps> = ({
           color={whiteUserBar ? 'white' : 'black'}
           fill={whiteUserBar ? 'white' : ''}
           className="flex-shrink-0"
-        />
+          onClick={() => setCarritoAbierto(true)}/>
+        {carritoAbierto && (<CarritoLateral onClose={() => setCarritoAbierto(false)} />)}
       </div>
 
       {/* Navbar lateral */}
