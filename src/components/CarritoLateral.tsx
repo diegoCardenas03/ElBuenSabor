@@ -2,6 +2,8 @@ import { use, useEffect, useState } from 'react';
 import axios from 'axios';
 import { DetallePedido } from '../features/products/DetallePedido';
 import { useNavigate } from 'react-router-dom';
+import { IconMapPin } from '@tabler/icons-react';
+import { IconClockHour1 } from '@tabler/icons-react';
 
 const detallePedidos: DetallePedido[] = [
   { id: 1, cantidad: 2, subTotal: 200, pedidoId: 1, productoId: 1, insumoId: 1 },
@@ -123,14 +125,14 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
         </div>
 
         <div className="flex items-center space-x-4 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-clock-hour-2"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 12l3 -2" /><path d="M12 7v5" /></svg>
+          <IconClockHour1 stroke={2} width={25} height={25}/>
           <p className="text-gray-700">12:00</p>
         </div>
 
         {mostrarDireccion && (
           <div className="flex items-center space-x-4 mb-10">
-            <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-map-pin"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></svg>
-            <select className="border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700" defaultValue="Seleccionar dirección">
+            <IconMapPin stroke={2} width={30} height={30}/>
+            <select className="border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none" defaultValue="Seleccionar dirección">
               <option>Direccion1</option>
               <option>Direccion2</option>
               <option>Direccion3</option>

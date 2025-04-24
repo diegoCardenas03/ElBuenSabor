@@ -1,32 +1,28 @@
 import React from 'react'
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { DetallePedido } from '../features/products/DetallePedido';
+import { useState } from 'react';
 import imgDireccion from '../assets/icons/imgdireccion.png';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconChevronCompactRight } from '@tabler/icons-react';
+import { IconCashBanknote } from '@tabler/icons-react';
 
 const DetalleCompra = () => {
     const [mostrarDirecciones, setMostrarDirecciones] = useState(false);
     const [agregarComentario, setAgregarComentario] = useState(false);
 
     return (
-        <div className='bg-primary py-8 px-10'>
-            <div className='sm:flex justify-between'>
+        <div className='bg-primary h-[100%] py-8 px-10'>
+            <div className='lg:flex justify-between'>
                 <div>
                     <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>DETALLE ENTREGA</h1>
-                    <div className="bg-white rounded-lg p-5 w-[700px] shadow-md">
+                    <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
                         <div className='flex items-center justify-between pb-4'>
                             <div className="flex items-center">
                                 <img src={imgDireccion} alt="Dirección" className="w-20 h-20 mr-4" />
                                 <p className="font-bold text-[16px]">Dirección</p>
                             </div>
-                            <svg onClick={() => setMostrarDirecciones(true)} xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="text-gray-600">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M11 4l3 8l-3 8" />
-                            </svg>
+                            <IconChevronCompactRight stroke={2} className="text-gray-600" onClick={() => setMostrarDirecciones(true)}/>
                             {mostrarDirecciones && (
                                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                                    <div className="bg-white p-6 rounded-lg shadow-lg w-[450px] relative">
+                                    <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
                                         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => setMostrarDirecciones(false)}>
                                             ✕
                                         </button>
@@ -61,13 +57,10 @@ const DetalleCompra = () => {
 
                         <div className="flex items-center justify-between pb-4">
                             <p className="font-bold text-[16px] pl-2">Agregar comentario</p>
-                            <svg onClick={() => setAgregarComentario(true)} xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="text-gray-600">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M11 4l3 8l-3 8" />
-                            </svg>
+                            <IconChevronCompactRight stroke={2} className="text-gray-600" onClick={() => setAgregarComentario(true)}/>
                             {agregarComentario && (
                                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                                    <div className="bg-white p-6 rounded-lg shadow-lg w-[450px] relative">
+                                    <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
                                         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => setAgregarComentario(false)}>
                                             ✕
                                         </button>
@@ -92,11 +85,11 @@ const DetalleCompra = () => {
                     </div>
                     <div className='pt-10'>
                         <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>MEDIOS DE PAGO</h1>
-                        <div className="bg-white rounded-lg p-5 w-[700px] shadow-md">
+                        <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
                             <div className='flex'>
                                 <input type="radio" name="metodoPago" className="relative right-[-20px] accent-red-800 ..." />
                                 <p className='pl-8 font-bold text-[16px]'>Efectivo</p>
-                                <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-cash-banknote relative right-[-15px]"><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M3 8a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M18 12h.01" /><path d="M6 12h.01" /></svg>
+                                <IconCashBanknote stroke={2} className='ml-2'/>
                             </div>
                             <div className="border-b border-gray-300 my-4"></div>
                             <div className='flex'>
@@ -107,30 +100,34 @@ const DetalleCompra = () => {
                     </div>
                 </div>
 
-                <div className="pr-10 text-center">
-                    <h1 className="font-tertiary text-secondary text-[20px] sm:text-[30px] mb-5 pt-5">RESUMEN</h1>
+                <div className="text-left lg:text-center ">
+                    <h1 className="font-tertiary text-secondary text-[20px] sm:text-[30px] mb-5 pt-10 pl-5 lg:pt-0">RESUMEN</h1>
 
-                    <div className="bg-white w-[400px] shadow-md rounded-lg p-6">
-                        <div className="flex justify-between mb-2">
-                            <p>Productos</p>
-                            <p>$10000</p>
+                    <div className="bg-white shadow-md rounded-lg p-6 lg:w-[480px] lg:h-[300px] flex flex-col justify-between">
+                        <div>
+                            <div className="flex justify-between mb-3">
+                                <p>Productos</p>
+                                <p>$10000</p>
+                            </div>
+                            <div className="flex justify-between mb-3">
+                                <p>Envío</p>
+                                <p>$400</p>
+                            </div>
+                            <div className="flex justify-between mb-3">
+                                <p>Tarifa de servicio</p>
+                                <p>$150</p>
+                            </div>
                         </div>
-                        <div className="flex justify-between mb-2">
-                            <p>Envío</p>
-                            <p>$400</p>
-                        </div>
-                        <div className="flex justify-between mb-4 pb-10">
-                            <p>Tarifa de servicio</p>
-                            <p>$150</p>
-                        </div>
-                        <div className="border-t border-gray-300 my-2"></div>
-                        <div className="flex justify-between font-bold text-[16px]">
-                            <p>Total</p>
-                            <p>$10550</p>
+                        <div>
+                            <div className="border-t border-gray-300 my-2"></div>
+                            <div className="flex justify-between font-bold text-[16px]">
+                                <p>Total</p>
+                                <p>$10550</p>
+                            </div>
                         </div>
                     </div>
-                    <div className='pt-20'>
-                        <button className='bg-tertiary rounded-full w-75 h-8 text-[16px] hover:scale-102 transition-transform duration-200'>Pedir</button>
+                    <div className='pt-10 text-center md:pt-20'>
+                        <button className='bg-tertiary rounded-full w-75 h-10 text-[18px] md:w-80 hover:scale-102 transition-transform duration-200'>Pedir</button>
                     </div>
                 </div>
             </div>
