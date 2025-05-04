@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   nombreUsuario = "Tung Tung Sahur",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const usuarioLogeado = true;
+  const usuarioLogeado = false;
 
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
