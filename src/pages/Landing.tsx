@@ -1,4 +1,3 @@
-import React from "react";
 import pizza from "../assets/img/pizza-landing.png";
 import CardLanding from "../components/CardLanding";
 import pizzaCarrusel from "../assets/img/pizzaCarrusel.png"
@@ -10,8 +9,8 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import ProdPopulares from "../components/prodPopulares";
 const items = [
-  {id: 1, titulo:"Hamburguesas", imagen: burger1 },
-   {id: 2, titulo:"Pizzas", imagen: pizzaCarrusel},
+{id: 1, titulo:"Hamburguesas", imagen: burger1 },
+  {id: 2, titulo:"Pizzas", imagen: pizzaCarrusel},
 {id: 3, titulo:"Lomos", imagen: pizzaCarrusel},
 {id: 4, titulo:"Panchos", imagen: pizzaCarrusel},
 {id: 5, titulo:"Papas Fritas", imagen: PapasCheddar},

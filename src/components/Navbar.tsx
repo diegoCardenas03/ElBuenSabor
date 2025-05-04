@@ -1,7 +1,8 @@
 import usuarioImg from '../assets/img/usuarioLogeado.jpg';
 import { useState } from 'react';
-import { IconUserFilled, IconReceiptFilled, IconMapPinFilled, IconToolsKitchen2, IconLogout, IconX } from '@tabler/icons-react';
-import ModalLogin from './ModalLogin';
+import ModalLogin from './modals/ModalLogin';
+import ModalRegister from './modals/ModalRegister';
+import { FaTimes, FaUser, FaClipboardList, FaMapMarkerAlt, FaUtensils, FaSignOutAlt  } from "react-icons/fa";
 
 interface NavbarProps {
   open: boolean;
@@ -11,14 +12,14 @@ interface NavbarProps {
 }
 
 const navbarLinks = [
-  { icon: <IconUserFilled stroke={1} fill='white' className="w-7 h-7" />, texto: 'Mi Perfil' },
-  { icon: <IconReceiptFilled stroke={1} fill='white' className="w-7 h-7" />, texto: 'Mis Ordenes' },
-  { icon: <IconMapPinFilled stroke={1} fill='white' className="w-7 h-7" />, texto: 'Mis Direcciones' },
+  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mi Perfil' },
+  { icon: <FaClipboardList  stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Ordenes' },
+  { icon: <FaMapMarkerAlt stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Direcciones' },
 ];
 
 const navbarLinks2 = [
-  { icon: <IconToolsKitchen2 color="white" stroke={2} fill='white' className="w-7 h-7" />, texto: 'Menu' },
-  { icon: <IconUserFilled stroke={1} fill='white' className="w-7 h-7" />, texto: 'Contactanos' },
+  { icon: <FaUtensils  color="white" stroke='1' fill='white' className="w-6 h-6" />, texto: 'Menu' },
+  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Contactanos' },
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -35,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <>
         <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex justify-end">
-            <IconX stroke={2} color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" />
+            <FaTimes stroke='2' color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4"/>
           </div>
           <div className="flex flex-col items-center justify-center h-full">
             <button
@@ -49,9 +50,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Modal Login */}
         {abrirModalLogin && (
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
-            <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg">
+            <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
               <ModalLogin />
-              <IconX stroke={2} onClick={() => setAbrirModalLogin(false)} className="absolute top-4 right-4 cursor-pointer" />
+              {/* <ModalRegister/> */}
+              <FaTimes stroke='4' onClick={() => setAbrirModalLogin(false)} className="w-6 h-6 absolute top-4 right-4 cursor-pointer"/>
+
             </div>
           </div>
         )}
@@ -64,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <>
       <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex justify-end">
-          <IconX stroke={2} color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar" />
+          <FaTimes stroke='2' color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar"/>
         </div>
         <div className="p-4 pt-0 flex align-top justify-between">
           <img src={usuarioImg} alt="Usuario" className="w-12 h-12 rounded-full mx-auto" />
@@ -93,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
           <div className='flex items-center gap-2 w-50 m-auto mb-4'>
-            <IconLogout stroke={2} color='white' fill='none' className="w-7 h-7" />
+            <FaSignOutAlt className="w-6 h-6 text-white" />
             <p className="text-quaternary">Cerrar Sesion</p>
           </div>
         </div>
@@ -103,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
           <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg">
             <ModalLogin />
-            <IconX stroke={2} onClick={() => setAbrirModalLogin(false)} className="absolute top-4 right-4 cursor-pointer" />
+            <FaTimes stroke='2' onClick={() => setAbrirModalLogin(false)} className="absolute top-4 right-4 cursor-pointer"/>
           </div>
         </div>
       )}

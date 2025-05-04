@@ -20,4 +20,25 @@ body{
     box-sizing: border-box;
     margin: 0px;
     padding: 0px;
+    
 }
+
+html{
+    scroll-behavior: smooth;
+    
+}
+
+::-webkit-scrollbar-track {
+    background: #FFF4E0; /* Color del fondo de la barra */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #BD1E22; /* Color del thumb (la parte móvil) */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra vertical */
+    height: 8px; /* Alto de la barra horizontal */
+  }

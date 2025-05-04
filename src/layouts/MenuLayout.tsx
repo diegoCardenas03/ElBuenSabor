@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { IconAdjustmentsHorizontal, IconSearch } from '@tabler/icons-react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { ProductFilterModal } from '../features/products/ProductFilterModal';
+import { FaSearch, FaFilter  } from "react-icons/fa";
 
 interface MenuLayoutProps {
   children: React.ReactNode;
@@ -82,7 +82,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
         {/* Buscador y botón de filtros */}
         <div className="flex flex-row sm:flex-row justify-center gap-2 sm:gap-4 w-full max-w-2xl mx-auto">
           <div className="relative w-full sm:w-64">
-            <IconSearch className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" height="20" />
+            <FaSearch className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 mr-2" height="20"/>
             <input
               type="text"
               placeholder="Buscar por nombre"
@@ -95,7 +95,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
             className="bg-[#d32f2f] hover:bg-[#c62828] rounded-full p-2 flex items-center justify-center w-10 h-10 self-center cursor-pointer"
             onClick={() => setFilterModalOpen(true)}
           >
-            <IconAdjustmentsHorizontal color="white" height="20" />
+            <FaFilter color="white" height="20"/>
           </button>
         </div>
         {/* Etiquetas de filtros activos debajo */}

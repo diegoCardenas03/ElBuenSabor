@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { IconArrowLeft, IconShoppingCart } from '@tabler/icons-react';
+import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
-
+import logo from "../assets/el_buen_sabor_logo.png";
 interface HeaderProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
@@ -16,39 +16,36 @@ export const Header: React.FC<HeaderProps> = ({
   nombreUsuario = "Tung Tung Sahur",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-
   const usuarioLogeado = true;
-  
 
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
 
   return (
-    <header className="relative flex items-center justify-between mb-5 h-20">
-      {/* Izquierda */}
+    <header className="relative flex items-center justify-between mb-5 h-20 px-7 mt-2">
+      {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
-        {!whiteUserBar && showBackButton ? (
+        {showBackButton ? (
           <div className="flex items-center space-x-2 cursor-pointer" onClick={onBackClick}>
-            <div className="bg-orange-400 rounded-full p-0.5">
-              <IconArrowLeft color="white" />
+            <div className="bg-orange-400 rounded-full p-1.5">
+              <FaArrowLeft color='white'/>
             </div>
             <span className="font-tertiary text-black text-base">VOLVER</span>
           </div>
         ) : (
-          <div className="w-[90px]" /> // Espacio reservado para alinear
+          // Logo a la izquierda cuando no hay botón de logo
+          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-100%"/>
         )}
       </div>
 
-      {/* Logo centrado absolutamente */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-        <img
-          src="src\assets\img\BuenSaborLogo.png"
-          alt="Logo El Buen Sabor"
-          className="h-20 w-auto"
-        />
-      </div>
+      {/* Logo centrado solo cuando hay botón de volver */}
+      {showBackButton && (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-100%"/>
+        </div>
+      )}
 
-      {/* Derecha */}
+      {/* Derecha - Sección de usuario y carrito */}
       <div className="flex-shrink-0 flex items-center space-x-3 z-10">
         <span
           className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${
@@ -64,11 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
             whiteUserBar ? 'border-white' : 'border-black'
           }`}
         ></div>
-        <IconShoppingCart
-          color={whiteUserBar ? 'white' : 'black'}
-          fill={whiteUserBar ? 'white' : ''}
-          className="flex-shrink-0"
-        />
+        <FaShoppingCart className='flex-shrink-0' fill={whiteUserBar ? 'white' : ''} color={whiteUserBar ? 'white' : 'black'}/>
       </div>
 
       {/* Navbar lateral */}
