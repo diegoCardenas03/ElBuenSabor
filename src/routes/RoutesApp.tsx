@@ -3,7 +3,7 @@ import { Header } from '../components/Header';
 import DetalleCompra from '../pages/detalleCompra';
 import MisDirecciones from '../pages/misDirecciones';
 
-const App = () => {
+const RoutesApp = () => {
   return (
     <BrowserRouter>
       <Header></Header>
@@ -16,4 +16,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default RoutesApp;

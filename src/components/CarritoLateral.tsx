@@ -1,23 +1,48 @@
 import { use, useEffect, useState } from 'react';
 import axios from 'axios';
-import { DetallePedido } from '../features/products/DetallePedido';
 import { useNavigate } from 'react-router-dom';
 import { IconMapPin } from '@tabler/icons-react';
 import { IconClockHour1 } from '@tabler/icons-react';
+import { Direccion, direccion } from '../pages/misDirecciones';
 
-const detallePedidos: DetallePedido[] = [
-  { id: 1, cantidad: 2, subTotal: 200, pedidoId: 1, productoId: 1, insumoId: 1 },
-  { id: 2, cantidad: 3, subTotal: 100, pedidoId: 1, productoId: 3, insumoId: 9 },
-];
+interface DetallePedido {
+  id: number;
+  cantidad: number;
+  subTotal: number;
+  pedidoId: number;
+  productoId: number;
+  insumoId: number;
+}
 
 type Props = {
   onClose: () => void;
 };
 
 const CarritoLateral: React.FC<Props> = ({ onClose }) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [detallePedido, setDetallePedido] = useState<DetallePedido[]>([]);
-  const [mostrarDireccion, setMostrarDireccion] = useState(false);
+  const [mostrarDireccion, setMostrarDireccion] = useState<boolean>(false);
+  const [tipoEntrega, setTipoEntrega] = useState<'enTienda' | 'delivery' >('enTienda');
   const navigate = useNavigate();
+  const [direcciones, setDirecciones] = useState<Direccion[]>([]);
+  const [direccionSeleccionada, setDireccionSeleccionada] = useState<string>('');
+
+
+  useEffect(() => {
+    const detallePedido: DetallePedido[] = [
+      { id: 1, cantidad: 1, subTotal: 200, pedidoId: 1, productoId: 1, insumoId: 1 },
+      { id: 2, cantidad: 1, subTotal: 100, pedidoId: 1, productoId: 3, insumoId: 9 },
+    ];
+    setDetallePedido(detallePedido);
+    setLoading(false);
+
+    const direcciones = direccion();
+    setDirecciones(direcciones);
+  }
+    , []);
+
+  const formatearDireccion = (d: Direccion) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
   /*useEffect(() => {
     const fetchDetallePedido = async () => {
@@ -25,18 +50,21 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
         const response = await axios.get('http://localhost:3000/api/detallepedido');
         setDetallePedido(response.data);
       } catch (error) {
-        console.error('Error fetching DetallePedido:', error);
+        setError('Error al cargar los detalles del pedido');
+      } finally {
+        setLoading(false);
       }
     }
     fetchDetallePedido();
   }
   , []);*/
 
+  const precioUnitario = 100; // suponiendo precio fijo 100
   const incrementarCantidad = (id: number) => {
     setDetallePedido(prev =>
       prev.map(item =>
         item.id === id
-          ? { ...item, cantidad: item.cantidad + 1, subTotal: (item.cantidad + 1) * 100 } // suponiendo precio fijo 100
+          ? { ...item, cantidad: item.cantidad + 1, subTotal: (item.cantidad + 1) * precioUnitario }
           : item
       )
     );
@@ -46,37 +74,27 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     setDetallePedido(prev =>
       prev.map(item =>
         item.id === id && item.cantidad > 1
-          ? { ...item, cantidad: item.cantidad - 1, subTotal: (item.cantidad - 1) * 100 }
+          ? { ...item, cantidad: item.cantidad - 1, subTotal: (item.cantidad - 1) * precioUnitario }
           : item
       )
     );
   };
 
-  const entregaEnTienda = (enTienda: string, delivery: string) => {
-    const enTiendaButton = document.getElementById(enTienda);
-    const deliveryButton = document.getElementById(delivery);
-    setMostrarDireccion(false);
-
-    if (enTiendaButton && deliveryButton) {
-      enTiendaButton.classList.add('bg-secondary', 'text-white');
-      deliveryButton.classList.remove('bg-secondary', 'text-white');
-    }
-  }
-
-  const entregaDelivery = (delivery: string, enTienda: string) => {
-    const deliveryButton = document.getElementById(delivery);
-    const enTiendaButton = document.getElementById(enTienda);
-    setMostrarDireccion(true);
-
-    if (deliveryButton && enTiendaButton) {
-      deliveryButton.classList.add('bg-secondary', 'text-white');
-      enTiendaButton.classList.remove('bg-secondary', 'text-white');
-    }
-
-  }
+  const eliminarItem = (id: number) => {
+    setDetallePedido(prev => prev.filter(item => item.id !== id));
+  };
 
   const handleRealizarPedido = () => {
-    navigate('/DetalleCompra');
+    const direccionActual = direcciones.find(d => d.id === direccionSeleccionada);
+    navigate('/DetalleCompra', {
+      state: {
+        direccion: direccionActual,
+        tipoEntrega: tipoEntrega,
+        subTotal: subTotal,
+        envio: envio,
+        total: total,
+      }
+    });
     onClose();
   };
 
@@ -85,12 +103,12 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     if (confirmacion) {
       navigate('/');
       onClose();
-    } else {
-
     }
-
-
   }
+
+  const subTotal = detallePedido.reduce((subtotal, item) => subtotal + item.subTotal, 0);
+  const envio = mostrarDireccion ? 200 : 0;
+  const total = subTotal + envio;
 
   return (
     <div className="fixed right-0 top-0 h-screen w-96 bg-primary shadow-lg p-6 rounded-xl z-50 overflow-auto transition-transform duration-300">
@@ -98,7 +116,13 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       <h2 className="text-2xl font-bold text-gray-800 mb-3 pb-2">MI ORDEN</h2>
 
       <div className="p-2">
-        {detallePedidos.map((item: DetallePedido) => (
+        {loading &&
+          <p className="text-gray-600 mb-2">Cargando pedido...</p>
+        }
+        {error &&
+          <p className="text-red-500 mb-2">{error}</p>
+        }
+        {!loading && detallePedido.map((item: DetallePedido) => (
           <div key={item.id} className="flex justify-between items-center mb-3">
             <img src="" alt="" className="left-20 w-14 h-14 rounded-[15px] ring-1 ring-gray-300" />
             <div className="flex flex-col">
@@ -111,7 +135,10 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                 <span>{item.cantidad}</span>
                 <button onClick={() => incrementarCantidad(item.id)} className="px-2 py-1 rounded-full">+</button>
               </div>
-              <button className="bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">Eliminar</button>
+              <button onClick={() => eliminarItem(item.id)}
+                className="bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
+                Eliminar
+              </button>
             </div>
           </div>
         ))}
@@ -120,41 +147,57 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       <h2 className="text-2xl font-bold text-gray-800 mt-3 mb-4 pb-2">ENTREGA</h2>
       <div className='space-y-8'>
         <div className="flex justify-around items-center space-x-5">
-          <button onClick={() => entregaEnTienda('enTienda', 'delivery')} id='enTienda' className="border border-gray-300 text-gray-700 px-4 py-1 rounded-full">En tienda</button>
-          <button onClick={() => entregaDelivery('delivery', 'enTienda')} id='delivery' className="border border-gray-300 g-secondary text-gray-700 px-4 py-1 rounded-full">Delivery</button>
+          <button
+            onClick={() => { setTipoEntrega("enTienda"); setMostrarDireccion(false); }}
+            className={`border px-4 py-1 rounded-full ${tipoEntrega === 'enTienda' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
+            En tienda
+          </button>
+          <button
+            onClick={() => { setTipoEntrega("delivery"); setMostrarDireccion(true); }}
+            className={`border px-4 py-1 rounded-full ${tipoEntrega === 'delivery' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
+            Delivery
+          </button>
         </div>
 
         <div className="flex items-center space-x-4 mb-4">
-          <IconClockHour1 stroke={2} width={25} height={25}/>
+          <IconClockHour1 stroke={2} width={25} height={25} />
           <p className="text-gray-700">12:00</p>
         </div>
 
         {mostrarDireccion && (
           <div className="flex items-center space-x-4 mb-10">
-            <IconMapPin stroke={2} width={30} height={30}/>
-            <select className="border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none" defaultValue="Seleccionar dirección">
-              <option>Direccion1</option>
-              <option>Direccion2</option>
-              <option>Direccion3</option>
+            <IconMapPin stroke={2} width={30} height={30} />
+            <select
+              className="border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
+              value={direccionSeleccionada}
+              onChange={(e) => setDireccionSeleccionada(e.target.value)}
+            >
+              <option value="" disabled>Seleccionar dirección</option>
+              {direcciones.map((dir) => (
+                <option key={dir.id} value={dir.id}>
+                  {formatearDireccion(dir)}
+                </option>
+              ))}
             </select>
+
           </div>)}
       </div>
 
       <div className="space-y-4 border-t pt-4">
         <div className="flex justify-between mb-4">
           <p className="text-gray-700">Subtotal:</p>
-          <p className="text-gray-700">${detallePedido.reduce((subtotal, item) => subtotal + item.subTotal, 0)}</p>
+          <p className="text-gray-700">${subTotal}</p>
         </div>
 
         {mostrarDireccion && (
           <div className="flex justify-between mb-4">
-            <p className="text-gray-700">Delivery:</p>
-            <p className="text-gray-700">$0</p>
+            <p className="text-gray-700">Envio:</p>
+            <p className="text-gray-700">${envio}</p>
           </div>)}
 
         <div className="flex justify-between mb-4">
           <p className="font-bold">Total:</p>
-          <p className="font-bold">${detallePedido.reduce((total, item) => total + item.subTotal, 0)}</p>
+          <p className="font-bold">${total}</p>
         </div>
         <button onClick={handleRealizarPedido} className="bg-secondary text-white px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200">Realizar pedido</button>
         <button onClick={handleCancelarPedido} className="bg-tertiary border border-gray-300 px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200">Cancelar pedido</button>

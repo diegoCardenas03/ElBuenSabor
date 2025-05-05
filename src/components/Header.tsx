@@ -72,7 +72,9 @@ export const Header: React.FC<HeaderProps> = ({
           fill={whiteUserBar ? 'white' : ''}
           className="flex-shrink-0"
           onClick={() => setCarritoAbierto(true)}/>
-        {carritoAbierto && (<CarritoLateral onClose={() => setCarritoAbierto(false)} />)}
+        {carritoAbierto && (
+          <CarritoLateral onClose={() => setCarritoAbierto(false)} 
+        />)}
       </div>
 
       {/* Navbar lateral */}
