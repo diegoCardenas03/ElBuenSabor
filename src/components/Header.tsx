@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
 import logo from "../assets/el_buen_sabor_logo.png";
+import CarritoLateral from './CarritoLateral';
+
+
 interface HeaderProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
@@ -16,7 +19,10 @@ export const Header: React.FC<HeaderProps> = ({
   nombreUsuario = "Tung Tung Sahur",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const usuarioLogeado = false;
+  const [carritoAbierto, setCarritoAbierto] = useState(false);
+
+  const usuarioLogeado = true;
+  
 
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
