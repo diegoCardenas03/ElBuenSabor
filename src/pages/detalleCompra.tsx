@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import imgDireccion from '../assets/icons/imgdireccion.png';
-import { IconChevronCompactRight, IconCashBanknote } from '@tabler/icons-react';
 import { useLocation } from 'react-router-dom';
 import { Direccion, direccion } from '../pages/misDirecciones';
+import { FaMoneyBillAlt, FaAngleRight  } from "react-icons/fa";
+import { Header } from '../components/Header';
 
 type MetodoPago = 'efectivo' | 'mercadoPago';
 
@@ -50,7 +51,8 @@ const DetalleCompra = () => {
 
     return (
         <>
-            <div className='bg-primary h-[100%] py-8 px-10'>
+            <Header/>
+            <div className='bg-primary h-[100%] py-8 px-10 pt-10'>
                 <div className='lg:flex justify-between'>
                     <div>
                         {tipoEntregaState ? (
@@ -66,7 +68,7 @@ const DetalleCompra = () => {
                                                     || 'Seleccione una dirección'}
                                             </p>
                                         </div>
-                                        <IconChevronCompactRight stroke={2} className="text-gray-600" onClick={() => setMostrarDirecciones(true)} />
+                                        <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setMostrarDirecciones(true)} />
                                     </div>
 
                                     <div className="border-b border-gray-300 mb-4"></div>
@@ -75,7 +77,7 @@ const DetalleCompra = () => {
                                         <p className={`${!comentarioState.actual ? 'font-bold' : 'text-gray-500'} text-[16px] pl-2`}>
                                             {comentarioState.actual || "Agregar comentario"}
                                         </p>
-                                        <IconChevronCompactRight stroke={2} className="text-gray-600" onClick={() => setAgregarComentario(true)} />
+                                        <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setAgregarComentario(true)} />
                                     </div>
 
                                     <div className="border-b border-gray-300 mb-4"></div>
@@ -106,7 +108,7 @@ const DetalleCompra = () => {
                                         <p className={`${!comentarioState.actual ? 'font-bold' : 'text-gray-500'} text-[16px] pl-2`}>
                                             {comentarioState.actual || "Agregar comentario"}
                                         </p>
-                                        <IconChevronCompactRight stroke={2} className="text-gray-600" onClick={() => setAgregarComentario(true)} />
+                                        <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setAgregarComentario(true)} />
                                     </div>
 
                                     <div className="border-b border-gray-300 mb-4"></div>
@@ -131,10 +133,10 @@ const DetalleCompra = () => {
                                         value='efectivo'
                                         checked={metodoPago === 'efectivo'}
                                         onChange={() => setMetodoPago('efectivo')}
-                                        className='accent-red-800 mr-3'
+                                        className='accent-red-800 mr-3 cursor-pointer'
                                     />
                                     <p className='font-bold'>Efectivo</p>
-                                    <IconCashBanknote stroke={2} className='ml-2' />
+                                    <FaMoneyBillAlt  stroke='2' className='ml-2'/>
                                 </label>
 
                                 <div className="border-b border-gray-300 mb-4 mt-4"></div>
@@ -146,7 +148,7 @@ const DetalleCompra = () => {
                                         value='mercadoPago'
                                         checked={metodoPago === 'mercadoPago'}
                                         onChange={() => setMetodoPago('mercadoPago')}
-                                        className='accent-red-800 mr-3'
+                                        className='accent-red-800 mr-3 cursor-pointer'
                                     />
                                     <p className='font-bold'>Mercado Pago</p>
                                 </label>
@@ -183,7 +185,7 @@ const DetalleCompra = () => {
                             </div>
                         </div>
                         <div className='pt-10 text-center md:pt-20'>
-                            <button className='bg-tertiary rounded-full w-75 h-10 text-[18px] md:w-80 hover:scale-102 transition-transform duration-200'>Pedir</button>
+                            <button className='bg-tertiary rounded-full w-75 h-10 text-[18px] md:w-80 hover:scale-102 transition-transform duration-200 cursor-pointer'>Pedir</button>
                         </div>
                     </div>
                 </div>
@@ -228,7 +230,7 @@ const DetalleCompra = () => {
             {agregarComentario && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
-                        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setAgregarComentario(false); setComentarioState({ ...comentarioState, temporal: comentarioState.actual }); }}>
+                        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 cursor-pointer" onClick={() => { setAgregarComentario(false); setComentarioState({ ...comentarioState, temporal: comentarioState.actual }); }}>
                             ✕
                         </button>
                         <h2 className="text-secondary font-primary font-bold pb-8 pl-5 text-[20px]">¿Qué comentario querés agregar?</h2>
@@ -241,7 +243,7 @@ const DetalleCompra = () => {
                             placeholder='Escribí tu comentario...'
                         />
                         <div className="pt-8 flex justify-center">
-                            <button className='bg-tertiary rounded-full px-5 py-1 hover:scale-102 transition-transform duration-200'
+                            <button className='bg-tertiary rounded-full px-5 py-1 hover:scale-102 transition-transform duration-200 cursor-pointer'
                                 onClick={() => handleSubmit('comentario')}>
                                 Continuar
                             </button>

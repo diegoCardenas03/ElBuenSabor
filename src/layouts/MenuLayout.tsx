@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { ProductFilterModal } from '../features/products/ProductFilterModal';
-import { FaSearch, FaFilter  } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
+import { HiOutlineAdjustments } from "react-icons/hi";
 
 interface MenuLayoutProps {
   children: React.ReactNode;
@@ -95,7 +96,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
             className="bg-[#d32f2f] hover:bg-[#c62828] rounded-full p-2 flex items-center justify-center w-10 h-10 self-center cursor-pointer"
             onClick={() => setFilterModalOpen(true)}
           >
-            <FaFilter color="white" height="20"/>
+            <HiOutlineAdjustments className='rotate-90 w-6 h-6' color="white"/>
           </button>
         </div>
         {/* Etiquetas de filtros activos debajo */}

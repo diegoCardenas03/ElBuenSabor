@@ -1,9 +1,8 @@
-import { use, useEffect, useState } from 'react';
+import {useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { IconMapPin } from '@tabler/icons-react';
-import { IconClockHour1 } from '@tabler/icons-react';
 import { Direccion, direccion } from '../pages/misDirecciones';
+import { FaRegClock, FaMapMarkerAlt  } from "react-icons/fa";
 
 interface DetallePedido {
   id: number;
@@ -112,7 +111,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className="fixed right-0 top-0 h-screen w-96 bg-primary shadow-lg p-6 rounded-xl z-50 overflow-auto transition-transform duration-300">
-      <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-xl">✕</button>
+      <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-xl cursor-pointer">✕</button>
       <h2 className="text-2xl font-bold text-gray-800 mb-3 pb-2">MI ORDEN</h2>
 
       <div className="p-2">
@@ -131,12 +130,12 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <button onClick={() => decrementarCantidad(item.id)} className="px-2 py-1 rounded-full">–</button>
+                <button onClick={() => decrementarCantidad(item.id)} className="px-2 py-1 rounded-full cursor-pointer">–</button>
                 <span>{item.cantidad}</span>
-                <button onClick={() => incrementarCantidad(item.id)} className="px-2 py-1 rounded-full">+</button>
+                <button onClick={() => incrementarCantidad(item.id)} className="px-2 py-1 rounded-full cursor-pointer">+</button>
               </div>
               <button onClick={() => eliminarItem(item.id)}
-                className="bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
+                className="cursor-pointer bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
                 Eliminar
               </button>
             </div>
@@ -149,26 +148,26 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
         <div className="flex justify-around items-center space-x-5">
           <button
             onClick={() => { setTipoEntrega("enTienda"); setMostrarDireccion(false); }}
-            className={`border px-4 py-1 rounded-full ${tipoEntrega === 'enTienda' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
+            className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === 'enTienda' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
             En tienda
           </button>
           <button
             onClick={() => { setTipoEntrega("delivery"); setMostrarDireccion(true); }}
-            className={`border px-4 py-1 rounded-full ${tipoEntrega === 'delivery' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
+            className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === 'delivery' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
             Delivery
           </button>
         </div>
 
         <div className="flex items-center space-x-4 mb-4">
-          <IconClockHour1 stroke={2} width={25} height={25} />
+          <FaRegClock stroke='2'className='w-7 h-7'/>
           <p className="text-gray-700">12:00</p>
         </div>
 
         {mostrarDireccion && (
           <div className="flex items-center space-x-4 mb-10">
-            <IconMapPin stroke={2} width={30} height={30} />
+            <FaMapMarkerAlt  stroke='2' className='w-7 h-7'/>
             <select
-              className="border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
+              className="cursor-pointer border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
               value={direccionSeleccionada}
               onChange={(e) => setDireccionSeleccionada(e.target.value)}
             >
@@ -199,8 +198,8 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
           <p className="font-bold">Total:</p>
           <p className="font-bold">${total}</p>
         </div>
-        <button onClick={handleRealizarPedido} className="bg-secondary text-white px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200">Realizar pedido</button>
-        <button onClick={handleCancelarPedido} className="bg-tertiary border border-gray-300 px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200">Cancelar pedido</button>
+        <button onClick={handleRealizarPedido} className="bg-secondary text-white px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Realizar pedido</button>
+        <button onClick={handleCancelarPedido} className="bg-tertiary border border-gray-300 px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Cancelar pedido</button>
       </div>
 
 

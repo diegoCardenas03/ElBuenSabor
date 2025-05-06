@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleCloseNavbar = () => setNavbarOpen(false);
 
   return (
-    <header className="relative flex items-center justify-between mb-5 h-20 px-7 mt-2">
+    <header className="relative flex items-center justify-between h-20 px-7">
       {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
         {showBackButton ? (
@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Logo centrado solo cuando hay botón de volver */}
       {showBackButton && (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+        <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
           <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-100%"/>
         </div>
       )}
@@ -67,7 +67,10 @@ export const Header: React.FC<HeaderProps> = ({
             whiteUserBar ? 'border-white' : 'border-black'
           }`}
         ></div>
-        <FaShoppingCart className='flex-shrink-0' fill={whiteUserBar ? 'white' : ''} color={whiteUserBar ? 'white' : 'black'}/>
+        <FaShoppingCart className='flex-shrink-0 cursor-pointer' fill={whiteUserBar ? 'white' : ''} color={whiteUserBar ? 'white' : 'black'} onClick={() => setCarritoAbierto(true)}/>
+        {carritoAbierto && (
+          <CarritoLateral onClose={() => setCarritoAbierto(false)} 
+        />)} 
       </div>
 
       {/* Navbar lateral */}
