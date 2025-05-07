@@ -3,13 +3,14 @@ import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
 import logo from "../assets/el_buen_sabor_logo.png";
 import CarritoLateral from './CarritoLateral';
-
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
   whiteUserBar?: boolean;
   nombreUsuario?: string;
+  backgroundColor?: string;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,45 +18,53 @@ export const Header: React.FC<HeaderProps> = ({
   onBackClick,
   whiteUserBar = false,
   nombreUsuario = "Tung Tung Sahur",
+  backgroundColor = "none",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [carritoAbierto, setCarritoAbierto] = useState(false);
 
   const usuarioLogeado = true;
-  
 
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
 
   return (
-    <header className="relative flex items-center justify-between h-20 px-7">
+    <header
+      className={`relative flex items-center justify-between h-20 px-7 ${backgroundColor}`}
+    >
       {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
         {showBackButton ? (
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={onBackClick}>
-            <div className="bg-orange-400 rounded-full p-1.5">
-              <FaArrowLeft color='white'/>
-            </div>
-            <span className="font-tertiary text-black text-base">VOLVER</span>
+          <div
+            className="flex items-center space-x-2 cursor-pointer"
+            onClick={onBackClick}
+          >
+            <Link to={"/"} className="flex items-center space-x-2">
+              <div className="bg-orange-400 rounded-full p-1.5">
+                <FaArrowLeft color="white" />
+              </div>
+              <span className="font-tertiary text-black text-base">VOLVER</span>
+            </Link>
           </div>
         ) : (
-          // Logo a la izquierda cuando no hay botón de logo
-          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-100%"/>
+          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
         )}
       </div>
 
       {/* Logo centrado solo cuando hay botón de volver */}
-      {showBackButton && (
-        <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-100%"/>
-        </div>
-      )}
+      <Link to={"/"}>
+        {showBackButton && (
+          <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+            <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+          </div>
+        )}
+      </Link>
 
-      {/* Derecha - Sección de usuario y carrito */}
+      {/* Derecha - Usuario y carrito */}
       <div className="flex-shrink-0 flex items-center space-x-3 z-10">
         <span
           className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${
-            whiteUserBar ? 'text-white' : 'text-black'
+            whiteUserBar ? "text-white" : "text-black"
           }`}
           onClick={handleUserClick}
           title={nombreUsuario}
@@ -64,16 +73,20 @@ export const Header: React.FC<HeaderProps> = ({
         </span>
         <div
           className={`h-5 border-l flex-shrink-0 ${
-            whiteUserBar ? 'border-white' : 'border-black'
+            whiteUserBar ? "border-white" : "border-black"
           }`}
         ></div>
-        <FaShoppingCart className='flex-shrink-0 cursor-pointer' fill={whiteUserBar ? 'white' : ''} color={whiteUserBar ? 'white' : 'black'} onClick={() => setCarritoAbierto(true)}/>
+        <FaShoppingCart
+          className="flex-shrink-0 cursor-pointer"
+          fill={whiteUserBar ? "white" : ""}
+          color={whiteUserBar ? "white" : "black"}
+          onClick={() => setCarritoAbierto(true)}
+        />
         {carritoAbierto && (
-          <CarritoLateral onClose={() => setCarritoAbierto(false)} 
-        />)} 
+          <CarritoLateral onClose={() => setCarritoAbierto(false)} />
+        )}
       </div>
 
-      {/* Navbar lateral */}
       <Navbar
         open={navbarOpen}
         onClose={handleCloseNavbar}

@@ -51,7 +51,7 @@ const DetalleCompra = () => {
 
     return (
         <>
-            <Header/>
+            <Header backgroundColor='bg-primary'/>
             <div className='bg-primary h-[100%] py-8 px-10 pt-10'>
                 <div className='lg:flex justify-between'>
                     <div>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import ModalLogin from './modals/ModalLogin';
 import ModalRegister from './modals/ModalRegister';
 import { FaTimes, FaUser, FaClipboardList, FaMapMarkerAlt, FaUtensils, FaSignOutAlt  } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   open: boolean;
@@ -12,14 +13,14 @@ interface NavbarProps {
 }
 
 const navbarLinks = [
-  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mi Perfil' },
-  { icon: <FaClipboardList  stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Ordenes' },
-  { icon: <FaMapMarkerAlt stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Direcciones' },
+  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mi Perfil', to:'' },
+  { icon: <FaClipboardList  stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Ordenes', to:'' },
+  { icon: <FaMapMarkerAlt stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Direcciones', to:'/MisDirecciones' }
 ];
 
 const navbarLinks2 = [
-  { icon: <FaUtensils  color="white" stroke='1' fill='white' className="w-6 h-6" />, texto: 'Menu' },
-  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Contactanos' },
+  { icon: <FaUtensils  color="white" stroke='1' fill='white' className="w-6 h-6" />, texto: 'Menu', to:'/Menu' },
+  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Contactanos', to:'' }
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -65,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Si está logeado, muestra el menú lateral completo
   return (
     <>
-      <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'} `}>
         <div className="flex justify-end">
           <FaTimes stroke='2' color='white' onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar"/>
         </div>
@@ -79,20 +80,20 @@ export const Navbar: React.FC<NavbarProps> = ({
         <hr className='text-quaternary w-40 m-auto ' />
         <div className="p-4 ml-4 cursor-pointer">
           {navbarLinks.map((link, index) => (
-            <div key={index} className="flex items-center gap-2 w-50 m-auto mb-4 mt-4">
+            <Link to={link.to} key={index} className='text-white flex items-center gap-2 w-50 m-auto mb-4 mt-4'>
               {link.icon}
-              <p className="text-quaternary">{link.texto}</p>
-            </div>
+              <p className='text-quarternary'>{link.texto}</p>
+            </Link>
           ))}
         </div>
         <hr className='text-quaternary w-40 m-auto' />
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
-          {navbarLinks2.map((link, index) => (
-            <div key={index} className="flex items-center gap-2 w-50 m-auto mb-4 mt-4">
-              {link.icon}
-              <p className="text-quaternary">{link.texto}</p>
-            </div>
-          ))}
+            {navbarLinks2.map((link, index) => (
+              <Link to={link.to} key={index} className='text-white flex items-center gap-2 w-50 m-auto mb-4 mt-4'>
+                {link.icon}
+                <p className='text-quarternary'>{link.texto}</p>
+              </Link>
+            ))}
         </div>
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
           <div className='flex items-center gap-2 w-50 m-auto mb-4'>

@@ -37,7 +37,7 @@ const MisDirecciones = () => {
 
     return (
         <>
-            <Header />
+            <Header backgroundColor='bg-primary'/>
             <div className="bg-primary flex flex-col justify-center align-center">
                 <h1 className="font-tertiary pt-10 text-[40px] flex justify-center">Mis Direcciones</h1>
 
