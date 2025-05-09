@@ -86,18 +86,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             <nav className="flex-1 overflow-y-auto px-4">
               <div className="space-y-2">
                 {menuPorRol[rol]?.map((item, index) => (
-                  <Link
-                    key={index}
-                    to={item.path}
-                    className="
-                      block w-full px-4 py-3 
-                      text-white text-center
-                      hover:bg-white/10 
-                      rounded-lg
-                      transition-colors duration-200
-                    "
-                    onClick={toggleNavbar}
-                  >
+                  <Link key={index} to={item.path} className=" block w-full px-4 py-3  text-white text-center hover:bg-white/10  rounded-lg transition-colors duration-200 " onClick={toggleNavbar}>
                     {item.label}
                   </Link>
                 ))}
@@ -106,11 +95,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
             {/* Pie del navbar */}
             <div className="p-4 border-t border-white/10 ">
-              <button className="
-                flex items-center justify-center gap-2 w-full
-                px-4 py-2 text-gray-300 hover:text-white
-                transition-colors duration-200
-              cursor-pointer ">
+              <button className="flex items-center justify-center gap-2 w-fullpx-4 py-2 text-gray-300 hover:text-whitetransition-colors duration-200cursor-pointer ">
                 <FaSignOutAlt />
                 <span>Cerrar sesión</span>
               </button>
