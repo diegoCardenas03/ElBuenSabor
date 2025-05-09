@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
-import logo from "../assets/el_buen_sabor_logo.png";
+import logo from "../../assets/el_buen_sabor_logo.png";
 import CarritoLateral from './CarritoLateral';
 import { Link } from 'react-router-dom';
 

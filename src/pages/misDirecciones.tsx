@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pizza from '../assets/img/pizzaBanco.png'
 import { FaPen, FaTrashAlt, FaMapMarkerAlt   } from "react-icons/fa";
-import { Header } from '../components/Header';
+import { Header } from '../components/commons/Header';
 
 export type Direccion = {
     id: string;

@@ -3,7 +3,7 @@ import imgDireccion from '../assets/icons/imgdireccion.png';
 import { useLocation } from 'react-router-dom';
 import { Direccion, direccion } from '../pages/misDirecciones';
 import { FaMoneyBillAlt, FaAngleRight  } from "react-icons/fa";
-import { Header } from '../components/Header';
+import { Header } from '../components/commons/Header';
 
 type MetodoPago = 'efectivo' | 'mercadoPago';
 

@@ -1,7 +1,7 @@
-import usuarioImg from '../assets/img/usuarioLogeado.jpg';
+import usuarioImg from '../../assets/img/usuarioLogeado.jpg';
 import { useState } from 'react';
-import ModalLogin from './modals/ModalLogin';
-import ModalRegister from './modals/ModalRegister';
+import ModalLogin from '../modals/ModalLogin';
+import ModalRegister from '../modals/ModalRegister';
 import { FaTimes, FaUser, FaClipboardList, FaMapMarkerAlt, FaUtensils, FaSignOutAlt  } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 

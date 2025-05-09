@@ -1,7 +1,7 @@
 import {useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Direccion, direccion } from '../pages/misDirecciones';
+import { Direccion, direccion } from '../../pages/misDirecciones';
 import { FaRegClock, FaMapMarkerAlt  } from "react-icons/fa";
 
 interface DetallePedido {
