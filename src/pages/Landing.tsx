@@ -26,47 +26,46 @@ const Landing = () => {
 
 
       {/* Círculo rojo derecho (atrás del texto) */}
-      <div className="absolute bg-[#BD1E22] rounded-full z-0 
+    
+      <div className="absolute bg-[#BD1E22] rounded-[300%] z-0 
   w-[90vw] h-[90vw] 
-  sm:w-[120vw] sm:h-[120vw] 
-  md:w-[1000px] md:h-[1000px] 
-  lg:w-[1200px] lg:h-[1200px] 
+  md:w-[1000px] md:h-[900px] 
+  lg:w-[1200px] lg:h-[940px] 
   top-[-40vw] right-[-40vw] 
-  md:top-[-300px] md:right-[-500px]">
-</div>
+  md:top-[-350px] md:right-[-500px]"/>
 
       {/* Contenido principal */}
       <div className="relative z-10">
         <Header whiteUserBar={true} showBackButton={false} />
 
-        <main className="h-screen flex flex-col md:flex-row items-center md:items-start justify-center px-4 md:px-16 gap-10 relative z-20">
-  {/* Pizza */}
-  <div className="w-full md:w-1/2 flex justify-center md:justify-end pt-10 md:pt-0">
-    <img
-      src={pizza}
-      alt="Pizza"
-      className="w-[50vw] md:w-[40vw] lg:w-[35vw] max-w-[500px]"
-    />
-  </div>
+        <main className="h-screen flex flex-col md:flex-row items-center md:items-start justify-center px-4 md:px-16 gap-15 md:gap-40 relative z-20">
+          {/* Pizza */}
+          <div className="w-full md:w-1/2 flex justify-center md:justify-end pt-0 md:pt-30">
+            <img
+              src={pizza}
+              alt="Pizza"
+              className="w-[50vw] md:w-[40vw] lg:w-[35vw] max-w-[500px]"
+            />
+          </div>
 
-  {/* Texto */}
-  <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-6">
-    <h1 className="text-[#FF9D3A] text-[48px] md:text-[80px] lg:text-[15vh] font-tertiary leading-none uppercase">
-      El Buen <br /> Sabor
-    </h1>
-    <Link to="/menu">
-      <button className="bg-[#FFF4E0] text-black px-8 py-2 font-primary rounded-full font-semibold shadow hover:scale-105 transition text-base md:text-lg">
-        Ver el menú completo
-      </button>
-    </Link>
-  </div>
-</main>
+          {/* Texto */}
+          <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-6 md:mt-15">
+            <h1 className="text-[#FF9D3A] text-[48px] md:text-[80px] lg:text-[15vh] font-tertiary leading-none uppercase">
+              El Buen <br /> Sabor
+            </h1>
+            <Link to="/menu">
+              <button className="bg-white md:bg-[#FFF4E0] text-black px-8 py-2 font-primary rounded-full font-semibold shadow hover:scale-105 transition text-base md:text-[14px] md:ml-20 lg:text-lg">
+                Ver el menú completo
+              </button>
+            </Link>
+          </div>
+        </main>
 
 
 
         {/* Productos Populares */}
         <div className="flex flex-col items-center justify-center mt-0 md:mt-10 mb-10 p-6 md:p-20">
-        <div className="flex items-center justify-center gap-6 relative mb-12 flex-wrap">
+          <div className="flex items-center justify-center gap-6 relative mb-12 flex-wrap">
             <h2 className="font-tertiary text-5xl md:text-7xl text-center leading-tight">
               PRODUCTOS<br />POPULARES
             </h2>
