@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
       <Navbar
         open={navbarOpen}
         onClose={handleCloseNavbar}
-        usuarioLogeado={usuarioLogeado}
+        usuarioLogeado={false}
         nombreUsuario={nombreUsuario}
       />
     </header>

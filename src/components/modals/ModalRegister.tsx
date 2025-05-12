@@ -3,6 +3,7 @@ import Confirmar from '../commons/Confirmar';
 import iconFacebook from '../../assets/icons/facebook.svg';
 import iconGoogle from '../../assets/icons/iconGoogle.svg';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { handleGoogleLogin } from "../../utils/auth/GoogleAuth";
 
 const ModalRegister: React.FC = () => {
   const [VerContrasenia, setVerContrasenia] = useState<boolean>(false);
@@ -64,7 +65,10 @@ const ModalRegister: React.FC = () => {
           </button>
 
           {/* Botón Google */}
-          <button className=" cursor-pointer flex items-center justify-center gap-2 border border-gray-300 bg-white hover:bg-gray-100 text-gray-600 font-medium py-1 px-3 w-full max-w-xs rounded-md shadow-md">
+          <button
+          type="button"
+          onClick={handleGoogleLogin} 
+          className=" cursor-pointer flex items-center justify-center gap-2 border border-gray-300 bg-white hover:bg-gray-100 text-gray-600 font-medium py-1 px-3 w-full max-w-xs rounded-md shadow-md">
             <img src={iconGoogle} alt="Google" className="w-4 h-4" />
             Log In with Google
           </button>
