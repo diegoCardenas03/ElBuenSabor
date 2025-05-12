@@ -3,9 +3,11 @@ import Confirmar from '../commons/Confirmar';
 import iconFacebook from '../../assets/icons/facebook.svg';
 import iconGoogle from '../../assets/icons/iconGoogle.svg';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { handleGoogleLogin } from "../../utils/auth/GoogleAuth";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const ModalRegister: React.FC = () => {
+
+  const { loginWithPopup } = useAuth0();
   const [VerContrasenia, setVerContrasenia] = useState<boolean>(false);
   
     const verPassword = (): void => {
@@ -67,7 +69,7 @@ const ModalRegister: React.FC = () => {
           {/* Botón Google */}
           <button
           type="button"
-          onClick={handleGoogleLogin} 
+          onClick ={() => loginWithPopup({ authorizationParams: {connection: 'google-oauth2'}})}
           className=" cursor-pointer flex items-center justify-center gap-2 border border-gray-300 bg-white hover:bg-gray-100 text-gray-600 font-medium py-1 px-3 w-full max-w-xs rounded-md shadow-md">
             <img src={iconGoogle} alt="Google" className="w-4 h-4" />
             Log In with Google
