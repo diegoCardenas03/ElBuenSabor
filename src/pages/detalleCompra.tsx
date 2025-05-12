@@ -195,7 +195,7 @@ const DetalleCompra = () => {
 
             {mostrarDirecciones && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
+                    <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative ">
                         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionState({ ...direccionState, temporal: direccionState.seleccionada }); }}>
                             ✕
                         </button>
@@ -203,12 +203,12 @@ const DetalleCompra = () => {
 
                         <ul className="space-y-2">
                             {direcciones.map(dir => (
-                                <label key={dir.id} className='flex items-center'>
+                                <label key={dir.id} className='flex items-center cursor-pointer pl-8'>
                                     <input
                                         type='radio'
                                         name='direccion'
                                         value={dir.id}
-                                        checked={direccionState.temporal === dir.id}
+                                        checked={direccionState.temporal === dir.id || direccionDesdeState?.id === dir.id} 
                                         onChange={handleChange}
                                         className='accent-red-800 mr-3'
                                     />
@@ -229,14 +229,14 @@ const DetalleCompra = () => {
 
             {agregarComentario && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
+                    <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
                         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 cursor-pointer" onClick={() => { setAgregarComentario(false); setComentarioState({ ...comentarioState, temporal: comentarioState.actual }); }}>
                             ✕
                         </button>
                         <h2 className="text-secondary font-primary font-bold pb-8 pl-5 text-[20px]">¿Qué comentario querés agregar?</h2>
 
                         <textarea
-                            className='w-full h-24 border border-gray-300 rounded-lg p-4'
+                            className='bg-white w-full h-24 border-none rounded-lg p-4'
                             name='comentario'
                             value={comentarioState.temporal}
                             onChange={handleChange}

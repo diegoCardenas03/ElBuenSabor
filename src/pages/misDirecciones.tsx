@@ -90,7 +90,7 @@ const MisDirecciones = () => {
                 <div>
                     {mostrarModal && (
                         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                            <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
+                            <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative flex flex-col justify-center items-center">
                                 <button
                                     className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-800"
                                     onClick={() => {
@@ -102,33 +102,33 @@ const MisDirecciones = () => {
                                 >
                                     ✕
                                 </button>
-                                <h2 className="text-secondary font-primary font-bold pb-4 text-[20px]">
+                                <h2 className="items-center text-secondary font-primary font-bold pb-4 text-[20px]">
                                     {modoEditar ? 'Editar dirección' : 'Agregar nueva dirección'}
                                 </h2>
                                 <input
                                     type="text"
-                                    className="w-full border border-gray-300 rounded-lg p-3 mb-4"
+                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Calle"
                                     value={calle}
                                     onChange={(e) => setDireccionNueva({ ...direccionNueva, calle: e.target.value })}
                                 />
                                 <input
                                     type="text"
-                                    className="w-full border border-gray-300 rounded-lg p-3 mb-4"
+                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Número"
                                     value={numero}
                                     onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value })}
                                 />
                                 <input
                                     type="text"
-                                    className="w-full border border-gray-300 rounded-lg p-3 mb-4"
+                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Localidad"
                                     value={localidad}
                                     onChange={(e) => setDireccionNueva({ ...direccionNueva, localidad: e.target.value })}
                                 />
                                 <input
                                     type="text"
-                                    className="w-full border border-gray-300 rounded-lg p-3 mb-4"
+                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Codigo Postal"
                                     value={codigoPostal}
                                     onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value })}
