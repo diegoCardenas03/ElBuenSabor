@@ -15,7 +15,7 @@ export const MiPerfilUsuarioPage: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = React.useState(false);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<PerfilForm>({
+  const { register, handleSubmit, watch, formState: { errors, isDirty } } = useForm<PerfilForm>({
     defaultValues: {
       nombre: "nOOO La Politzia noOooo",
       telefono: "+5492614360505",
@@ -33,15 +33,15 @@ export const MiPerfilUsuarioPage: React.FC = () => {
 
   return (
     <MiPerfilUsuarioLayout>
-      <div className="w-full max-w-2xl flex flex-col md:flex-row items-start justify-center gap-8 relative">
-        <button className="absolute top-0 right-0 bg-[#d32f2f] hover:bg-[#962020] text-white px-4 py-2 rounded-full font-semibold text-sm cursor-pointer">
+      <div className="w-full max-w-2xl flex flex-col md:flex-row items-start justify-center gap-8 relative px-2">
+        <button className="absolute top-2 right-2 bg-[#d32f2f] hover:bg-[#962020] text-white px-4 py-2 rounded-full font-semibold text-sm cursor-pointer">
           Historial Pedidos
         </button>
         <div className="flex-shrink-0 flex flex-col items-center w-full md:w-auto pt-8">
-          <img src={usuarioImg} alt="Usuario" className="w-32 h-32 rounded-full object-cover mb-2" />
+          <img src={usuarioImg} alt="Usuario" className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mb-2" />
         </div>
         <form
-          className="flex-1 w-full flex flex-col gap-2 mt-2 md:mt-0 pt-8"
+          className="flex-1 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col gap-2 mt-2 md:mt-0 pt-8 mx-auto"
           onSubmit={handleSubmit(onSubmit)}
         >
           <label className="font-semibold text-base mb-1">
@@ -151,7 +151,9 @@ export const MiPerfilUsuarioPage: React.FC = () => {
           </a>
           <button
             type="submit"
-            className="mx-auto mt-6 bg-[#FF9D3A] hover:bg-[#e68a1f] text-black font-bold py-2 px-8 rounded-full text-base shadow cursor-pointer"
+            className="w-full sm:w-auto mx-auto mt-6 bg-[#FF9D3A] hover:bg-[#e68a1f] text-black font-bold py-2 px-8 rounded-full text-base shadow cursor-pointer
+              disabled:bg-[#FFD59E] disabled:hover:bg-[#FFD59E] disabled:text-black disabled:cursor-not-allowed disabled:opacity-100"
+            disabled={!isDirty}
           >
             Guardar Cambios
           </button>

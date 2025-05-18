@@ -54,9 +54,16 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Logo centrado solo cuando hay botón de volver */}
       <Link to={"/"}>
         {showBackButton && (
-          <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-            <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
-          </div>
+          <>
+            {/* Logo centrado en desktop */}
+            <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+              <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+            </div>
+            {/* Logo arriba en mobile */}
+            <div className="block md:hidden absolute left-1/2 top-2 -translate-x-1/2 flex items-center">
+              <img src={logo} alt="Logo El Buen Sabor" className="h-12 w-auto" />
+            </div>
+          </>
         )}
       </Link>
 
@@ -90,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
       <Navbar
         open={navbarOpen}
         onClose={handleCloseNavbar}
-        usuarioLogeado={false}
+        usuarioLogeado={usuarioLogeado}
         nombreUsuario={nombreUsuario}
       />
     </header>
