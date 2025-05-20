@@ -1,9 +1,8 @@
-export interface Domicilio {
+export interface DomicilioResponseDTO {
     id?: number;
     calle: string;
     numero: number;
     localidad: string;
     codigoPostal: number;
-    infoAdicional?: string;
     activo: boolean;
 }

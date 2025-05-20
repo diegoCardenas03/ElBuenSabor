@@ -4,6 +4,7 @@ import DetalleCompra from '../pages/detalleCompra';
 import MisDirecciones from '../pages/misDirecciones';
 import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
+import PedidosCocinero from '../pages/pedidosCocinero';
 
 const RoutesApp = () => {
   return (
@@ -13,6 +14,7 @@ const RoutesApp = () => {
         <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
         <Route path="/MisDirecciones" element={<MisDirecciones />} />
         <Route path="/Menu" element={<Menu />} />
+        <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
       </Routes>
     </BrowserRouter>
   );
