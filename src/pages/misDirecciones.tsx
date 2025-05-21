@@ -2,38 +2,31 @@ import { useEffect, useState } from 'react'
 import Pizza from '../assets/img/pizzaBanco.png'
 import { FaPen, FaTrashAlt, FaMapMarkerAlt   } from "react-icons/fa";
 import { Header } from '../components/Header';
+import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 
-export type Direccion = {
-    id: string;
-    calle: string;
-    numero: string;
-    localidad: string;
-    codigoPostal: string;
-};
-
-export const direccion = (): Direccion[] => {
-    return [
-        { id: '1', calle: 'Av. San Martin', numero: '123', localidad: 'Ciudad', codigoPostal: '1000' },
-        { id: '2', calle: 'Calle Falsa', numero: '456', localidad: 'Godoy Cruz', codigoPostal: '2000' },
-        { id: '3', calle: 'Calle San Juan', numero: '436', localidad: 'Ciudad', codigoPostal: '3000' }
-    ];
-};
+// export const domicilio = (): DomicilioDTO[] => {
+//     return [
+//         { id: "1", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
+//         { id: "2", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
+//         { id: "3", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" }
+//     ];
+// };
 
 const MisDirecciones = () => {
-    const [direcciones, setDirecciones] = useState<Direccion[]>([]);
+    const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
     const [mostrarModal, setMostrarModal] = useState<boolean>(false);
     const [direccionNueva, setDireccionNueva] = useState({calle: '', numero: '', localidad: '', codigoPostal: ''});
     const {calle, numero, localidad, codigoPostal} = direccionNueva;
     const [modoEditar, setModoEditar] = useState<boolean>(false);
-    const [direccionEditando, setDireccionEditando] = useState<Direccion | null>(null);
+    const [direccionEditando, setDireccionEditando] = useState<DomicilioDTO | null>(null);
 
     
-    useEffect(() => {
-        const direcciones = direccion();
-        setDirecciones(direcciones);
-    }, []);
+    // useEffect(() => {
+    //     const direcciones = domicilio();
+    //     setDirecciones(direcciones);
+    // }, []);
 
-    const formatearDireccion = (d: Direccion) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
+    const formatearDireccion = (d: DomicilioDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
     return (
         <>
@@ -75,12 +68,12 @@ const MisDirecciones = () => {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        const nuevas = direcciones.filter(d => d.id !== d.id);
+                                        const nuevas = direcciones.filter(dirItem => dirItem.id !== d.id);
                                         setDirecciones(nuevas);
                                     }}
                                     className="flex items-center cursor-pointer flex bg-primary px-4 py-2 rounded-full mt-2 hover:scale-102 transition-transform duration-200">
                                     Eliminar
-                                    <FaTrashAlt  stroke='2' width={20} height={20} className="relative left-[5px]" />
+                                    <FaTrashAlt stroke='2' width={20} height={20} className="relative left-[5px]" />
                                 </button>
                             </div>
                         </div>
@@ -141,7 +134,7 @@ const MisDirecciones = () => {
                                                 const nuevasDirecciones = direcciones.map(d => d.id === direccionEditando.id ? { ...direccionEditando, ...direccionNueva } : d);
                                                 setDirecciones(nuevasDirecciones);
                                             } else {
-                                                const nuevaDireccion = { id: Math.random().toString(), ...direccionNueva };
+                                                const nuevaDireccion = { ...direccionNueva };
                                                 setDirecciones([...direcciones, nuevaDireccion]);
                                             }
                                             setMostrarModal(false);
