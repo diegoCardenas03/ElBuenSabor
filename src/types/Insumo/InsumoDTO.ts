@@ -12,5 +12,5 @@ export interface InsumoDTO {
     esParaElaborar: boolean;
     activo: boolean;
     unidadMedida: UnidadMedida;
-    rubro: RubroInsumoDTO;
+    rubro: RubroInsumoDTO[];
 }

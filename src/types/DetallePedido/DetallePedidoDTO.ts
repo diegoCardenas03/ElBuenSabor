@@ -2,7 +2,8 @@ import { ProductoDTO } from '../Producto/ProductoDTO';
 import { InsumoDTO } from '../Insumo/InsumoDTO';
 
 export interface DetallePedidoDTO {
-  producto: ProductoDTO[];
-  insumo: InsumoDTO;
+  id: number;
+  productoId?: number;
+  insumo?: InsumoDTO[];
   cantidad: number;
 }

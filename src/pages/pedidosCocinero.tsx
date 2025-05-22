@@ -1,10 +1,10 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { Estado } from '../types/enums/Estado';
 
 
 const PedidosCocinero: React.FC = () => {
-    const [pedidos, setPedidos] = useState<any[]>([]);
+    // const [pedidos, setPedidos] = useState<any[]>([]);
     const [enPreparacion, setEnPreparacion] = useState<any[]>([]);
     const [comandas, setComandas] = useState<any[]>([]);
     const [modalDetallePedido, setModalDetallePedido] = useState<Boolean>(false)
