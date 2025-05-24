@@ -1,170 +1,222 @@
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useState } from 'react';
 import { FaSearch, FaTimes, FaPencilAlt, FaRegTrashAlt, FaAngleUp } from "react-icons/fa";
 import { RubroInsumo } from '../../types/RubroInsumo';
+import { RubroProducto } from '../../types/RubroProducto';
+
+type Rubro = RubroInsumo | RubroProducto;
 
 const Categorias = () => {
   const [modalAbierto, setModalAbierto] = useState<boolean>(false);
   const [nombreRubro, setNombreRubro] = useState<string>("");
-  const [tipoRubro, setTipoRubro] = useState<string>("");
+  const [tipoRubro, setTipoRubro] = useState<"Insumo" | "Producto">("Insumo");
   const [rubroPadreSeleccionado, setRubroPadreSeleccionado] = useState<string>("");
-  const [rubros, setRubros] = useState<RubroInsumo[]>([]);
-  const [subCategoriasAbiertas, setSubCategoriasAbiertas] = useState<{ [key: number]: boolean }>({});
+  const [rubrosInsumos, setRubrosInsumos] = useState<RubroInsumo[]>([]);
+  const [rubrosProductos, setRubrosProductos] = useState<RubroProducto[]>([]);
+  const [busqueda, setBusqueda] = useState<string>("");
+  const [opcionFiltrar, setOpcionFiltrar] = useState<"Insumo" | "Producto" | "">("");
 
-  const abrirModal = () => {
-    setModalAbierto(!modalAbierto);
+  // Función recursiva para obtener todos los rubros Insumo (para seleccionar padre)
+  const obtenerRubrosInsumoAnidados = (rubros: RubroInsumo[]): RubroInsumo[] => {
+    return rubros.flatMap(rubro => [rubro, ...obtenerRubrosInsumoAnidados(rubro.subRubros)]);
+  };
+
+  // Crear nuevo rubro (Insumo con subcategorías o Producto sin ellas)
+  const crearRubro = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nombreRubro || !tipoRubro) return;
+
+    if (tipoRubro === "Insumo") {
+      const nuevoRubro: RubroInsumo = {
+        id: Date.now(),
+        denominacion: nombreRubro,
+        activo: true,
+        tipo: "Insumo",
+        subRubros: [],
+      };
+
+      // Lógica para padre (solo Insumo)
+      if (rubroPadreSeleccionado) {
+        const encontrarPadre = (rubros: RubroInsumo[]): RubroInsumo | undefined => {
+          for (const rubro of rubros) {
+            if (rubro.id === Number(rubroPadreSeleccionado)) return rubro;
+            const encontrado = encontrarPadre(rubro.subRubros);
+            if (encontrado) return encontrado;
+          }
+        };
+
+        const padre = encontrarPadre(rubrosInsumos);
+        if (padre) {
+          padre.subRubros.push(nuevoRubro);
+          setRubrosInsumos([...rubrosInsumos]);
+        }
+      } else {
+        setRubrosInsumos([...rubrosInsumos, nuevoRubro]);
+      }
+    } else {
+      // Lógica para Producto (sin padre ni subcategorías)
+      const nuevoProducto: RubroProducto = {
+        id: Date.now(),
+        denominacion: nombreRubro,
+        activo: true,
+        tipo: "Producto",
+      };
+      setRubrosProductos([...rubrosProductos, nuevoProducto]);
+    }
+
+    setModalAbierto(false);
     setNombreRubro("");
-    setTipoRubro("");
     setRubroPadreSeleccionado("");
   };
 
-  const opcionElegida = (opcion: string) => {
-    return setOpcionFiltrar(opcion);
-  }
+  // Componente para mostrar rubros (maneja Insumo y Producto)
+  const RubroItem = ({ rubro, nivel = 0 }: { rubro: Rubro; nivel?: number }) => {
+    const [subAbierto, setSubAbierto] = useState(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setBusqueda(e.target.value);
-  };
+    return (
+      <div className="w-full">
+        <div className="flex items-center h-10">
+          <div className="w-1/2 pl-10 flex items-center gap-5" style={{ marginLeft: `${rubro.tipo === "Insumo" ? nivel * 20 : 0}px` }}>
+            <p className="underline">{rubro.denominacion}</p>
+          </div>
+          <div className="flex justify-end w-full pr-10 gap-5">
+            <FaPencilAlt className="cursor-pointer hover:text-tertiary" />
+            <FaRegTrashAlt
+              className="cursor-pointer hover:text-tertiary"
+              onClick={() => {
+                if (rubro.tipo === "Insumo") {
+                  setRubrosInsumos(rubrosInsumos.filter(r => r.id !== rubro.id));
+                } else {
+                  setRubrosProductos(rubrosProductos.filter(r => r.id !== rubro.id));
+                }
+              }}
+            />
+            {/* Solo mostrar flecha para Insumos con subcategorías */}
+            {rubro.tipo === "Insumo" && rubro.subRubros.length > 0 && (
+              <FaAngleUp
+                onClick={() => setSubAbierto(!subAbierto)}
+                className={`cursor-pointer h-5 ${subAbierto ? "rotate-180" : ""}`}
+              />
+            )}
+          </div>
+        </div>
 
-  const [busqueda, setBusqueda] = useState<string>("")
-  const [opcionFiltrar, setOpcionFiltrar] = useState<string>('')
-
-  const crearRubro = (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!nombreRubro || !tipoRubro) return;
-
-  const nuevoRubro: RubroInsumo = {
-    id: Date.now(),
-    denominacion: nombreRubro,
-    activo: true,
-    rubroPadre: undefined,
-    subRubros: [],
-  };
-
-  // Si tiene rubro padre, se guarda como subrubro
-  if (tipoRubro === "Insumo" && rubroPadreSeleccionado) {
-    setRubros((prevRubros) =>
-      prevRubros.map((rubro) =>
-        rubro.denominacion === rubroPadreSeleccionado
-          ? {
-              ...rubro,
-              subRubros: [...rubro.subRubros, { ...nuevoRubro }]
-            }
-          : rubro
-      )
-    );
-  } else {
-    setRubros([...rubros, nuevoRubro]);
-  }
-
-  abrirModal();
-  console.log("Nuevo rubro creado:", nuevoRubro);
-};
-
-  const agregarSubRubro = (rubroId: number, subRubroNombre: string) => {
-    setRubros(
-      rubros.map((rubro) =>
-        rubro.id === rubroId
-          ? { ...rubro, subRubros: [...rubro.subRubros, { id: Date.now(), denominacion: subRubroNombre, activo: true, subRubros: [] }] }
-          : rubro
-      )
+        {/* Mostrar subcategorías solo para Insumos */}
+        {rubro.tipo === "Insumo" && subAbierto && (
+          <div className="ml-5">
+            {rubro.subRubros.map((subrubro) => (
+              <RubroItem key={subrubro.id} rubro={subrubro} nivel={nivel + 1} />
+            ))}
+          </div>
+        )}
+      </div>
     );
   };
-
-  const toggleSubCategorias = (rubroId: number) => {
-    setSubCategoriasAbiertas((prevState) => ({
-      ...prevState,
-      [rubroId]: !prevState[rubroId],
-    }));
-  };
-
-  const rubrosPadres = rubros.filter((r) => !r.rubroPadre);
 
   return (
     <>
-      <div className='w-4/5 mt-10 flex justify-around items-center'>
-        <form action="" className='flex items-center'>
-          <input type="search" name="" id="" placeholder='Buscar' onChange={handleChange} className='bg-white py-2 p-0.5 pl-3 border rounded-2xl focus:border-none  focus:outline-3 focus:outline-[#BD1E22]' />
-          <FaSearch className={`relative right-7 ${busqueda === "" ? "relative" : "hidden"}`} />
+      <div className='w-5/6 mt-10 flex justify-around items-center'>
+        <form className='flex items-center'>
+          <input type="search" placeholder='Buscar' onChange={(e) => setBusqueda(e.target.value)} className='bg-white py-2 pl-3 pr-8 border rounded-2xl focus:outline-[#BD1E22]' />
+          <FaSearch className={`relative right-7 ${busqueda ? "hidden" : "block"}`} />
         </form>
-        <div className='flex gap-5'>
-          <button className={`font-bold py-2 rounded-lg px-3 bg-white cursor-pointer ${opcionFiltrar === "Insumos" ? "shadow-xl/10" : ""}`} onClick={() => opcionElegida("Insumos")}>Insumos</button>
-          <button className={`font-bold py-2 rounded-lg px-3 bg-white cursor-pointer ${opcionFiltrar === "Productos" ? "shadow-xl/10" : ""}`} onClick={() => opcionElegida("Productos")}>Productos</button>
-        </div >
-        <button className='bg-secondary text-white px-3 py-2 rounded-2xl cursor-pointer' onClick={abrirModal}>+ Agregar Categoria</button>
-      </div >
+        <div className='flex gap-2'>
+          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Insumo")} > Insumos </button>
+          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Producto")} > Productos </button>
+        </div>
+        <button className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer' onClick={() => setModalAbierto(true)}>+Agregar Categoría</button>
+      </div>
 
-      <div className="mt-10 bg-white h-10 w-8/10 pl-10 flex items-center rounded-4xl text-base shadow-xl/10 font-semibold">
+      <div className="mt-10 bg-white h-10 w-8/10 pl-10 flex items-center rounded-t-lg font-semibold">
         Nombre
       </div>
 
-      {rubros.map((rubro) => (
-        <div key={rubro.id} className="w-8/10 mt-5 flex flex-col rounded-4xl text-base font-semibold">
-          <div className="flex items-center h-10">
-            <div className="w-1/2 pl-10 flex items-center gap-5">
-              <p className="underline">{rubro.denominacion}</p>
-            </div>
-            <div className="flex justify-end w-full pr-10 gap-5">
-              <FaPencilAlt className="text-black cursor-pointer transition-colors hover:text-tertiary" />
-              <FaRegTrashAlt className="text-black cursor-pointer transition-colors hover:text-tertiary" onClick={() => setRubros(rubros.filter((r) => r.id !== rubro.id))} />
-              <FaAngleUp onClick={() => toggleSubCategorias(rubro.id)} className={`text-black cursor-pointer transition-colors hover:text-tertiary h-5 transform ${subCategoriasAbiertas[rubro.id] ? "rotate-180" : ""}`} />
-            </div>
-          </div>
+      {/* Listar rubros según filtro */}
+      <ul className='w-8/10'>
+        {opcionFiltrar === "Insumo" && rubrosInsumos.map((rubro) => (
+          <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md'><RubroItem key={rubro.id} rubro={rubro} /></li>
+        ))}
 
-          {subCategoriasAbiertas[rubro.id] && (
-            <div className="w-8/10 pl-16 pr-10 py-3">
-              <div className="mb-2">
-                {rubro.subRubros.map((subrubro) => (
-                  <p key={subrubro.id} className="text-sm">- {subrubro.denominacion}</p>
-                ))}
-              </div>
-            </div>
-          )}
+        {opcionFiltrar === "Producto" && rubrosProductos.map((rubro) => (
+          <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md'><RubroItem key={rubro.id} rubro={rubro} /></li>
+        ))}
+      </ul>
 
-          <hr className="w-full"></hr>
-        </div>
-      ))}
 
+      {/* Modal de creación */}
       {modalAbierto && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40"></div>
-          <div className="rounded-3xl p-5 absolute top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 bg-primary flex justify-center items-center shadow-lg w-5/10 flex-col">
-            <button onClick={abrirModal} className="cursor-pointer absolute top-4 right-4 text-secondary hover:text-tertiary transition-colors"><FaTimes className="h-6 w-6" /></button>
-            <h4 className="mt-5 font-bold text-2xl text-secondary">Agregar nueva categoría</h4>
-            <form onSubmit={crearRubro} className="flex flex-col mt-5 w-full gap-2">
-              <label htmlFor="nombre">Nombre</label>
-              <input type="text" id="nombre" placeholder="Nombre..." value={nombreRubro} onChange={(e) => setNombreRubro(e.target.value)} className="bg-white mb-2 py-2 pl-3 border rounded-2xl focus:border-none focus:outline-3 focus:outline-[#BD1E22]" />
-
-              <label>Tipo:</label>
-              <div className="flex gap-10 items-center">
-                <label className="flex items-center gap-2">
-                  <input type="radio" className="cursor-pointer" name="tipoCategoria" value="Insumo" onChange={(e) => setTipoRubro(e.target.value)} />Insumo
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="radio" className="cursor-pointer" name="tipoCategoria" value="Producto" onChange={(e) => setTipoRubro(e.target.value)} /> Producto
-                </label>
+        <div className="fixed inset-0 bg-black/50 z-40">
+          <div className="rounded-3xl p-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary w-1/2">
+            <button
+              onClick={() => setModalAbierto(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-red-600"
+            >
+              <FaTimes className="text-secondary h-6 w-6" />
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-secondary">Nueva Categoría</h2>
+            <form onSubmit={crearRubro}>
+              <div className="mb-4">
+                <label className="block mb-2">Nombre</label>
+                <input
+                  type="text"
+                  placeholder='Nombre de la categoria'
+                  className="w-full p-2 border rounded bg-white"
+                  value={nombreRubro}
+                  onChange={(e) => setNombreRubro(e.target.value)}
+                  required
+                />
               </div>
 
+              <div className="mb-4">
+                <label className="block mb-2">Tipo</label>
+                <div className="flex gap-4">
+                  <label>
+                    <input
+                      type="radio"
+                      name="tipo"
+                      value="Insumo"
+                      checked={tipoRubro === "Insumo"}
+                      onChange={() => setTipoRubro("Insumo")}
+                    />
+                    <span className="ml-2">Insumo</span>
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      name="tipo"
+                      value="Producto"
+                      checked={tipoRubro === "Producto"}
+                      onChange={() => setTipoRubro("Producto")}
+                    />
+                    <span className="ml-2">Producto</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Mostrar selector de padre solo para Insumos */}
               {tipoRubro === "Insumo" && (
-                <>
-                  <label htmlFor="rubroPadre">Rubro Padre (Opcional)</label>
-                  <select id="rubroPadre" className="bg-white py-2 px-3 border rounded-2xl" onChange={(e) => setRubroPadreSeleccionado(e.target.value)}>
-                    <option value="">Seleccionar...</option>
-                    {rubrosPadres.map((rubro) => (
-                      <option key={rubro.id} value={rubro.denominacion}>
-                        {rubro.denominacion}
+                <div className="mb-4">
+                  <label className="block mb-2">Rubro Padre (Opcional)</label>
+                  <select
+                    className="w-full p-2 border rounded bg-white"
+                    onChange={(e) => setRubroPadreSeleccionado(e.target.value)}
+                  >
+                    <option value="">Ninguno</option>
+                    {obtenerRubrosInsumoAnidados(rubrosInsumos).map((rubro) => (
+                      <option key={rubro.id} value={rubro.id}>
+                        {"— ".repeat(rubro.subRubros.length)} {rubro.denominacion}
                       </option>
                     ))}
                   </select>
-                </>
+                </div>
               )}
 
-              <div className="flex justify-around mt-5">
-                <button type="button" onClick={abrirModal} className="underline font-semibold cursor-pointer">Cancelar</button>
-                <button type="submit" className="py-1 px-4 font-semibold rounded-2xl text-white bg-tertiary cursor-pointer">Crear</button>
+              <div className="flex justify-end gap-4 mt-6">
+                <button type="button" onClick={() => setModalAbierto(false)} className="px-4 py-2 text-gray-600 hover:text-gray-800" > Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-tertiary text-white rounded hover:bg-secondary transition-colors" > Crear </button>
               </div>
             </form>
           </div>
-        </>
+        </div>
       )}
     </>
   );

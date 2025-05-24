@@ -1,5 +1,6 @@
 export interface RubroProducto {
-    id?: number;
+    id: number;
     denominacion: string;
     activo: boolean;
+    tipo: "Producto"; 
 }
