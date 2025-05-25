@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from 'react';
 import { FaSearch, FaTimes, FaPencilAlt, FaRegTrashAlt, FaAngleUp } from "react-icons/fa";
-import { RubroInsumo } from '../../types/RubroInsumo';
-import { RubroProducto } from '../../types/RubroProducto';
+import { RubroInsumoDTO } from '../../types/RubroProducto/RubroProductoDTO';
+import { RubroProductoDTO } from '../../types/RubroInsumo/RubroInsumoDTO';
 
-type Rubro = RubroInsumo | RubroProducto;
+type Rubro = RubroInsumoDTO | RubroProductoDTO;
 
 const Categorias = () => {
   const [modalAbierto, setModalAbierto] = useState<boolean>(false);
@@ -277,7 +277,5 @@ const Categorias = () => {
     </>
   );
 };
-
-// comentario para poder hacer un commit
 
 export default Categorias;

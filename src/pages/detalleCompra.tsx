@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import imgDireccion from '../assets/icons/imgdireccion.png';
 import { useLocation } from 'react-router-dom';
-import { Direccion, direccion } from '../pages/misDirecciones';
+// import { Direccion, direccion } from '../pages/misDirecciones';
 import { FaMoneyBillAlt, FaAngleRight  } from "react-icons/fa";
 import { Header } from '../components/commons/Header';
 
