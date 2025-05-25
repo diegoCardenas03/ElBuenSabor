@@ -1,7 +1,7 @@
 import {useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Direccion, direccion } from '../../pages/misDirecciones';
+// import { DomicilioDTO } from '../pages/misDirecciones';
 import { FaRegClock, FaMapMarkerAlt  } from "react-icons/fa";
 
 interface DetallePedido {
@@ -24,7 +24,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const [mostrarDireccion, setMostrarDireccion] = useState<boolean>(false);
   const [tipoEntrega, setTipoEntrega] = useState<'enTienda' | 'delivery' >('enTienda');
   const navigate = useNavigate();
-  const [direcciones, setDirecciones] = useState<Direccion[]>([]);
+  // const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
   const [direccionSeleccionada, setDireccionSeleccionada] = useState<string>('');
 
 
@@ -36,12 +36,12 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     setDetallePedido(detallePedido);
     setLoading(false);
 
-    const direcciones = direccion();
-    setDirecciones(direcciones);
+    // const direcciones = direccion();
+    // setDirecciones(direcciones);
   }
     , []);
 
-  const formatearDireccion = (d: Direccion) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
+  // const formatearDireccion = (d: Direccion) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
   /*useEffect(() => {
     const fetchDetallePedido = async () => {
@@ -84,17 +84,17 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   };
 
   const handleRealizarPedido = () => {
-    const direccionActual = direcciones.find(d => d.id === direccionSeleccionada);
-    navigate('/DetalleCompra', {
-      state: {
-        direccion: direccionActual,
-        tipoEntrega: tipoEntrega,
-        subTotal: subTotal,
-        envio: envio,
-        total: total,
-      }
-    });
-    onClose();
+    // const direccionActual = direcciones.find(d => d.id === direccionSeleccionada);
+    // navigate('/DetalleCompra', {
+    //   state: {
+    //     direccion: direccionActual,
+    //     tipoEntrega: tipoEntrega,
+    //     subTotal: subTotal,
+    //     envio: envio,
+    //     total: total,
+    //   }
+    // });
+    // onClose();
   };
 
   const handleCancelarPedido = () => {
@@ -172,11 +172,11 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
               onChange={(e) => setDireccionSeleccionada(e.target.value)}
             >
               <option value="" disabled>Seleccionar dirección</option>
-              {direcciones.map((dir) => (
+              {/*{direcciones.map((dir) => (
                 <option key={dir.id} value={dir.id}>
                   {formatearDireccion(dir)}
                 </option>
-              ))}
+              ))}*/}
             </select>
 
           </div>)}
