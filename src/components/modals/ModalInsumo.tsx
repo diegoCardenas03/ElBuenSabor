@@ -1,6 +1,6 @@
 import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { removeElementActive } from "../../hooks/redux/slices/TableReducer";
 import { UnidadMedida } from "../../types/enums/UnidadMedida";
@@ -9,6 +9,8 @@ import { InsumoService } from "../../services/InsumoService";
 import TextFieldValue from "../TextFildValue/TextFildValue";
 import SelectField from "../SelectField/SelectField"; // Componente personalizado tipo select
 import { useEffect, useState } from "react";
+import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
+import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
 const API_URL = import.meta.env.VITE_API_URL;
 
 interface IModalInsumo {
@@ -26,10 +28,23 @@ export const ModalInsumo = ({
   const elementActive = useAppSelector(
     (state) => state.tablaReducer.elementActive
   );
-  const apiInsumo = new InsumoService(API_URL + "/insumos");
+  const apiInsumo = new InsumoService();
 
-  // Estado para rubros (simula que los cargas de API)
-  const [rubros, setRubros] = useState<{ id: number; nombre: string }[]>([]);
+  const [rubros, setRubros] = useState<RubroInsumoResponseDTO[]>([]);
+
+  useEffect(() => {
+    const fetchRubros = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/rubroinsumo");
+        const data = await response.json();
+        setRubros(data);
+      } catch (error) {
+        console.error("Error al cargar rubros:", error);
+      }
+    };
+
+    fetchRubros();
+  }, []);
 
   useEffect(() => {
     fetch(`${API_URL}/rubros`)
@@ -50,17 +65,17 @@ export const ModalInsumo = ({
   const initialValues: InsumoDTO = elementActive
     ? elementActive
     : {
-        denominacion: "",
-        urlImagen: "",
-        precioCosto: 0,
-        precioVenta: 0,
-        stockActual: 0,
-        stockMinimo: 0,
-        esParaElaborar: false,
-        activo: true,
-        unidadMedida: UnidadMedida.UNIDADES,
-        rubro: 0,
-      };
+      denominacion: "",
+      urlImagen: "",
+      precioCosto: 0,
+      precioVenta: 0,
+      stockActual: 0,
+      stockMinimo: 0,
+      esParaElaborar: false,
+      activo: true,
+      unidadMedida: UnidadMedida.UNIDADES,
+      rubroId: 0,
+    };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -82,13 +97,14 @@ export const ModalInsumo = ({
             precioVenta: Yup.number().min(0, "Debe ser positivo"),
             stockActual: Yup.number().min(0),
             stockMinimo: Yup.number().min(0),
-            rubro: Yup.number().required("Campo requerido"),
+            rubroId: Yup.number().required("Campo requerido"),
             unidadMedida: Yup.string().required("Campo requerido"),
           })}
           enableReinitialize
           onSubmit={async (values) => {
+            console.log(values);
             if (elementActive?.id) {
-              await apiInsumo.put(elementActive.id, values);
+              await apiInsumo.patch(elementActive.id, values);
             } else {
               await apiInsumo.post(values);
             }
@@ -142,11 +158,24 @@ export const ModalInsumo = ({
                   options={unidadMedidaOptions}
                 />
 
-                <SelectField
-                  label="Rubro"
-                  name="rubro"
-                  options={rubroOptions}
-                />
+                <div className="mt-2">
+                  <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>
+                    Rubro:
+                  </label>
+                  <Field
+                    as="select"
+                    name="rubroId"
+                    className="form-control mb-3 input-formulario"
+                  >
+                    <option value="">Seleccione un rubro</option>
+                    {rubros.map((rubro) => (
+                      <option value={rubro.id} key={rubro.id}>
+                        {rubro.denominacion}
+                      </option>
+                    ))}
+                  </Field>
+                  <ErrorMessage name="rubroId" component="div" className="error" />
+                </div>
 
                 {/* Checkboxes */}
                 <div className="form-check">

@@ -21,7 +21,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
   }
 
   async post(data: RequestType): Promise<ResponseType> {
-    const response = await fetch(`${this.baseUrl}`, {
+    const response = await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,9 +32,9 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     return newData as ResponseType;
   }
 
-  async put(id: number | string, data: RequestType): Promise<ResponseType> {
+  async patch(id: number | string, data: RequestType): Promise<ResponseType> {
     const response = await fetch(`${this.baseUrl}/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
@@ -46,7 +46,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
 
   // Método para eliminar un elemento por su ID
   async delete(id: number): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/${id}`, {
+    const response = await fetch(`${this.baseUrl}/delete/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {

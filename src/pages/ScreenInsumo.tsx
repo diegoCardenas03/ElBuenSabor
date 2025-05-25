@@ -96,7 +96,7 @@ const ColumnsTableInsumo = [
       }
     });
   };
-  // Función para obtener las personas
+  // Función para obtener los insumos
   const getInsumos = async () => {
     await insumoService.getAll().then((insumoData) => {
       dispatch(setDataTable(insumoData));
