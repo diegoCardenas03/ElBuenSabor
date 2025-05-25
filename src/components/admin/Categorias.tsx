@@ -15,6 +15,25 @@ const Categorias = () => {
   const [busqueda, setBusqueda] = useState<string>("");
   const [opcionFiltrar, setOpcionFiltrar] = useState<"Insumo" | "Producto" | "">("");
 
+  // Función recursiva para filtrar rubros Insumo y sus subcategorías
+  const filtrarRubrosInsumos = (rubros: RubroInsumo[], termino: string): RubroInsumo[] => {
+    const term = termino.toLowerCase();
+    return rubros.filter(rubro => {
+      const nombreMatch = rubro.denominacion.toLowerCase().includes(term);
+      const subRubrosFiltrados = filtrarRubrosInsumos(rubro.subRubros, termino);
+      return nombreMatch || subRubrosFiltrados.length > 0;
+    }).map(rubro => ({
+      ...rubro,
+      subRubros: filtrarRubrosInsumos(rubro.subRubros, termino)
+    }));
+  };
+
+  // Filtrar rubros según la búsqueda
+  const filteredInsumos = filtrarRubrosInsumos(rubrosInsumos, busqueda);
+  const filteredProductos = rubrosProductos.filter(rubro => 
+    rubro.denominacion.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   // Función recursiva para obtener todos los rubros Insumo (para seleccionar padre)
   const obtenerRubrosInsumoAnidados = (rubros: RubroInsumo[]): RubroInsumo[] => {
     return rubros.flatMap(rubro => [rubro, ...obtenerRubrosInsumoAnidados(rubro.subRubros)]);
@@ -90,7 +109,6 @@ const Categorias = () => {
                 }
               }}
             />
-            {/* Solo mostrar flecha para Insumos con subcategorías */}
             {rubro.tipo === "Insumo" && rubro.subRubros.length > 0 && (
               <FaAngleUp
                 onClick={() => setSubAbierto(!subAbierto)}
@@ -100,7 +118,6 @@ const Categorias = () => {
           </div>
         </div>
 
-        {/* Mostrar subcategorías solo para Insumos */}
         {rubro.tipo === "Insumo" && subAbierto && (
           <div className="ml-5">
             {rubro.subRubros.map((subrubro) => (
@@ -116,33 +133,54 @@ const Categorias = () => {
     <>
       <div className='w-5/6 mt-10 flex justify-around items-center'>
         <form className='flex items-center'>
-          <input type="search" placeholder='Buscar' onChange={(e) => setBusqueda(e.target.value)} className='bg-white py-2 pl-3 pr-8 border rounded-2xl focus:outline-[#BD1E22]' />
+          <input 
+            type="search" 
+            placeholder='Buscar' 
+            onChange={(e) => setBusqueda(e.target.value)} 
+            className='bg-white py-2 pl-3 pr-8 border rounded-2xl focus:outline-[#BD1E22]' 
+          />
           <FaSearch className={`relative right-7 ${busqueda ? "hidden" : "block"}`} />
         </form>
         <div className='flex gap-2'>
-          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Insumo")} > Insumos </button>
-          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Producto")} > Productos </button>
+          <button 
+            className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} 
+            onClick={() => setOpcionFiltrar("Insumo")}
+          >
+            Insumos
+          </button>
+          <button 
+            className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} 
+            onClick={() => setOpcionFiltrar("Producto")}
+          >
+            Productos
+          </button>
         </div>
-        <button className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer' onClick={() => setModalAbierto(true)}>+Agregar Categoría</button>
+        <button 
+          className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer'
+          onClick={() => setModalAbierto(true)}
+        >
+          +Agregar Categoría
+        </button>
       </div>
 
       <div className="mt-10 bg-white h-10 w-8/10 pl-10 flex items-center rounded-t-lg font-semibold">
         Nombre
       </div>
 
-      {/* Listar rubros según filtro */}
       <ul className='w-8/10'>
-        {opcionFiltrar === "Insumo" && rubrosInsumos.map((rubro) => (
-          <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md'><RubroItem key={rubro.id} rubro={rubro} /></li>
+        {opcionFiltrar === "Insumo" && filteredInsumos.map((rubro) => (
+          <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md' key={rubro.id}>
+            <RubroItem rubro={rubro} />
+          </li>
         ))}
 
-        {opcionFiltrar === "Producto" && rubrosProductos.map((rubro) => (
-          <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md'><RubroItem key={rubro.id} rubro={rubro} /></li>
+        {opcionFiltrar === "Producto" && filteredProductos.map((rubro) => (
+          <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md' key={rubro.id}>
+            <RubroItem rubro={rubro} />
+          </li>
         ))}
       </ul>
 
-
-      {/* Modal de creación */}
       {modalAbierto && (
         <div className="fixed inset-0 bg-black/50 z-40">
           <div className="rounded-3xl p-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary w-1/2">
@@ -192,7 +230,6 @@ const Categorias = () => {
                 </div>
               </div>
 
-              {/* Mostrar selector de padre solo para Insumos */}
               {tipoRubro === "Insumo" && (
                 <div className="mb-4">
                   <label className="block mb-2">Rubro Padre (Opcional)</label>
@@ -211,8 +248,19 @@ const Categorias = () => {
               )}
 
               <div className="flex justify-end gap-4 mt-6">
-                <button type="button" onClick={() => setModalAbierto(false)} className="px-4 py-2 text-gray-600 hover:text-gray-800" > Cancelar</button>
-                <button type="submit" className="px-4 py-2 bg-tertiary text-white rounded hover:bg-secondary transition-colors" > Crear </button>
+                <button 
+                  type="button" 
+                  onClick={() => setModalAbierto(false)} 
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 bg-tertiary text-white rounded hover:bg-secondary transition-colors"
+                >
+                  Crear
+                </button>
               </div>
             </form>
           </div>
