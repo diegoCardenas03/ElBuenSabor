@@ -1,7 +1,7 @@
-import LogoIcon from "../assets/img/BuenSaborLogo.png";
-import iconFacebook from "../assets/icons/facebook.svg";
-import iconInstagram from "../assets/icons/instagram.svg";
-import iconTwitter from "../assets/icons/twitter.svg";
+import LogoIcon from "../../assets/img/BuenSaborLogo.png";
+import iconFacebook from "../../assets/icons/facebook.svg";
+import iconInstagram from "../../assets/icons/instagram.svg";
+import iconTwitter from "../../assets/icons/twitter.svg";
 
 
 export const Footer: React.FC = () => {

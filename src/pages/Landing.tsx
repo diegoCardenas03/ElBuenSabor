@@ -5,8 +5,8 @@ import burger1 from "../assets/img/burger1.png";
 import PapasCheddar from "../assets/img/PapasCheddar.png";
 import PizzanuestroMenu from "../assets/img/pizzanuestromenu.png";
 import ProductosPopularesImg from "../assets/img/imagen-productos-populares.png";
-import { Header } from "../components/Header";
-import { Footer } from "../components/Footer";
+import { Header } from "../components/commons/Header";
+import { Footer } from "../components/commons/Footer";
 import ProdPopulares from "../components/prodPopulares";
 import { Link } from "react-router-dom";
 

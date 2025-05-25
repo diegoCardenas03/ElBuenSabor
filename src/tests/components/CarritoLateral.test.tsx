@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import CarritoLateral from '../../components/CarritoLateral';
+import CarritoLateral from '../../components/commons/CarritoLateral';
 import axios from 'axios';
 import React from 'react';
 import { vi } from 'vitest';
