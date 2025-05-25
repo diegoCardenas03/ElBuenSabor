@@ -278,4 +278,6 @@ const Categorias = () => {
   );
 };
 
+// comentario para poder hacer un commit
+
 export default Categorias;
