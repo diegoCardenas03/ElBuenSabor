@@ -1,5 +1,5 @@
 import { UnidadMedida } from '../enums/UnidadMedida';
-import { RubroInsumoDTO } from '../RubroInsumo/RubroInsumoDTO';
+// import { RubroInsumoDTO } from '../RubroInsumo/RubroInsumoDTO';
 
 
 export interface InsumoDTO {

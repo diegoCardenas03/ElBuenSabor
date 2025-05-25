@@ -5,11 +5,10 @@ import { TableGeneric } from "../components/TableGeneric";
 import { Button, CircularProgress } from "@mui/material";
 import { ModalInsumo } from "../components/modals/ModalInsumo";
 import { useAppDispatch } from "../hooks/redux";
-
 import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { RubroInsumoResponseDTO } from "../types/RubroInsumo/RubroInsumoResponseDTO";
-
+import { AdminHeader } from "../components/admin/AdminHeader";
 // Definición de la URL base de la API
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -112,6 +111,7 @@ const ColumnsTableInsumo = [
 
   return (
     <>
+    <AdminHeader />
       <div>
         <div
           style={{
