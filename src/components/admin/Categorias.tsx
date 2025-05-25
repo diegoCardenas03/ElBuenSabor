@@ -15,7 +15,16 @@ const Categorias = () => {
   const [busqueda, setBusqueda] = useState<string>("");
   const [opcionFiltrar, setOpcionFiltrar] = useState<"Insumo" | "Producto" | "">("");
 
-  // Función recursiva para filtrar rubros Insumo y sus subcategorías
+  // Función recursiva para eliminar rubros Insumo
+  const eliminarRubroInsumo = (rubros: RubroInsumo[], id: number): RubroInsumo[] => {
+    return rubros.filter(rubro => rubro.id !== id)
+      .map(rubro => ({
+        ...rubro,
+        subRubros: eliminarRubroInsumo(rubro.subRubros, id)
+      }));
+  };
+
+  // Función recursiva para filtrar rubros Insumo
   const filtrarRubrosInsumos = (rubros: RubroInsumo[], termino: string): RubroInsumo[] => {
     const term = termino.toLowerCase();
     return rubros.filter(rubro => {
@@ -28,18 +37,18 @@ const Categorias = () => {
     }));
   };
 
-  // Filtrar rubros según la búsqueda
+  // Filtrar resultados
   const filteredInsumos = filtrarRubrosInsumos(rubrosInsumos, busqueda);
   const filteredProductos = rubrosProductos.filter(rubro => 
     rubro.denominacion.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  // Función recursiva para obtener todos los rubros Insumo (para seleccionar padre)
+  // Obtener todos los rubros Insumo anidados
   const obtenerRubrosInsumoAnidados = (rubros: RubroInsumo[]): RubroInsumo[] => {
     return rubros.flatMap(rubro => [rubro, ...obtenerRubrosInsumoAnidados(rubro.subRubros)]);
   };
 
-  // Crear nuevo rubro (Insumo con subcategorías o Producto sin ellas)
+  // Crear nuevo rubro
   const crearRubro = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nombreRubro || !tipoRubro) return;
@@ -53,7 +62,6 @@ const Categorias = () => {
         subRubros: [],
       };
 
-      // Lógica para padre (solo Insumo)
       if (rubroPadreSeleccionado) {
         const encontrarPadre = (rubros: RubroInsumo[]): RubroInsumo | undefined => {
           for (const rubro of rubros) {
@@ -72,7 +80,6 @@ const Categorias = () => {
         setRubrosInsumos([...rubrosInsumos, nuevoRubro]);
       }
     } else {
-      // Lógica para Producto (sin padre ni subcategorías)
       const nuevoProducto: RubroProducto = {
         id: Date.now(),
         denominacion: nombreRubro,
@@ -87,7 +94,7 @@ const Categorias = () => {
     setRubroPadreSeleccionado("");
   };
 
-  // Componente para mostrar rubros (maneja Insumo y Producto)
+  // Componente de rubro
   const RubroItem = ({ rubro, nivel = 0 }: { rubro: Rubro; nivel?: number }) => {
     const [subAbierto, setSubAbierto] = useState(false);
 
@@ -103,7 +110,8 @@ const Categorias = () => {
               className="cursor-pointer hover:text-tertiary"
               onClick={() => {
                 if (rubro.tipo === "Insumo") {
-                  setRubrosInsumos(rubrosInsumos.filter(r => r.id !== rubro.id));
+                  const nuevosRubros = eliminarRubroInsumo(rubrosInsumos, rubro.id);
+                  setRubrosInsumos(nuevosRubros);
                 } else {
                   setRubrosProductos(rubrosProductos.filter(r => r.id !== rubro.id));
                 }
