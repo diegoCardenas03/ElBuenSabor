@@ -12,30 +12,26 @@ type Props = {
   onClose: () => void;
 };
 
-const productos: ProductoDTO[] = [{
-  id: 1, denominacion: "Pizza Muzza", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
-  rubro: [{ id: 1, denominacion: "queso", activo: true }],
-  detalleProductos: [{
-    id: 1,
-    cantidad: 2,
-    insumo: [{
-      denominacion: "queso", urlImagen: "string", precioCosto: 100, precioVenta: 200, stockActual: 5, stockMinimo: 3, esParaElaborar: true, activo: true, unidadMedida: UnidadMedida.GRAMOS,
-      rubro: [{ denominacion: "lacteos", activo: true }]
-    }]
-  }]
-},
-{
-  id: 2, denominacion: "Pizza 2", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
-  rubro: [{ id: 1, denominacion: "queso", activo: true }],
-  detalleProductos: [{
-    id: 1,
-    cantidad: 2,
-    insumo: [{
-      denominacion: "queso", urlImagen: "string", precioCosto: 100, precioVenta: 200, stockActual: 5, stockMinimo: 3, esParaElaborar: true, activo: true, unidadMedida: UnidadMedida.GRAMOS,
-      rubro: [{ denominacion: "lacteos", activo: true }]
-    }]
-  }]
-}];
+const productos: ProductoDTO[] = [];
+
+// const productos: ProductoDTO[] = [{
+//   id: 1, denominacion: "Pizza Muzza", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
+//   rubro: [{ id: 1, denominacion: "queso", activo: true }],
+//   detalleProductos: [{
+//     id: 1,
+//     cantidad: 2,
+//     insumoId: 1
+// }]
+// },
+// {
+//   id: 2, denominacion: "Pizza 2", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
+//   rubro: [{ id: 1, denominacion: "queso", activo: true }],
+//   detalleProductos: [{
+//     id: 1,
+//     cantidad: 2,
+//     insumoId: 2
+//   }]
+// }];
 
 
 const CarritoLateral: React.FC<Props> = ({ onClose }) => {
@@ -76,9 +72,9 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       }
     ]);*/}
 
-    setDetallePedido([{ id: 1, productoId: 1, cantidad: 2 },
-    { id: 2, productoId: 2, cantidad: 1 }
-    ]);
+    // setDetallePedido([{ id: 1, productoId: 1, cantidad: 2 },
+    // { id: 2, productoId: 2, cantidad: 1 }
+    // ]);
 
     const direcciones = domicilio();
     setDirecciones(direcciones);
