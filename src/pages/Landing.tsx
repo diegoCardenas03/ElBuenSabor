@@ -35,10 +35,10 @@ const Landing = () => {
   md:top-[-350px] md:right-[-500px]"/>
 
       {/* Contenido principal */}
-      <div className="relative z-10">
+      <div className="relative">
         <Header whiteUserBar={true} showBackButton={false} />
 
-        <main className="h-screen flex flex-col md:flex-row items-center md:items-start justify-center px-4 md:px-16 gap-15 md:gap-40 relative z-20">
+        <main className="h-screen flex flex-col md:flex-row items-center md:items-start justify-center px-4 md:px-16 gap-15 md:gap-40 relative">
           {/* Pizza */}
           <div className="w-full md:w-1/2 flex justify-center md:justify-end pt-0 md:pt-30">
             <img
