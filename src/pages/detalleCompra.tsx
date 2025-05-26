@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import imgDireccion from '../assets/icons/imgdireccion.png';
 import { useLocation } from 'react-router-dom';
 import { FaMoneyBillAlt, FaAngleRight } from "react-icons/fa";
-import { Header } from '../components/Header';
+import { Header } from '../components/commons/Header';
+import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { FormaPago } from '../types/enums/FormaPago';
 import { domicilio } from './misDirecciones';
@@ -269,6 +270,7 @@ const DetalleCompra = () => {
                     </div>
                 </div>
             )}
+            <Footer />
         </>
     );
 }

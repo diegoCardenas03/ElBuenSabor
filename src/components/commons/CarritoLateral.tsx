@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaRegClock, FaMapMarkerAlt } from "react-icons/fa";
-import { ProductoDTO } from '../types/Producto/ProductoDTO';
-import { DetallePedidoDTO } from '../types/DetallePedido/DetallePedidoDTO';
-import { TipoEnvio } from '../types/enums/TipoEnvio';
-import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
-import { UnidadMedida } from '../types/enums/UnidadMedida';
-import { domicilio } from '../pages/misDirecciones';
+import { ProductoDTO } from '../../types/Producto/ProductoDTO';
+import { DetallePedidoDTO } from '../../types/DetallePedido/DetallePedidoDTO';
+import { TipoEnvio } from '../../types/enums/TipoEnvio';
+import { DomicilioDTO } from '../../types/Domicilio/DomicilioDTO';
+import { domicilio } from '../../pages/misDirecciones';
 
 type Props = {
   onClose: () => void;

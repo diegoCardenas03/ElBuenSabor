@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import Pizza from '../assets/img/pizzaBanco.png'
 import { FaPen, FaTrashAlt, FaMapMarkerAlt } from "react-icons/fa";
-import { Header } from '../components/Header';
+import { Header } from '../components/commons/Header';
+import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 
 export const domicilio = (): DomicilioDTO[] => {
@@ -152,9 +153,10 @@ const MisDirecciones = () => {
                 </div>
 
                 <div className="flex justify-center items-center pt-10">
-                    <img src={Pizza} alt="pizza" className="w-[45%] h-[45%]" />
+                    <img src={Pizza} alt="pizza" className="w-[35%] h-[35%]" />
                 </div>
             </div>
+            <Footer />
         </>
     );
 }
