@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from 'react'
 import imgDireccion from '../assets/icons/imgdireccion.png';
 import { useLocation } from 'react-router-dom';
-// import { Direccion, direccion } from '../pages/misDirecciones';
-import { FaMoneyBillAlt, FaAngleRight  } from "react-icons/fa";
-import { Header } from '../components/commons/Header';
-
-type MetodoPago = 'efectivo' | 'mercadoPago';
+import { FaMoneyBillAlt, FaAngleRight } from "react-icons/fa";
+import { Header } from '../components/Header';
+import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
+import { FormaPago } from '../types/enums/FormaPago';
+import { domicilio } from './misDirecciones';
 
 const DetalleCompra = () => {
-    const [direcciones, setDirecciones] = useState<Direccion[]>([]);
+    const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
     const [mostrarDirecciones, setMostrarDirecciones] = useState<boolean>(false);
     const [direccionState, setDireccionState] = useState({ seleccionada: '', temporal: '' });
     const [agregarComentario, setAgregarComentario] = useState<boolean>(false);
     const [comentarioState, setComentarioState] = useState({ actual: '', temporal: '' });
-    const [metodoPago, setMetodoPago] = useState<MetodoPago>('efectivo');
+    const [metodoPago, setMetodoPago] = useState<FormaPago>();
     const location = useLocation();
     const { direccion: direccionDesdeState, tipoEntrega, subTotal, envio, total } = location.state || {};
-    const [tipoEntregaState, setTipoEntregaState] = useState(tipoEntrega === 'delivery' ? true : false);
+    const [tipoEntregaState, setTipoEntregaState] = useState<boolean>(tipoEntrega === 'DELIVERY' ? true : false);
 
 
     useEffect(() => {
-        const direcciones = direccion();
+        const direcciones = domicilio();
         setDirecciones(direcciones);
     }, []);
 
-    const formatearDireccion = (d?: Direccion) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
+    useEffect(() => {
+        if (mostrarDirecciones) {
+            setDireccionState(prev => ({
+                ...prev,
+                temporal: prev.seleccionada || direccionDesdeState?.id || ''
+            }));
+        }
+    }, [mostrarDirecciones, direccionDesdeState]);
 
+    const formatearDireccion = (d?: DomicilioDTO) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
     const tarifaServicio = 150; // Suponiendo una tarifa de servicio fija
 
 
@@ -51,7 +59,7 @@ const DetalleCompra = () => {
 
     return (
         <>
-            <Header backgroundColor='bg-primary'/>
+            <Header backgroundColor='bg-primary' />
             <div className='bg-primary h-[100%] py-8 px-10 pt-10'>
                 <div className='lg:flex justify-between'>
                     <div>
@@ -126,28 +134,32 @@ const DetalleCompra = () => {
                         <div className='pt-10'>
                             <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>MEDIOS DE PAGO</h1>
                             <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
-                                <label className='flex items-center'>
-                                    <input
-                                        type='radio'
-                                        name='metodoPago'
-                                        value='efectivo'
-                                        checked={metodoPago === 'efectivo'}
-                                        onChange={() => setMetodoPago('efectivo')}
-                                        className='accent-red-800 mr-3 cursor-pointer'
-                                    />
-                                    <p className='font-bold'>Efectivo</p>
-                                    <FaMoneyBillAlt  stroke='2' className='ml-2'/>
-                                </label>
+                                {!tipoEntregaState && (
+                                    <div>
+                                        <label className='flex items-center'>
+                                            <input
+                                                type='radio'
+                                                name='metodoPago'
+                                                value='efectivo'
+                                                checked={metodoPago === 'EFECTIVO'}
+                                                onChange={() => setMetodoPago(FormaPago.EFECTIVO)}
+                                                className='accent-red-800 mr-3 cursor-pointer'
+                                            />
+                                            <p className='font-bold'>Efectivo</p>
+                                            <FaMoneyBillAlt stroke='2' className='ml-2' />
+                                        </label>
 
-                                <div className="border-b border-gray-300 mb-4 mt-4"></div>
+                                        <div className="border-b border-gray-300 mb-4 mt-4"></div>
 
+                                    </div>
+                                )}
                                 <label className='flex items-center'>
                                     <input
                                         type='radio'
                                         name='metodoPago'
                                         value='mercadoPago'
-                                        checked={metodoPago === 'mercadoPago'}
-                                        onChange={() => setMetodoPago('mercadoPago')}
+                                        checked={metodoPago === 'MERCADO_PAGO'}
+                                        onChange={() => setMetodoPago(FormaPago.MERCADO_PAGO)}
                                         className='accent-red-800 mr-3 cursor-pointer'
                                     />
                                     <p className='font-bold'>Mercado Pago</p>
@@ -196,9 +208,13 @@ const DetalleCompra = () => {
             {mostrarDirecciones && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative ">
-                        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionState({ ...direccionState, temporal: direccionState.seleccionada }); }}>
+                        {/* <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionState({ ...direccionState, temporal: direccionState.seleccionada }); }}>
+                            ✕
+                        </button> */}
+                        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionState(prev => ({ ...prev, temporal: prev.seleccionada })); }}>
                             ✕
                         </button>
+
                         <h2 className="text-secondary font-primary font-bold pb-8 pl-5 text-[20px]">¿Donde querés recibir tu pedido?</h2>
 
                         <ul className="space-y-2">
@@ -208,7 +224,8 @@ const DetalleCompra = () => {
                                         type='radio'
                                         name='direccion'
                                         value={dir.id}
-                                        checked={direccionState.temporal === dir.id || direccionDesdeState?.id === dir.id} 
+                                        // checked={direccionState.temporal === dir.id || direccionDesdeState?.id === dir}
+                                        checked={direccionState.temporal === dir.id}
                                         onChange={handleChange}
                                         className='accent-red-800 mr-3'
                                     />

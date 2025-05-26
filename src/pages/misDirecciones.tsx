@@ -1,36 +1,36 @@
 import { useEffect, useState } from 'react'
 import Pizza from '../assets/img/pizzaBanco.png'
-import { FaPen, FaTrashAlt, FaMapMarkerAlt   } from "react-icons/fa";
-import { Header } from '../components/commons/Header';
+import { FaPen, FaTrashAlt, FaMapMarkerAlt } from "react-icons/fa";
+import { Header } from '../components/Header';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 
-// export const domicilio = (): DomicilioDTO[] => {
-//     return [
-//         { id: "1", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
-//         { id: "2", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
-//         { id: "3", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" }
-//     ];
-// };
+export const domicilio = (): DomicilioDTO[] => {
+    return [
+        { id: "1", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
+        { id: "2", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
+        { id: "3", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" }
+    ];
+};
 
 const MisDirecciones = () => {
     const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
     const [mostrarModal, setMostrarModal] = useState<boolean>(false);
-    const [direccionNueva, setDireccionNueva] = useState({calle: '', numero: '', localidad: '', codigoPostal: ''});
-    const {calle, numero, localidad, codigoPostal} = direccionNueva;
+    const [direccionNueva, setDireccionNueva] = useState({ calle: '', numero: '', localidad: '', codigoPostal: '' });
+    const { calle, numero, localidad, codigoPostal } = direccionNueva;
     const [modoEditar, setModoEditar] = useState<boolean>(false);
     const [direccionEditando, setDireccionEditando] = useState<DomicilioDTO | null>(null);
 
-    
-    // useEffect(() => {
-    //     const direcciones = domicilio();
-    //     setDirecciones(direcciones);
-    // }, []);
+
+    useEffect(() => {
+        const direcciones = domicilio();
+        setDirecciones(direcciones);
+    }, []);
 
     const formatearDireccion = (d: DomicilioDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
     return (
         <>
-            <Header backgroundColor='bg-primary'/>
+            <Header backgroundColor='bg-primary' />
             <div className="bg-primary flex flex-col justify-center align-center">
                 <h1 className="font-tertiary pt-10 text-[40px] flex justify-center">Mis Direcciones</h1>
 
@@ -45,7 +45,7 @@ const MisDirecciones = () => {
                     {direcciones.map((d) => (
                         <div className="shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px]" key={d.id}>
                             <div className='flex text-primary '>
-                                <FaMapMarkerAlt stroke='2'className='relative top-[3px] w-5 h-5 mt-2' />
+                                <FaMapMarkerAlt stroke='2' className='relative top-[3px] w-5 h-5 mt-2' />
                                 <h2 className="text-primary text-xl font-semibold pt-1 pb-3 pl-1">{formatearDireccion(d)}</h2>
                             </div>
                             <p className="text-primary pb-3 pl-3">{formatearDireccion(d)}</p>
@@ -90,7 +90,7 @@ const MisDirecciones = () => {
                                         setMostrarModal(false);
                                         setModoEditar(false);
                                         setDireccionEditando(null);
-                                        setDireccionNueva({calle: '', numero: '', localidad: '', codigoPostal: ''});
+                                        setDireccionNueva({ calle: '', numero: '', localidad: '', codigoPostal: '' });
                                     }}
                                 >
                                     ✕
@@ -140,7 +140,7 @@ const MisDirecciones = () => {
                                             setMostrarModal(false);
                                             setModoEditar(false);
                                             setDireccionEditando(null);
-                                            setDireccionNueva({calle: '', numero: '', localidad: '', codigoPostal: ''});
+                                            setDireccionNueva({ calle: '', numero: '', localidad: '', codigoPostal: '' });
                                         }}
                                     >
                                         Guardar

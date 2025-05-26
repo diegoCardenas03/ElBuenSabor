@@ -1,47 +1,90 @@
-import {useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { DomicilioDTO } from '../pages/misDirecciones';
-import { FaRegClock, FaMapMarkerAlt  } from "react-icons/fa";
-
-interface DetallePedido {
-  id: number;
-  cantidad: number;
-  subTotal: number;
-  pedidoId: number;
-  productoId: number;
-  insumoId: number;
-}
+import { FaRegClock, FaMapMarkerAlt } from "react-icons/fa";
+import { ProductoDTO } from '../types/Producto/ProductoDTO';
+import { DetallePedidoDTO } from '../types/DetallePedido/DetallePedidoDTO';
+import { TipoEnvio } from '../types/enums/TipoEnvio';
+import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
+import { UnidadMedida } from '../types/enums/UnidadMedida';
+import { domicilio } from '../pages/misDirecciones';
 
 type Props = {
   onClose: () => void;
 };
 
+const productos: ProductoDTO[] = [];
+
+// const productos: ProductoDTO[] = [{
+//   id: 1, denominacion: "Pizza Muzza", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
+//   rubro: [{ id: 1, denominacion: "queso", activo: true }],
+//   detalleProductos: [{
+//     id: 1,
+//     cantidad: 2,
+//     insumoId: 1
+// }]
+// },
+// {
+//   id: 2, denominacion: "Pizza 2", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
+//   rubro: [{ id: 1, denominacion: "queso", activo: true }],
+//   detalleProductos: [{
+//     id: 1,
+//     cantidad: 2,
+//     insumoId: 2
+//   }]
+// }];
+
+
 const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [detallePedido, setDetallePedido] = useState<DetallePedido[]>([]);
-  const [mostrarDireccion, setMostrarDireccion] = useState<boolean>(false);
-  const [tipoEntrega, setTipoEntrega] = useState<'enTienda' | 'delivery' >('enTienda');
+  const [detallePedido, setDetallePedido] = useState<DetallePedidoDTO[]>([]);
+  const [tipoEntrega, setTipoEntrega] = useState<TipoEnvio>();
   const navigate = useNavigate();
-  // const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
+  const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
   const [direccionSeleccionada, setDireccionSeleccionada] = useState<string>('');
 
 
   useEffect(() => {
-    const detallePedido: DetallePedido[] = [
-      { id: 1, cantidad: 1, subTotal: 200, pedidoId: 1, productoId: 1, insumoId: 1 },
-      { id: 2, cantidad: 1, subTotal: 100, pedidoId: 1, productoId: 3, insumoId: 9 },
-    ];
-    setDetallePedido(detallePedido);
+    {/* setProducto([
+      {
+        id: 1, denominacion: "Pizza Muzza", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
+        rubro: [{ id: 1, denominacion: "queso", activo: true }],
+        detalleProductos: [{
+          id: 1,
+          cantidad: 2,
+          insumo: [{
+            denominacion: "queso", urlImagen: "string", precioCosto: 100, precioVenta: 200, stockActual: 5, stockMinimo: 3, esParaElaborar: true, activo: true, unidadMedida: UnidadMedida.GRAMOS,
+            rubro: [{ denominacion: "lacteos", activo: true }]
+          }]
+        }]
+      },
+      {
+        id: 2, denominacion: "Pizza 2", descripcion: "Pizza con muzzarella y salsa", tiempoEstimadoPreparacion: 20, precioVenta: 200, urlImagen: "ruta/a/imagen.jpg", activo: true,
+        rubro: [{ id: 1, denominacion: "queso", activo: true }],
+        detalleProductos: [{
+          id: 1,
+          cantidad: 2,
+          insumo: [{
+            denominacion: "queso", urlImagen: "string", precioCosto: 100, precioVenta: 200, stockActual: 5, stockMinimo: 3, esParaElaborar: true, activo: true, unidadMedida: UnidadMedida.GRAMOS,
+            rubro: [{ denominacion: "lacteos", activo: true }]
+          }]
+        }]
+      }
+    ]);*/}
+
+    // setDetallePedido([{ id: 1, productoId: 1, cantidad: 2 },
+    // { id: 2, productoId: 2, cantidad: 1 }
+    // ]);
+
+    const direcciones = domicilio();
+    setDirecciones(direcciones);
+
     setLoading(false);
 
-    // const direcciones = direccion();
-    // setDirecciones(direcciones);
   }
     , []);
 
-  // const formatearDireccion = (d: Direccion) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
+  const formatearDireccion = (d: DomicilioDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
   /*useEffect(() => {
     const fetchDetallePedido = async () => {
@@ -58,12 +101,11 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   }
   , []);*/
 
-  const precioUnitario = 100; // suponiendo precio fijo 100
   const incrementarCantidad = (id: number) => {
     setDetallePedido(prev =>
       prev.map(item =>
         item.id === id
-          ? { ...item, cantidad: item.cantidad + 1, subTotal: (item.cantidad + 1) * precioUnitario }
+          ? { ...item, cantidad: item.cantidad + 1 }
           : item
       )
     );
@@ -73,7 +115,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     setDetallePedido(prev =>
       prev.map(item =>
         item.id === id && item.cantidad > 1
-          ? { ...item, cantidad: item.cantidad - 1, subTotal: (item.cantidad - 1) * precioUnitario }
+          ? { ...item, cantidad: item.cantidad - 1 }
           : item
       )
     );
@@ -83,18 +125,19 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     setDetallePedido(prev => prev.filter(item => item.id !== id));
   };
 
+
   const handleRealizarPedido = () => {
-    // const direccionActual = direcciones.find(d => d.id === direccionSeleccionada);
-    // navigate('/DetalleCompra', {
-    //   state: {
-    //     direccion: direccionActual,
-    //     tipoEntrega: tipoEntrega,
-    //     subTotal: subTotal,
-    //     envio: envio,
-    //     total: total,
-    //   }
-    // });
-    // onClose();
+    const direccionActual = direcciones.find(d => d.id === direccionSeleccionada);
+    navigate('/DetalleCompra', {
+      state: {
+        direccion: direccionActual,
+        tipoEntrega: tipoEntrega,
+        subTotal: subTotal,
+        envio: envio,
+        total: total,
+      }
+    });
+    onClose();
   };
 
   const handleCancelarPedido = () => {
@@ -105,8 +148,11 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     }
   }
 
-  const subTotal = detallePedido.reduce((subtotal, item) => subtotal + item.subTotal, 0);
-  const envio = mostrarDireccion ? 200 : 0;
+  const subTotal = detallePedido.reduce((acum, item) => {
+    const producto = productos.find(p => p.id === item.productoId);
+    return acum + (producto ? producto.precioVenta * item.cantidad : 0);
+  }, 0);
+  const envio = tipoEntrega === TipoEnvio.DELIVERY ? 200 : 0;
   const total = subTotal + envio;
 
   return (
@@ -121,62 +167,74 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
         {error &&
           <p className="text-red-500 mb-2">{error}</p>
         }
-        {!loading && detallePedido.map((item: DetallePedido) => (
-          <div key={item.id} className="flex justify-between items-center mb-3">
-            <img src="" alt="" className="left-20 w-14 h-14 rounded-[15px] ring-1 ring-gray-300" />
-            <div className="flex flex-col">
-              <p className="font-semibold">{item.productoId}</p>
-              <p className="text-sm text-gray-500">Subtotal: ${item.subTotal}</p>
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <button onClick={() => decrementarCantidad(item.id)} className="px-2 py-1 rounded-full cursor-pointer">–</button>
-                <span>{item.cantidad}</span>
-                <button onClick={() => incrementarCantidad(item.id)} className="px-2 py-1 rounded-full cursor-pointer">+</button>
+        {!loading && detallePedido.map((item) => {
+          const producto = productos.find(p => p.id === item.productoId);
+          return (
+            <div key={item.id} className="flex justify-between items-center mb-3">
+              <div className="flex items-center space-x-4">
+                <img
+                  src={producto?.urlImagen}
+                  alt={producto?.denominacion}
+                  className="left-20 w-14 h-14 rounded-[15px] ring-1 ring-gray-300"
+                />
+                <div className="flex flex-col">
+                  <p className="font-semibold">{producto?.denominacion}</p>
+                  <p className="text-sm text-gray-500">
+                    Subtotal: ${(producto ? (producto.precioVenta * item.cantidad) : 0)}
+                  </p>
+                </div>
               </div>
-              <button onClick={() => eliminarItem(item.id)}
-                className="cursor-pointer bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
-                Eliminar
-              </button>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <button onClick={() => decrementarCantidad(item.id)} className="px-2 py-1 rounded-full cursor-pointer">–</button>
+                  <span>{item.cantidad}</span>
+                  <button onClick={() => incrementarCantidad(item.id)} className="px-2 py-1 rounded-full cursor-pointer">+</button>
+                </div>
+                <button onClick={() => eliminarItem(item.id)}
+                  className="cursor-pointer bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
+                  Eliminar
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
 
       <h2 className="text-2xl font-bold text-gray-800 mt-3 mb-4 pb-2">ENTREGA</h2>
       <div className='space-y-8'>
         <div className="flex justify-around items-center space-x-5">
           <button
-            onClick={() => { setTipoEntrega("enTienda"); setMostrarDireccion(false); }}
-            className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === 'enTienda' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
+            onClick={() => setTipoEntrega(TipoEnvio.RETIRO_LOCAL)}
+            className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === TipoEnvio.RETIRO_LOCAL ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
             En tienda
           </button>
           <button
-            onClick={() => { setTipoEntrega("delivery"); setMostrarDireccion(true); }}
-            className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === 'delivery' ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
+            onClick={() => setTipoEntrega(TipoEnvio.DELIVERY)}
+            className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === TipoEnvio.DELIVERY ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
             Delivery
           </button>
         </div>
 
         <div className="flex items-center space-x-4 mb-4">
-          <FaRegClock stroke='2'className='w-7 h-7'/>
+          <FaRegClock stroke='2' className='w-7 h-7' />
           <p className="text-gray-700">12:00</p>
         </div>
 
-        {mostrarDireccion && (
+        {tipoEntrega === "DELIVERY" && (
           <div className="flex items-center space-x-4 mb-10">
-            <FaMapMarkerAlt  stroke='2' className='w-7 h-7'/>
+            <FaMapMarkerAlt stroke='2' className='w-7 h-7' />
             <select
               className="cursor-pointer border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
               value={direccionSeleccionada}
               onChange={(e) => setDireccionSeleccionada(e.target.value)}
             >
               <option value="" disabled>Seleccionar dirección</option>
-              {/*{direcciones.map((dir) => (
+              {direcciones.map((dir) => (
                 <option key={dir.id} value={dir.id}>
                   {formatearDireccion(dir)}
                 </option>
-              ))}*/}
+              ))}
             </select>
 
           </div>)}
@@ -188,7 +246,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
           <p className="text-gray-700">${subTotal}</p>
         </div>
 
-        {mostrarDireccion && (
+        {tipoEntrega === "DELIVERY" && (
           <div className="flex justify-between mb-4">
             <p className="text-gray-700">Envio:</p>
             <p className="text-gray-700">${envio}</p>
@@ -202,9 +260,10 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
         <button onClick={handleCancelarPedido} className="bg-tertiary border border-gray-300 px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Cancelar pedido</button>
       </div>
 
+    </div>
+  )
 
-    </div >
-  );
+
 }
 
 export default CarritoLateral;

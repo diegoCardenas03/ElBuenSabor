@@ -1,6 +1,4 @@
 import { UnidadMedida } from '../enums/UnidadMedida';
-import { RubroInsumoDTO } from '../RubroInsumo/RubroInsumoDTO';
-
 
 export interface InsumoDTO {
     denominacion: string;
@@ -12,5 +10,5 @@ export interface InsumoDTO {
     esParaElaborar: boolean;
     activo: boolean;
     unidadMedida: UnidadMedida;
-    rubro: RubroInsumoDTO;
+    rubroId: number;
 }
