@@ -6,6 +6,7 @@ import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
 import PedidosCocinero from '../pages/pedidosCocinero';
 import { ScreenInsumo } from '../pages/ScreenInsumo';
+import Configuracion from '../pages/admin/Configuracion';
 const RoutesApp = () => {
   return (
     <BrowserRouter>
@@ -16,6 +17,7 @@ const RoutesApp = () => {
         <Route path="/Menu" element={<Menu />} />
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
         <Route path="/Insumos" element={<ScreenInsumo />} />
+        <Route path='/admin/Configuracion' element={<Configuracion />} />
       </Routes>
     </BrowserRouter>
   );

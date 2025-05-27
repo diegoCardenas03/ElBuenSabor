@@ -174,6 +174,8 @@ const ColumnsTableInsumo = [
             handleDelete={handleDelete}
             columns={ColumnsTableInsumo}
             setOpenModal={setOpenModal}
+            getRowClassName={(insumo) =>
+            insumo.stockActual < insumo.stockMinimo ? "bg-red-100 text-red-900 font-semibold" : ""}
           />
         )}
       </div>

@@ -15,18 +15,21 @@ interface ITableColumn<T> {
   label: string; // Etiqueta de la columna
   key: string; // Clave que corresponde a la propiedad del objeto en los datos
   render?: (item: T) => React.ReactNode; // Función opcional para personalizar la renderización del contenido de la celda
+ 
 }
 
 export interface ITableProps<T> {
   columns: ITableColumn<T>[]; // Definición de las columnas de la tabla
   handleDelete: (id: number) => void; // Función para manejar la eliminación de un elemento
   setOpenModal: (state: boolean) => void;
+  getRowClassName?: (row: T) => string;
 }
 
 export const TableGeneric = <T extends { id: any }>({
   columns,
   handleDelete,
   setOpenModal,
+  getRowClassName,
 }: ITableProps<T>) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -86,7 +89,13 @@ export const TableGeneric = <T extends { id: any }>({
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index: number) => {
                   return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={index}
+                        className={getRowClassName ? getRowClassName(row) : ""}
+                      >
                       {/* Celdas de la fila */}
                       {columns.map((column, i: number) => {
                         return (
