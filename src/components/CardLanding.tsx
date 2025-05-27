@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-
+import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 interface CarruselItem {
   id: number;
   titulo: string;
@@ -41,7 +42,7 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
           onClick={handlePrev}
           className="text-red-500 border border-red-500 rounded-full p-2 hover:bg-red-100 transition"
         >
-          ←
+          <FaArrowLeft />
         </button>
 
         <div className="flex gap-4 overflow-hidden">
@@ -72,7 +73,7 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
           onClick={handleNext}
           className="text-red-500 border border-red-500 rounded-full p-2 hover:bg-red-100 transition"
         >
-          →
+          <FaArrowRight />
         </button>
       </div>
 
