@@ -3,8 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import RoutesApp from './routes/RoutesApp'
 import { Provider } from 'react-redux'
-import { store } from './hooks/redux/store' // Ajusta la ruta si tu store está en otro lugar
-import "bootstrap/dist/css/bootstrap.min.css";
+import { store } from './hooks/redux/store'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

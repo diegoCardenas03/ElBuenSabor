@@ -1,8 +1,7 @@
-import { Button } from "@mui/material";
 import { useAppDispatch } from "../../hooks/redux";
 import { setElementActive } from "../../hooks/redux/slices/TableReducer";
 import { InsumoDTO } from "../../types/Insumo/InsumoDTO";
-
+import { FaPencilAlt } from "react-icons/fa";
 // Interfaz para los props del componente
 interface IButtonsTable {
   el: InsumoDTO; // Elemento de tipo Insumo
@@ -12,7 +11,7 @@ interface IButtonsTable {
 
 export const ButtonsTable = ({
   el,
-  handleDelete,
+  // handleDelete,
   setOpenModal,
 }: IButtonsTable) => {
   const dispatch = useAppDispatch();
@@ -25,10 +24,10 @@ export const ButtonsTable = ({
     setOpenModal(true);
   };
 
-  // Función para manejar la eliminación de un elemento
-  const handleDeleteItem = () => {
-    handleDelete(el.id); // Llamar a la función handleDelete con el ID del elemento
-  };
+  // // Función para manejar la eliminación de un elemento
+  // const handleDeleteItem = () => {
+  //   handleDelete(el.id); // Llamar a la función handleDelete con el ID del elemento
+  // };
 
   return (
     <div
@@ -39,13 +38,13 @@ export const ButtonsTable = ({
       }}
     >
       {/* Botón para editar el elemento */}
-      <Button variant="contained" onClick={handleModalSelected}>
-        <span className="material-symbols-outlined">edit</span>
-      </Button>
-      {/* Botón para eliminar el elemento */}
-      <Button variant="contained" color="error" onClick={handleDeleteItem}>
-        <span className="material-symbols-outlined">delete_forever</span>
-      </Button>
+      <button className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg"  onClick={handleModalSelected}>
+        <FaPencilAlt />
+      </button>
+       {/* Botón para eliminar el elemento */}
+      {/* // <Button variant="contained" color="error" onClick={handleDeleteItem}>
+      //   <span className="material-symbols-outlined">delete_forever</span>
+      // </Button> */}
     </div>
   );
 };

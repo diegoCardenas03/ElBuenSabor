@@ -1,5 +1,14 @@
-import { Button, Modal } from "react-bootstrap";
+// import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { removeElementActive } from "../../hooks/redux/slices/TableReducer";
@@ -12,7 +21,7 @@ import { useEffect, useState } from "react";
 import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
 import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
 const API_URL = import.meta.env.VITE_API_URL;
-
+import "./ModalInsumo.css";
 interface IModalInsumo {
   getInsumos: () => void;
   openModal: boolean;
@@ -83,11 +92,21 @@ export const ModalInsumo = ({
   };
 
   return (
-    <Modal show={openModal} onHide={handleClose} size="lg" backdrop="static">
-      <Modal.Header closeButton>
-        <Modal.Title>{elementActive ? "Editar" : "Añadir"} Insumo</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+   <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
+      <DialogTitle>
+        <h2 className="font-tertiary"
+          style={{
+            color: "#c62828",
+            fontWeight: "bold",
+            fontSize: "2rem",
+            textAlign: "center",
+          }}
+        >
+          {elementActive ? "EDITAR INSUMO" : "CREAR UN NUEVO INSUMO"}
+        </h2>
+      </DialogTitle>
+
+      <DialogContent dividers>
         <Formik
           initialValues={initialValues}
           validationSchema={Yup.object({
@@ -102,7 +121,6 @@ export const ModalInsumo = ({
           })}
           enableReinitialize
           onSubmit={async (values) => {
-            console.log(values);
             if (elementActive?.id) {
               await apiInsumo.patch(elementActive.id, values);
             } else {
@@ -113,93 +131,158 @@ export const ModalInsumo = ({
           }}
         >
           {() => (
-            <Form className="form-obraAlta">
+            <Form>
               <div className="container_Form_Ingredientes">
-                <TextFieldValue
-                  label="Denominación"
-                  name="denominacion"
-                  type="text"
-                  placeholder="Nombre del insumo"
-                />
-                <TextFieldValue
-                  label="Imagen (URL)"
-                  name="urlImagen"
-                  type="text"
-                  placeholder="https://..."
-                />
-                <TextFieldValue
-                  label="Precio de costo"
-                  name="precioCosto"
-                  type="number"
-                  placeholder="0.00"
-                />
-                <TextFieldValue
-                  label="Precio de venta"
-                  name="precioVenta"
-                  type="number"
-                  placeholder="0.00"
-                />
-                <TextFieldValue
-                  label="Stock actual"
-                  name="stockActual"
-                  type="number"
-                  placeholder="0"
-                />
-                <TextFieldValue
-                  label="Stock mínimo"
-                  name="stockMinimo"
-                  type="number"
-                  placeholder="0"
-                />
+                {/* Columna izquierda */}
+                <div className="input-col">
+                  <TextFieldValue
+                    label="Nombre del insumo:"
+                    name="denominacion"
+                    type="text"
+                    placeholder="Ingrese el nombre"
+                  />
 
-                <SelectField
-                  label="Unidad de medida"
-                  name="unidadMedida"
-                  options={unidadMedidaOptions}
-                />
-
-                <div className="mt-2">
-                  <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>
-                    Rubro:
-                  </label>
+                  <label style={{ fontWeight: "bold" }}>Categoría:</label>
                   <Field
                     as="select"
                     name="rubroId"
-                    className="form-control mb-3 input-formulario"
+                    className="form-control input-formulario"
                   >
-                    <option value="">Seleccione un rubro</option>
+                    <option value="">Seleccione una categoría</option>
                     {rubros.map((rubro) => (
-                      <option value={rubro.id} key={rubro.id}>
+                      <option key={rubro.id} value={rubro.id}>
                         {rubro.denominacion}
                       </option>
                     ))}
                   </Field>
-                  <ErrorMessage name="rubroId" component="div" className="error" />
+                  <ErrorMessage
+                    name="rubroId"
+                    component="div"
+                    className="error"
+                  />
+
+                  <TextFieldValue
+                    label="Stock mínimo:"
+                    name="stockMinimo"
+                    type="number"
+                    placeholder="Ingrese el stock mínimo"
+                  />
+                  <TextFieldValue
+                    label="Stock actual:"
+                    name="stockActual"
+                    type="number"
+                    placeholder="Ingrese el stock actual"
+                  />
                 </div>
 
-                {/* Checkboxes */}
-                <div className="form-check">
-                  <label>
-                    <Field type="checkbox" name="esParaElaborar" />
-                    {" "}¿Es para elaborar?
-                  </label>
-                </div>
-                <div className="form-check">
-                  <label>
-                    <Field type="checkbox" name="activo" />
-                    {" "}¿Está activo?
-                  </label>
+                {/* Columna derecha */}
+                <div className="input-col">
+                  <SelectField
+                    label="Unidad de medida:"
+                    name="unidadMedida"
+                    options={unidadMedidaOptions}
+                  />
+<TextFieldValue
+  label="Imagen del insumo:"
+  name="urlImagen"
+  type="text"
+  placeholder="https://..."
+/>
+
+{/* Miniatura */}
+<Field name="urlImagen">
+  {({ field }: any) => (
+    field.value && (
+      <div style={{ marginTop: "10px" }}>
+        <img
+          src={field.value}
+          alt="Vista previa"
+          style={{
+            width: "100px",
+            height: "100px",
+            objectFit: "cover",
+            borderRadius: "10px",
+            border: "2px solid #ddd",
+          }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "https://via.placeholder.com/100?text=No+Image";
+          }}
+        />
+      </div>
+    )
+  )}
+</Field>
+                  <TextFieldValue
+                    label="Precio de costo:"
+                    name="precioCosto"
+                    type="number"
+                    placeholder="0.00"
+                  />
+                  <TextFieldValue
+                    label="Precio de venta:"
+                    name="precioVenta"
+                    type="number"
+                    placeholder="0.00"
+                  />
                 </div>
               </div>
-              <div className="d-flex justify-content-end mt-3">
-                <Button variant="success" type="submit">
+
+              {/* Switches */}
+              <div style={{ display: "flex", gap: "30px", padding: "20px" }}>
+                <FormControlLabel
+                  control={
+                    <Field
+                      type="checkbox"
+                      name="esParaElaborar"
+                      as={Switch}
+                      color="warning"
+                    />
+                  }
+                  label="¿Es para elaborar?"
+                />
+                <FormControlLabel
+                  control={
+                    <Field
+                      type="checkbox"
+                      name="activo"
+                      as={Switch}
+                      color="error"
+                    />
+                  }
+                  label="Activo"
+                />
+              </div>
+
+              <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
+                <Button
+                  onClick={handleClose}
+                  sx={{
+                    fontWeight: "bold",
+                    textDecoration: "underline",
+                    color: "#000",
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#f9a825",
+                    color: "white",
+                    fontWeight: "bold",
+                    "&:hover": { backgroundColor: "#f57f17" },
+                    px: 4,
+                    borderRadius: "25px",
+                  }}
+                >
                   Guardar
                 </Button>
-              </div>
+              </DialogActions>
             </Form>
           )}
         </Formik>
-      </Modal.Body>
-    </Modal>
+      </DialogContent>
+    </Dialog>
   );
 };

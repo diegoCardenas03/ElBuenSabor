@@ -2,31 +2,32 @@ import { useEffect, useState } from "react";
 import { InsumoService } from "../services/InsumoService";
 import { InsumoResponseDTO } from "../types/Insumo/InsumoResponseDTO";
 import { TableGeneric } from "../components/TableGeneric";
-import { Button, CircularProgress } from "@mui/material";
+import {  CircularProgress } from "@mui/material";
 import { ModalInsumo } from "../components/modals/ModalInsumo";
 import { useAppDispatch } from "../hooks/redux";
 import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { RubroInsumoResponseDTO } from "../types/RubroInsumo/RubroInsumoResponseDTO";
 import { AdminHeader } from "../components/admin/AdminHeader";
+import { Switch } from "@mui/material";
 // Definición de la URL base de la API
-const API_URL = import.meta.env.VITE_API_URL;
-
+// const API_URL = import.meta.env.VITE_API_URL;
+import { InsumoDTO } from "../types/Insumo/InsumoDTO";
 export const ScreenInsumo = () => {
   // Estado para controlar la carga de datos
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
-  const insumoService = new InsumoService(API_URL + "/insumos");
+  const insumoService = new InsumoService();
   const dispatch = useAppDispatch();
 
   // Columnas de la tabla de insumos
 const ColumnsTableInsumo = [
-  {
-    label: "ID",
-    key: "id",
-    render: (insumo: RubroInsumoResponseDTO) => insumo.id?.toString() ?? "0",
-  },
+  // {
+  //   label: "ID",
+  //   key: "id",
+  //   render: (insumo: RubroInsumoResponseDTO) => insumo.id?.toString() ?? "0",
+  // },
   {
     label: "Denominación",
     key: "denominacion",
@@ -57,11 +58,28 @@ const ColumnsTableInsumo = [
     key: "esParaElaborar",
     render: (insumo: InsumoResponseDTO) => (insumo.esParaElaborar ? "Sí" : "No"),
   },
-  {
-    label: "Activo",
-    key: "activo",
-    render: (insumo: InsumoResponseDTO) => (insumo.activo ? "Sí" : "No"),
-  },
+{
+  label: "Activo",
+  key: "activo",
+  render: (insumo: InsumoDTO) => (
+    <Switch
+      checked={insumo.activo}
+      onChange={async () => {
+        try {
+          await insumoService.patch(insumo.id!, {
+            ...insumo,
+            activo: !insumo.activo,
+          });
+          getInsumos(); // Actualizás la tabla
+        } catch (error) {
+          Swal.fire("Error", "No se pudo actualizar el estado", "error");
+        }
+      }}
+      color="primary"
+    />
+  ),
+},
+
 {
   label: "Rubro",
   render: (insumo: InsumoResponseDTO) => insumo.rubro?.denominacion ?? "Sin rubro"
@@ -112,24 +130,27 @@ const ColumnsTableInsumo = [
   return (
     <>
     <AdminHeader />
-      <div>
+      <div className=" bg-[#FFF4E0]">
         <div
           style={{
             padding: ".4rem",
             display: "flex",
             justifyContent: "flex-end",
             width: "90%",
+
           }}
         >
-          {/* Botón para abrir el modal de agregar persona */}
-          <Button
+        
+          {/* Botón para abrir el modal de agregar insumos */}
+          <button className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg"
+          style={{ borderRadius: '9999px' }}
             onClick={() => {
               setOpenModal(true);
             }}
-            variant="contained"
+            // variant="contained"
           >
-            Agregar
-          </Button>
+            + Crear insumo
+          </button>
         </div>
         {/* Mostrar indicador de carga mientras se cargan los datos */}
         {loading ? (
