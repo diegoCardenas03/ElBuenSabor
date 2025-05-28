@@ -202,6 +202,7 @@ const CategoriaModal = ({
               <select className="w-full p-2 border rounded bg-white" onChange={(e) => setRubroPadreSeleccionado(e.target.value)} value={rubroPadreSeleccionado} disabled={editando && rubroEditando?.tipo === "Insumo" && (rubroEditando as RubroInsumo).subRubros.length > 0} >
                 <option value="">Ninguno</option>
                 {obtenerTodosRubrosUnicosAnidados(rubrosInsumos)
+                  .filter(({rubro}) => rubro.activo) // <-- Solo activos
                   .filter(({rubro}) => !editando || rubro.id !== rubroEditando?.id)
                   .map(({rubro, depth}) => (
                     <option key={rubro.id} value={rubro.id}>
