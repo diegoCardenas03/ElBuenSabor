@@ -1,6 +1,6 @@
 import { DetallePromocionDTO } from '../DetallePromocion/DetallePromocionDTO';
 
-export interface Promocion {
+export interface PromocionDTO {
     denominacion: string;
     urlImagen: string;
     fechaDesde: string;      // LocalDate como string
