@@ -5,16 +5,9 @@ import MisDirecciones from '../pages/misDirecciones';
 import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
 import PedidosCocinero from '../pages/pedidosCocinero';
-<<<<<<< Updated upstream
+// import { ScreenInsumo } from '../pages/ScreenInsumo';
 
 
-// Pantallas de Administradores
-
-
-=======
-import { ScreenInsumo } from '../pages/ScreenInsumo';
-import Configuracion from '../pages/admin/Configuracion';
->>>>>>> Stashed changes
 const RoutesApp = () => {
   return (
     <BrowserRouter>
@@ -27,11 +20,8 @@ const RoutesApp = () => {
         {/* Pantallas de Administradores */}
         <Route path='/admin/Configuracion' element={<Configuracion />} />
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
-<<<<<<< Updated upstream
-=======
-        <Route path="/Insumos" element={<ScreenInsumo />} />
+        {/* <Route path="/Insumos" element={<ScreenInsumo />} /> */}
         <Route path='/admin/Configuracion' element={<Configuracion />} />
->>>>>>> Stashed changes
       </Routes>
     </BrowserRouter>
   );

@@ -1,15 +1,65 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { FaSearch, FaTimes, FaPencilAlt, FaRegTrashAlt, FaAngleUp } from "react-icons/fa";
-<<<<<<< Updated upstream
-import { RubroInsumoDTO } from '../../types/RubroProducto/RubroProductoDTO';
-import { RubroProductoDTO } from '../../types/RubroInsumo/RubroInsumoDTO';
-=======
 import { RubroInsumoDTO } from '../../types/RubroInsumo/RubroInsumoDTO';
 import { RubroProductoDTO } from '../../types/RubroProducto/RubroProductoDTO';
 import Swal from "sweetalert2";
->>>>>>> Stashed changes
 
-type Rubro = RubroInsumoDTO | RubroProductoDTO;
+// Tipos internos para el manejo en frontend
+type RubroInsumo = RubroInsumoDTO & {
+  id: number;
+  subRubros: RubroInsumo[];
+  tipo: "Insumo";
+};
+type RubroProducto = RubroProductoDTO & {
+  id: number;
+  tipo: "Producto";
+};
+type Rubro = RubroInsumo | RubroProducto;
+
+// Función inmutable para agregar un subrubro a un árbol
+function agregarSubRubro(
+  rubros: RubroInsumo[],
+  padreId: number,
+  nuevo: RubroInsumo
+): RubroInsumo[] {
+  return rubros.map(rubro => {
+    if (rubro.id === padreId) {
+      return {
+        ...rubro,
+        subRubros: [...rubro.subRubros, nuevo]
+      };
+    }
+    return {
+      ...rubro,
+      subRubros: agregarSubRubro(rubro.subRubros, padreId, nuevo)
+    };
+  });
+}
+
+// Función para detectar si un rubro es hijo de otro (para mostrar sólo raíz en la lista)
+function rubroPadreIdEnData(rubros: RubroInsumo[], id: number): boolean {
+  function search(rubros: RubroInsumo[]): boolean {
+    for (const rubro of rubros) {
+      if (rubro.subRubros.some(sub => sub.id === id)) return true;
+      if (search(rubro.subRubros)) return true;
+    }
+    return false;
+  }
+  return search(rubros);
+}
+
+// Para el select: recorre todo el árbol y cada rubro aparece SOLO UNA VEZ (aunque el backend lo mande duplicado)
+const obtenerTodosRubrosUnicosAnidados = (rubros: RubroInsumo[], depth = 0, visitados = new Set<number>()): {rubro: RubroInsumo, depth: number}[] => {
+  let result: {rubro: RubroInsumo, depth: number}[] = [];
+  for (const rubro of rubros) {
+    if (!visitados.has(rubro.id)) {
+      visitados.add(rubro.id);
+      result.push({ rubro, depth });
+      result = result.concat(obtenerTodosRubrosUnicosAnidados(rubro.subRubros, depth + 1, visitados));
+    }
+  }
+  return result;
+};
 
 const Categorias = () => {
   const [modalAbierto, setModalAbierto] = useState<boolean>(false);
@@ -20,8 +70,6 @@ const Categorias = () => {
   const [rubrosProductos, setRubrosProductos] = useState<RubroProducto[]>([]);
   const [busqueda, setBusqueda] = useState<string>("");
   const [opcionFiltrar, setOpcionFiltrar] = useState<"Insumo" | "Producto" | "">("");
-<<<<<<< Updated upstream
-=======
   const [abiertos, setAbiertos] = useState<{ [id: number]: boolean }>({});
 
   const [editando, setEditando] = useState<boolean>(false);
@@ -47,13 +95,13 @@ const Categorias = () => {
         setRubrosInsumos(data.map(mapRubroInsumo));
       } catch (error) {
         Swal.fire({
-          position: "bottom-end",
-          icon: "error",
-          title: "Error al cargar rubros insumo",
-          showConfirmButton: false,
-          timer: 1000,
-          width: "20em"
-        });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Error al cargar rubros insumo",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
         console.error("Error fetch rubros insumo", error);
       }
     })();
@@ -74,13 +122,13 @@ const Categorias = () => {
         );
       } catch (error) {
         Swal.fire({
-          position: "bottom-end",
-          icon: "error",
-          title: "Error al cargar rubros producto",
-          showConfirmButton: false,
-          timer: 1000,
-          width: "20em"
-        });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Error al cargar rubros producto",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
         console.error("Error fetch rubros producto", error);
       }
     })();
@@ -90,18 +138,38 @@ const Categorias = () => {
   const toggleAbierto = (id: number) => {
     setAbiertos(prev => ({ ...prev, [id]: !prev[id] }));
   };
->>>>>>> Stashed changes
 
-  // Función recursiva para eliminar rubros Insumo
   const eliminarRubroInsumo = (rubros: RubroInsumo[], id: number): RubroInsumo[] => {
-    return rubros.filter(rubro => rubro.id !== id)
+    return rubros
+      .filter(rubro => rubro.id !== id)
       .map(rubro => ({
         ...rubro,
         subRubros: eliminarRubroInsumo(rubro.subRubros, id)
       }));
   };
 
-  // Función recursiva para filtrar rubros Insumo
+  const limpiarAbiertos = (obj: { [id: number]: boolean }, id: number, rubros: RubroInsumo[]) => {
+    delete obj[id];
+    rubros.forEach(sub => limpiarAbiertos(obj, sub.id, sub.subRubros));
+  };
+
+  const handleEliminar = async (rubro: Rubro) => {
+    if (rubro.tipo === "Insumo") {
+      // Si tienes endpoint DELETE, descomenta:
+      // await fetch(`http://localhost:8080/api/rubroinsumo/${rubro.id}`, { method: "DELETE" });
+      const nuevosRubros = eliminarRubroInsumo(rubrosInsumos, rubro.id);
+      setRubrosInsumos(nuevosRubros);
+      setAbiertos(prev => {
+        const nuevos = { ...prev };
+        limpiarAbiertos(nuevos, rubro.id, (rubro as RubroInsumo).subRubros || []);
+        return nuevos;
+      });
+    } else {
+      // await fetch(`http://localhost:8080/api/rubroProducto/${rubro.id}`, { method: "DELETE" });
+      setRubrosProductos(rubrosProductos.filter(r => r.id !== rubro.id));
+    }
+  };
+
   const filtrarRubrosInsumos = (rubros: RubroInsumo[], termino: string): RubroInsumo[] => {
     const term = termino.toLowerCase();
     return rubros.filter(rubro => {
@@ -114,22 +182,14 @@ const Categorias = () => {
     }));
   };
 
-  // Filtrar resultados
-  const filteredInsumos = filtrarRubrosInsumos(rubrosInsumos, busqueda);
-  const filteredProductos = rubrosProductos.filter(rubro => 
+  // Filtrar solo los rubros raíz (los que no son hijos de nadie)
+  const filteredInsumos = filtrarRubrosInsumos(rubrosInsumos, busqueda)
+    .filter(rubro => !rubroPadreIdEnData(rubrosInsumos, rubro.id));
+
+  const filteredProductos = rubrosProductos.filter(rubro =>
     rubro.denominacion.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  // Obtener todos los rubros Insumo anidados
-  const obtenerRubrosInsumoAnidados = (rubros: RubroInsumo[]): RubroInsumo[] => {
-    // Devuelve todos los rubros y subrubros en un array plano (para el select de padre)
-    return rubros.flatMap(rubro => [rubro, ...obtenerRubrosInsumoAnidados(rubro.subRubros)]);
-  };
-
-<<<<<<< Updated upstream
-  // Crear nuevo rubro
-  const crearRubro = (e: React.FormEvent) => {
-=======
   const encontrarPadre = (rubros: RubroInsumo[], id: number): RubroInsumo | undefined => {
     for (const rubro of rubros) {
       if (rubro.id === id) return rubro;
@@ -138,55 +198,24 @@ const Categorias = () => {
     }
   };
 
-  // Utilidad inmutable para agregar un subrubro a un padre
-  function agregarSubRubro(rubros: RubroInsumo[], padreId: number, nuevo: RubroInsumo): RubroInsumo[] {
-    return rubros.map(rubro => {
-      if (rubro.id === padreId) {
-        return {
-          ...rubro,
-          subRubros: [...rubro.subRubros, nuevo]
-        };
-      }
-      return {
-        ...rubro,
-        subRubros: agregarSubRubro(rubro.subRubros, padreId, nuevo)
-      };
-    });
-  }
-
   const crearRubro = async (e: React.FormEvent) => {
->>>>>>> Stashed changes
     e.preventDefault();
     if (!nombreRubro || !tipoRubro) return;
 
-    if (tipoRubro === "Insumo") {
-      const nuevoRubro: RubroInsumo = {
-        id: Date.now(),
-        denominacion: nombreRubro,
-        activo: true,
-        tipo: "Insumo",
-        subRubros: [],
-      };
+    try {
+      if (editando && rubroEditando) {
+        if (tipoRubro === "Insumo") {
+          let nuevosRubros = [...rubrosInsumos];
+          const eliminarRubro = (rubros: RubroInsumo[], id: number): RubroInsumo[] => {
+            return rubros
+              .filter(rubro => rubro.id !== id)
+              .map(rubro => ({
+                ...rubro,
+                subRubros: eliminarRubro(rubro.subRubros, id)
+              }));
+          };
+          nuevosRubros = eliminarRubro(nuevosRubros, rubroEditando.id);
 
-<<<<<<< Updated upstream
-      if (rubroPadreSeleccionado) {
-        const encontrarPadre = (rubros: RubroInsumo[]): RubroInsumo | undefined => {
-          for (const rubro of rubros) {
-            if (rubro.id === Number(rubroPadreSeleccionado)) return rubro;
-            const encontrado = encontrarPadre(rubro.subRubros);
-            if (encontrado) return encontrado;
-          }
-        };
-
-        const padre = encontrarPadre(rubrosInsumos);
-        if (padre) {
-          padre.subRubros.push(nuevoRubro);
-          setRubrosInsumos([...rubrosInsumos]);
-        }
-      } else {
-        setRubrosInsumos([...rubrosInsumos, nuevoRubro]);
-      }
-=======
           const rubroEditado: RubroInsumoDTO = {
             denominacion: nombreRubro,
             activo: true,
@@ -210,21 +239,21 @@ const Categorias = () => {
               ...rubroEditando as RubroInsumo,
               denominacion: nombreRubro,
             };
-            if (rubroPadreSeleccionado) {
-              const nuevos = agregarSubRubro(nuevosRubros, Number(rubroPadreSeleccionado), rubroActualizado);
-              setRubrosInsumos(nuevos);
+            if (rubroPadreSeleccionado && rubroPadreSeleccionado !== "") {
+              nuevosRubros = agregarSubRubro(nuevosRubros, Number(rubroPadreSeleccionado), rubroActualizado);
+              setRubrosInsumos(nuevosRubros);
             } else {
               setRubrosInsumos([...nuevosRubros, rubroActualizado]);
             }
           } catch (error) {
             Swal.fire({
-              position: "bottom-end",
-              icon: "error",
-              title: "Fallo al editar rubro insumo",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Fallo al editar rubro insumo",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
             console.error("Error PUT rubro insumo", error);
             return;
           }
@@ -253,13 +282,13 @@ const Categorias = () => {
             ));
           } catch (error) {
             Swal.fire({
-              position: "bottom-end",
-              icon: "error",
-              title: "Fallo al editar rubro producto",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Fallo al editar rubro producto",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
             console.error("Error PUT rubro producto", error);
             return;
           }
@@ -280,13 +309,13 @@ const Categorias = () => {
             });
             if (!res.ok) throw new Error('Error en POST rubro insumo');
             Swal.fire({
-              position: "bottom-end",
-              icon: "success",
-              title: "Categoria Insumo creada correctamente",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            });
+                  position: "bottom-end",
+                  icon: "success",
+                  title: "Categoria Insumo creada correctamente",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
             let resp = null;
             try {
               resp = await res.json();
@@ -301,22 +330,23 @@ const Categorias = () => {
                 tipo: "Insumo",
                 subRubros: []
               };
-              if (rubroPadreSeleccionado) {
-                const nuevos = agregarSubRubro(rubrosInsumos, Number(rubroPadreSeleccionado), nuevoRubroObj);
-                setRubrosInsumos(nuevos);
+              if (rubroPadreSeleccionado && rubroPadreSeleccionado !== "") {
+                setRubrosInsumos(prev =>
+                  agregarSubRubro(prev, Number(rubroPadreSeleccionado), nuevoRubroObj)
+                );
               } else {
-                setRubrosInsumos([...rubrosInsumos, nuevoRubroObj]);
+                setRubrosInsumos(prev => [...prev, nuevoRubroObj]);
               }
             }
           } catch (error) {
             Swal.fire({
-              position: "bottom-end",
-              icon: "error",
-              title: "Error al crear rubro insumo",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Error al crear rubro insumo",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
             console.error("Error POST rubro insumo", error);
             return;
           }
@@ -333,13 +363,13 @@ const Categorias = () => {
             });
             if (!res.ok) throw new Error('Error en POST rubro producto');
             Swal.fire({
-              position: "bottom-end",
-              icon: "success",
-              title: "Categoria creada correctamente",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            });
+                  position: "bottom-end",
+                  icon: "success",
+                  title: "Categoria creada correctamente",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
             let resp = null;
             try {
               resp = await res.json();
@@ -347,7 +377,7 @@ const Categorias = () => {
               resp = null;
             }
             if (resp) {
-              setRubrosProductos([...rubrosProductos, {
+              setRubrosProductos(prev => [...prev, {
                 id: resp.id,
                 denominacion: resp.denominacion,
                 activo: resp.activo,
@@ -356,13 +386,13 @@ const Categorias = () => {
             }
           } catch (error) {
             Swal.fire({
-              position: "bottom-end",
-              icon: "error",
-              title: "Error al crear rubro producto",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Error al crear rubro producto",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
             console.error("Error POST rubro producto", error);
             return;
           }
@@ -377,13 +407,13 @@ const Categorias = () => {
 
     } catch (error) {
       Swal.fire({
-        position: "bottom-end",
-        icon: "error",
-        title: "Error general en creacion o edicion del rubro",
-        showConfirmButton: false,
-        timer: 1000,
-        width: "20em"
-      });
+                  position: "bottom-end",
+                  icon: "error",
+                  title: "Error general en creacion o edicion del rubro",
+                  showConfirmButton: false,
+                  timer: 1000,
+                  width: "20em"
+                });
       console.error("Error general crear/editar rubro", error);
     }
   };
@@ -400,26 +430,14 @@ const Categorias = () => {
       };
       const padreId = buscarPadre(rubrosInsumos, rubro.id);
       setRubroPadreSeleccionado(padreId ? String(padreId) : "");
->>>>>>> Stashed changes
     } else {
-      const nuevoProducto: RubroProducto = {
-        id: Date.now(),
-        denominacion: nombreRubro,
-        activo: true,
-        tipo: "Producto",
-      };
-      setRubrosProductos([...rubrosProductos, nuevoProducto]);
+      setRubroPadreSeleccionado("");
     }
-
-    setModalAbierto(false);
-    setNombreRubro("");
-    setRubroPadreSeleccionado("");
   };
 
-  // Componente de rubro
-  const RubroItem = ({ rubro, nivel = 0 }: { rubro: Rubro; nivel?: number }) => {
-    const [subAbierto, setSubAbierto] = useState(false);
-
+  const RubroItem = ({ rubro, nivel = 0, abierto, onToggle,
+  }: { rubro: Rubro; nivel?: number; abierto?: boolean; onToggle?: () => void;
+  }) => {
     return (
       <div className="w-full">
         <div className="flex items-center h-10">
@@ -427,31 +445,19 @@ const Categorias = () => {
             <p className="underline">{rubro.denominacion}</p>
           </div>
           <div className="flex justify-end w-full pr-10 gap-5">
-            <FaPencilAlt className="cursor-pointer hover:text-tertiary" />
-            <FaRegTrashAlt
-              className="cursor-pointer hover:text-tertiary"
-              onClick={() => {
-                if (rubro.tipo === "Insumo") {
-                  const nuevosRubros = eliminarRubroInsumo(rubrosInsumos, rubro.id);
-                  setRubrosInsumos(nuevosRubros);
-                } else {
-                  setRubrosProductos(rubrosProductos.filter(r => r.id !== rubro.id));
-                }
-              }}
+            <FaPencilAlt className="cursor-pointer hover:text-tertiary" onClick={() => handleEditar(rubro)}
             />
-            {rubro.tipo === "Insumo" && rubro.subRubros.length > 0 && (
-              <FaAngleUp
-                onClick={() => setSubAbierto(!subAbierto)}
-                className={`cursor-pointer h-5 ${subAbierto ? "rotate-180" : ""}`}
-              />
+            <FaRegTrashAlt className="cursor-pointer hover:text-tertiary" onClick={() => handleEliminar(rubro)}
+            />
+            {rubro.tipo === "Insumo" && (rubro as RubroInsumo).subRubros.length > 0 && (
+              <FaAngleUp onClick={onToggle} className={`cursor-pointer h-5 ${abierto ? "rotate-180" : ""}`} />
             )}
           </div>
         </div>
-
-        {rubro.tipo === "Insumo" && subAbierto && (
+        {rubro.tipo === "Insumo" && abierto && (
           <div className="ml-5">
-            {rubro.subRubros.map((subrubro) => (
-              <RubroItem key={subrubro.id} rubro={subrubro} nivel={nivel + 1} />
+            {(rubro as RubroInsumo).subRubros.map((subrubro) => (
+              <RubroItem key={subrubro.id} rubro={subrubro} nivel={nivel + 1} abierto={abiertos[subrubro.id]} onToggle={() => toggleAbierto(subrubro.id)} />
             ))}
           </div>
         )}
@@ -463,47 +469,25 @@ const Categorias = () => {
     <>
       <div className='w-5/6 mt-10 flex justify-around items-center'>
         <form className='flex items-center'>
-          <input 
-            type="search" 
-            placeholder='Buscar' 
-            onChange={(e) => setBusqueda(e.target.value)} 
-            className='bg-white py-2 pl-3 pr-8 border rounded-2xl focus:outline-[#BD1E22]' 
-          />
+          <input type="search" placeholder='Buscar' onChange={(e) => setBusqueda(e.target.value)} className='bg-white py-2 pl-3 pr-8 border rounded-2xl focus:outline-[#BD1E22]' />
           <FaSearch className={`relative right-7 ${busqueda ? "hidden" : "block"}`} />
         </form>
         <div className='flex gap-2'>
-          <button 
-            className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} 
-            onClick={() => setOpcionFiltrar("Insumo")}
-          >
-            Insumos
-          </button>
-          <button 
-            className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} 
-            onClick={() => setOpcionFiltrar("Producto")}
-          >
-            Productos
-          </button>
+          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Insumo")} type="button" > Insumos </button>
+          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Producto")} type="button"> Productos </button>
         </div>
-        <button 
-          className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer'
-          onClick={() => setModalAbierto(true)}
-        >
-          +Agregar Categoría
+        <button className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer' onClick={() => { setModalAbierto(true); setEditando(false); setRubroEditando(null); setNombreRubro(""); setTipoRubro("Insumo"); setRubroPadreSeleccionado(""); }} > +Agregar Categoría
         </button>
       </div>
 
-      <div className="mt-10 bg-white h-10 w-8/10 pl-10 flex items-center rounded-t-lg font-semibold">
-        Nombre
-      </div>
+      <div className="mt-10 bg-white h-10 w-8/10 pl-10 flex items-center rounded-t-lg font-semibold">Nombre</div>
 
       <ul className='w-8/10'>
         {opcionFiltrar === "Insumo" && filteredInsumos.map((rubro) => (
           <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md' key={rubro.id}>
-            <RubroItem rubro={rubro} />
+            <RubroItem rubro={rubro} abierto={abiertos[rubro.id]} onToggle={() => toggleAbierto(rubro.id)} />
           </li>
         ))}
-
         {opcionFiltrar === "Producto" && filteredProductos.map((rubro) => (
           <li className='border-b-1 mt-2 underline-offset-6 font-semibold text-md' key={rubro.id}>
             <RubroItem rubro={rubro} />
@@ -514,47 +498,27 @@ const Categorias = () => {
       {modalAbierto && (
         <div className="fixed inset-0 bg-black/50 z-40">
           <div className="rounded-3xl p-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary w-1/2">
-            <button
-              onClick={() => setModalAbierto(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-red-600"
-            >
+            <button onClick={() => { setModalAbierto(false); setEditando(false); setRubroEditando(null); setNombreRubro(""); setTipoRubro("Insumo"); setRubroPadreSeleccionado(""); }} className="absolute top-4 right-4 text-gray-500 hover:text-red-600" >
               <FaTimes className="text-secondary h-6 w-6" />
             </button>
-            <h2 className="text-2xl font-bold mb-4 text-secondary">Nueva Categoría</h2>
+            <h2 className="text-2xl font-bold mb-4 text-secondary">
+              {editando ? "Editar Categoría" : "Nueva Categoría"}
+            </h2>
             <form onSubmit={crearRubro}>
               <div className="mb-4">
                 <label className="block mb-2">Nombre</label>
-                <input
-                  type="text"
-                  placeholder='Nombre de la categoria'
-                  className="w-full p-2 border rounded bg-white"
-                  value={nombreRubro}
-                  onChange={(e) => setNombreRubro(e.target.value)}
-                  required
-                />
+                <input type="text" placeholder='Nombre de la categoria' className="w-full p-2 border rounded bg-white" value={nombreRubro} onChange={(e) => setNombreRubro(e.target.value)} required />
               </div>
 
               <div className="mb-4">
                 <label className="block mb-2">Tipo</label>
                 <div className="flex gap-4">
                   <label>
-                    <input
-                      type="radio"
-                      name="tipo"
-                      value="Insumo"
-                      checked={tipoRubro === "Insumo"}
-                      onChange={() => setTipoRubro("Insumo")}
-                    />
+                    <input type="radio" name="tipo" value="Insumo" checked={tipoRubro === "Insumo"} onChange={() => setTipoRubro("Insumo")} disabled={editando} />
                     <span className="ml-2">Insumo</span>
                   </label>
                   <label>
-                    <input
-                      type="radio"
-                      name="tipo"
-                      value="Producto"
-                      checked={tipoRubro === "Producto"}
-                      onChange={() => setTipoRubro("Producto")}
-                    />
+                    <input type="radio" name="tipo" value="Producto" checked={tipoRubro === "Producto"} onChange={() => setTipoRubro("Producto")} disabled={editando} />
                     <span className="ml-2">Producto</span>
                   </label>
                 </div>
@@ -563,34 +527,25 @@ const Categorias = () => {
               {tipoRubro === "Insumo" && (
                 <div className="mb-4">
                   <label className="block mb-2">Rubro Padre (Opcional)</label>
-                  <select
-                    className="w-full p-2 border rounded bg-white"
-                    onChange={(e) => setRubroPadreSeleccionado(e.target.value)}
-                  >
+                  <select className="w-full p-2 border rounded bg-white" onChange={(e) => setRubroPadreSeleccionado(e.target.value)} value={rubroPadreSeleccionado} disabled={editando && rubroEditando?.tipo === "Insumo" && (rubroEditando as RubroInsumo).subRubros.length > 0} >
                     <option value="">Ninguno</option>
-                    {obtenerRubrosInsumoAnidados(rubrosInsumos).map((rubro) => (
-                      <option key={rubro.id} value={rubro.id}>
-                        {"— ".repeat(rubro.subRubros.length)} {rubro.denominacion}
-                      </option>
-                    ))}
+                    {obtenerTodosRubrosUnicosAnidados(rubrosInsumos)
+                      .filter(({rubro}) => !editando || rubro.id !== rubroEditando?.id)
+                      .map(({rubro, depth}) => (
+                        <option key={rubro.id} value={rubro.id}>
+                          {"— ".repeat(depth)} {rubro.denominacion}
+                        </option>
+                      ))}
                   </select>
+                  {editando && rubroEditando?.tipo === "Insumo" && (rubroEditando as RubroInsumo).subRubros.length > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">No puedes cambiar el padre si el rubro tiene subrubros.</p>
+                  )}
                 </div>
               )}
 
               <div className="flex justify-end gap-4 mt-6">
-                <button 
-                  type="button" 
-                  onClick={() => setModalAbierto(false)} 
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit" 
-                  className="px-4 py-2 bg-tertiary text-white rounded hover:bg-secondary transition-colors"
-                >
-                  Crear
-                </button>
+                <button type="button" onClick={() => { setModalAbierto(false); setEditando(false); setRubroEditando(null); setNombreRubro(""); setTipoRubro("Insumo"); setRubroPadreSeleccionado(""); }} className="px-4 py-2 text-gray-600 hover:text-gray-800"> Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-tertiary text-white rounded hover:bg-secondary transition-colors"> {editando ? "Guardar Cambios" : "Crear"}</button>
               </div>
             </form>
           </div>
