@@ -1,7 +1,13 @@
 import { ChangeEvent, useState } from 'react';
 import { FaSearch, FaTimes, FaPencilAlt, FaRegTrashAlt, FaAngleUp } from "react-icons/fa";
+<<<<<<< Updated upstream
 import { RubroInsumoDTO } from '../../types/RubroProducto/RubroProductoDTO';
 import { RubroProductoDTO } from '../../types/RubroInsumo/RubroInsumoDTO';
+=======
+import { RubroInsumoDTO } from '../../types/RubroInsumo/RubroInsumoDTO';
+import { RubroProductoDTO } from '../../types/RubroProducto/RubroProductoDTO';
+import Swal from "sweetalert2";
+>>>>>>> Stashed changes
 
 type Rubro = RubroInsumoDTO | RubroProductoDTO;
 
@@ -14,6 +20,77 @@ const Categorias = () => {
   const [rubrosProductos, setRubrosProductos] = useState<RubroProducto[]>([]);
   const [busqueda, setBusqueda] = useState<string>("");
   const [opcionFiltrar, setOpcionFiltrar] = useState<"Insumo" | "Producto" | "">("");
+<<<<<<< Updated upstream
+=======
+  const [abiertos, setAbiertos] = useState<{ [id: number]: boolean }>({});
+
+  const [editando, setEditando] = useState<boolean>(false);
+  const [rubroEditando, setRubroEditando] = useState<Rubro | null>(null);
+
+  // --------------------- FETCH DATA FROM BACKEND --------------------- //
+  useEffect(() => {
+    // Traer todos los Rubros Insumo
+    (async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/rubroinsumo');
+        if (!res.ok) throw new Error('Fallo al traer rubros insumo');
+        const data: any[] = await res.json();
+        function mapRubroInsumo(dto: any): RubroInsumo {
+          return {
+            id: dto.id,
+            denominacion: dto.denominacion,
+            activo: dto.activo,
+            tipo: "Insumo",
+            subRubros: (dto.subRubros || []).map(mapRubroInsumo)
+          }
+        }
+        setRubrosInsumos(data.map(mapRubroInsumo));
+      } catch (error) {
+        Swal.fire({
+          position: "bottom-end",
+          icon: "error",
+          title: "Error al cargar rubros insumo",
+          showConfirmButton: false,
+          timer: 1000,
+          width: "20em"
+        });
+        console.error("Error fetch rubros insumo", error);
+      }
+    })();
+
+    // Traer todos los Rubros Producto
+    (async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/rubroProducto');
+        if (!res.ok) throw new Error('Fallo al traer rubros producto');
+        const data: any[] = await res.json();
+        setRubrosProductos(
+          data.map(dto => ({
+            id: dto.id,
+            denominacion: dto.denominacion,
+            activo: dto.activo,
+            tipo: "Producto"
+          }))
+        );
+      } catch (error) {
+        Swal.fire({
+          position: "bottom-end",
+          icon: "error",
+          title: "Error al cargar rubros producto",
+          showConfirmButton: false,
+          timer: 1000,
+          width: "20em"
+        });
+        console.error("Error fetch rubros producto", error);
+      }
+    })();
+  }, []);
+  // ------------------------------------------------------------------- //
+
+  const toggleAbierto = (id: number) => {
+    setAbiertos(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+>>>>>>> Stashed changes
 
   // Función recursiva para eliminar rubros Insumo
   const eliminarRubroInsumo = (rubros: RubroInsumo[], id: number): RubroInsumo[] => {
@@ -45,11 +122,40 @@ const Categorias = () => {
 
   // Obtener todos los rubros Insumo anidados
   const obtenerRubrosInsumoAnidados = (rubros: RubroInsumo[]): RubroInsumo[] => {
+    // Devuelve todos los rubros y subrubros en un array plano (para el select de padre)
     return rubros.flatMap(rubro => [rubro, ...obtenerRubrosInsumoAnidados(rubro.subRubros)]);
   };
 
+<<<<<<< Updated upstream
   // Crear nuevo rubro
   const crearRubro = (e: React.FormEvent) => {
+=======
+  const encontrarPadre = (rubros: RubroInsumo[], id: number): RubroInsumo | undefined => {
+    for (const rubro of rubros) {
+      if (rubro.id === id) return rubro;
+      const encontrado = encontrarPadre(rubro.subRubros, id);
+      if (encontrado) return encontrado;
+    }
+  };
+
+  // Utilidad inmutable para agregar un subrubro a un padre
+  function agregarSubRubro(rubros: RubroInsumo[], padreId: number, nuevo: RubroInsumo): RubroInsumo[] {
+    return rubros.map(rubro => {
+      if (rubro.id === padreId) {
+        return {
+          ...rubro,
+          subRubros: [...rubro.subRubros, nuevo]
+        };
+      }
+      return {
+        ...rubro,
+        subRubros: agregarSubRubro(rubro.subRubros, padreId, nuevo)
+      };
+    });
+  }
+
+  const crearRubro = async (e: React.FormEvent) => {
+>>>>>>> Stashed changes
     e.preventDefault();
     if (!nombreRubro || !tipoRubro) return;
 
@@ -62,6 +168,7 @@ const Categorias = () => {
         subRubros: [],
       };
 
+<<<<<<< Updated upstream
       if (rubroPadreSeleccionado) {
         const encontrarPadre = (rubros: RubroInsumo[]): RubroInsumo | undefined => {
           for (const rubro of rubros) {
@@ -79,6 +186,221 @@ const Categorias = () => {
       } else {
         setRubrosInsumos([...rubrosInsumos, nuevoRubro]);
       }
+=======
+          const rubroEditado: RubroInsumoDTO = {
+            denominacion: nombreRubro,
+            activo: true,
+            rubroPadreId: rubroPadreSeleccionado ? Number(rubroPadreSeleccionado) : undefined,
+            tipo: "Insumo"
+          };
+          try {
+            const res = await fetch(`http://localhost:8080/api/rubroinsumo/${rubroEditando.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(rubroEditado)
+            });
+            if (!res.ok) throw new Error('Error en PUT rubro insumo');
+            let resp = null;
+            try {
+              resp = await res.json();
+            } catch (e) {
+              resp = null;
+            }
+            const rubroActualizado: RubroInsumo = {
+              ...rubroEditando as RubroInsumo,
+              denominacion: nombreRubro,
+            };
+            if (rubroPadreSeleccionado) {
+              const nuevos = agregarSubRubro(nuevosRubros, Number(rubroPadreSeleccionado), rubroActualizado);
+              setRubrosInsumos(nuevos);
+            } else {
+              setRubrosInsumos([...nuevosRubros, rubroActualizado]);
+            }
+          } catch (error) {
+            Swal.fire({
+              position: "bottom-end",
+              icon: "error",
+              title: "Fallo al editar rubro insumo",
+              showConfirmButton: false,
+              timer: 1000,
+              width: "20em"
+            });
+            console.error("Error PUT rubro insumo", error);
+            return;
+          }
+        } else {
+          const rubroEditado: RubroProductoDTO = {
+            denominacion: nombreRubro,
+            activo: true,
+          };
+          try {
+            const res = await fetch(`http://localhost:8080/api/rubroProducto/${rubroEditando.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(rubroEditado)
+            });
+            if (!res.ok) throw new Error('Error en PUT rubro producto');
+            let resp = null;
+            try {
+              resp = await res.json();
+            } catch (e) {
+              resp = null;
+            }
+            setRubrosProductos(rubrosProductos.map(rubro =>
+              rubro.id === rubroEditando.id
+                ? { ...rubro, denominacion: nombreRubro }
+                : rubro
+            ));
+          } catch (error) {
+            Swal.fire({
+              position: "bottom-end",
+              icon: "error",
+              title: "Fallo al editar rubro producto",
+              showConfirmButton: false,
+              timer: 1000,
+              width: "20em"
+            });
+            console.error("Error PUT rubro producto", error);
+            return;
+          }
+        }
+      } else {
+        if (tipoRubro === "Insumo") {
+          const nuevoRubro: RubroInsumoDTO = {
+            denominacion: nombreRubro,
+            activo: true,
+            rubroPadreId: rubroPadreSeleccionado ? Number(rubroPadreSeleccionado) : undefined,
+            tipo: "Insumo"
+          };
+          try {
+            const res = await fetch("http://localhost:8080/api/rubroinsumo/save", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(nuevoRubro)
+            });
+            if (!res.ok) throw new Error('Error en POST rubro insumo');
+            Swal.fire({
+              position: "bottom-end",
+              icon: "success",
+              title: "Categoria Insumo creada correctamente",
+              showConfirmButton: false,
+              timer: 1000,
+              width: "20em"
+            });
+            let resp = null;
+            try {
+              resp = await res.json();
+            } catch (e) {
+              resp = null;
+            }
+            if (resp) {
+              const nuevoRubroObj: RubroInsumo = {
+                id: resp.id,
+                denominacion: resp.denominacion,
+                activo: resp.activo,
+                tipo: "Insumo",
+                subRubros: []
+              };
+              if (rubroPadreSeleccionado) {
+                const nuevos = agregarSubRubro(rubrosInsumos, Number(rubroPadreSeleccionado), nuevoRubroObj);
+                setRubrosInsumos(nuevos);
+              } else {
+                setRubrosInsumos([...rubrosInsumos, nuevoRubroObj]);
+              }
+            }
+          } catch (error) {
+            Swal.fire({
+              position: "bottom-end",
+              icon: "error",
+              title: "Error al crear rubro insumo",
+              showConfirmButton: false,
+              timer: 1000,
+              width: "20em"
+            });
+            console.error("Error POST rubro insumo", error);
+            return;
+          }
+        } else {
+          const nuevoProducto: RubroProductoDTO = {
+            denominacion: nombreRubro,
+            activo: true,
+          };
+          try {
+            const res = await fetch("http://localhost:8080/api/rubroProducto/save", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(nuevoProducto)
+            });
+            if (!res.ok) throw new Error('Error en POST rubro producto');
+            Swal.fire({
+              position: "bottom-end",
+              icon: "success",
+              title: "Categoria creada correctamente",
+              showConfirmButton: false,
+              timer: 1000,
+              width: "20em"
+            });
+            let resp = null;
+            try {
+              resp = await res.json();
+            } catch (e) {
+              resp = null;
+            }
+            if (resp) {
+              setRubrosProductos([...rubrosProductos, {
+                id: resp.id,
+                denominacion: resp.denominacion,
+                activo: resp.activo,
+                tipo: "Producto"
+              }]);
+            }
+          } catch (error) {
+            Swal.fire({
+              position: "bottom-end",
+              icon: "error",
+              title: "Error al crear rubro producto",
+              showConfirmButton: false,
+              timer: 1000,
+              width: "20em"
+            });
+            console.error("Error POST rubro producto", error);
+            return;
+          }
+        }
+      }
+
+      setModalAbierto(false);
+      setNombreRubro("");
+      setRubroPadreSeleccionado("");
+      setEditando(false);
+      setRubroEditando(null);
+
+    } catch (error) {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "error",
+        title: "Error general en creacion o edicion del rubro",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+      console.error("Error general crear/editar rubro", error);
+    }
+  };
+
+  const handleEditar = (rubro: Rubro) => { setEditando(true); setRubroEditando(rubro); setNombreRubro(rubro.denominacion); setTipoRubro(rubro.tipo); setModalAbierto(true);
+    if (rubro.tipo === "Insumo") {
+      const buscarPadre = (rubros: RubroInsumo[], id: number, padreId?: number): number | "" => {
+        for (const rubroItem of rubros) {
+          if (rubroItem.subRubros.some(sub => sub.id === id)) return rubroItem.id;
+          const resultado = buscarPadre(rubroItem.subRubros, id, rubroItem.id);
+          if (resultado) return resultado;
+        }
+        return "";
+      };
+      const padreId = buscarPadre(rubrosInsumos, rubro.id);
+      setRubroPadreSeleccionado(padreId ? String(padreId) : "");
+>>>>>>> Stashed changes
     } else {
       const nuevoProducto: RubroProducto = {
         id: Date.now(),
