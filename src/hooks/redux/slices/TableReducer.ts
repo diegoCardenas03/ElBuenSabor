@@ -1,47 +1,41 @@
-// Importaciones necesarias
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { InsumoResponseDTO } from "../../../types/Insumo/InsumoResponseDTO";
+import { ProductoDTO } from "../../../types/Producto/ProductoDTO";
 
-// Definimos la interfaz para el estado inicial del slice
+// El tipo de dato puede ser insumo o producto (o ambos)
+type TableElement = InsumoResponseDTO | ProductoDTO;
+
 interface IInitialState {
-  dataTable: InsumoResponseDTO[]; // Datos de la tabla
-  elementActive: null | InsumoResponseDTO; // Elemento activo seleccionado
+  dataTable: TableElement[]; // Datos de la tabla (pueden ser insumos o productos)
+  elementActive: null | TableElement; // Elemento activo seleccionado
 }
 
-// Estado inicial del slice
 const initialState: IInitialState = {
-  dataTable: [], // Inicialmente la tabla está vacía
-  elementActive: null, // No hay ningún elemento activo seleccionado inicialmente
+  dataTable: [],
+  elementActive: null,
 };
 
-// Interfaz para la acción del payload personalizado
 interface PayloadSetElement {
-  element: InsumoResponseDTO; // Elemento de tipo IPersona
+  element: TableElement;
 }
 
-// Creamos un slice con Redux Toolkit para manejar la tabla
 const TablaReducer = createSlice({
-  name: "TablaReducer", // Nombre del slice
-  initialState, // Estado inicial del slice
+  name: "TablaReducer",
+  initialState,
   reducers: {
-    // Reducer para establecer los datos de la tabla
-    setDataTable(state, action: PayloadAction<any[]>) {
-      state.dataTable = action.payload; // Actualizamos los datos de la tabla con los datos proporcionados
+    setDataTable(state, action: PayloadAction<TableElement[]>) {
+      state.dataTable = action.payload;
     },
-    // Reducer para establecer el elemento activo
     setElementActive(state, action: PayloadAction<PayloadSetElement>) {
-      state.elementActive = action.payload.element; // Establecemos el elemento activo con el elemento proporcionado en el payload
+      state.elementActive = action.payload.element;
     },
-    // Reducer para eliminar el elemento activo
     removeElementActive(state) {
-      state.elementActive = null; // Eliminamos el elemento activo estableciéndolo como null
+      state.elementActive = null;
     },
   },
 });
 
-// Exportamos los actions generados por el slice
 export const { setDataTable, setElementActive, removeElementActive } =
   TablaReducer.actions;
 
-// Exportamos el reducer generado por el slice
 export default TablaReducer.reducer;

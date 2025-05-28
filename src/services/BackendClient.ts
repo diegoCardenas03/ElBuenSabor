@@ -33,7 +33,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
   }
 
   async patch(id: number | string, data: RequestType): Promise<ResponseType> {
-    const response = await fetch(`${this.baseUrl}/${id}`, {
+    const response = await fetch(`${this.baseUrl}/update/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -42,6 +42,16 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     });
     const newData = await response.json();
     return newData as ResponseType;
+  }
+
+  // Metodo para actualizar el estado
+  async updateEstado(id: number): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/actualizar-estado/${id}`, {
+      method: "PUT",
+    });
+    if (!response.ok) {
+      throw new Error(`Error al actualizar el estadod el elemento con ID ${id}`);
+    }
   }
 
   // Método para eliminar un elemento por su ID

@@ -27,7 +27,6 @@ interface IModalInsumo {
   openModal: boolean;
   setOpenModal: (state: boolean) => void;
 }
-
 export const ModalInsumo = ({
   getInsumos,
   openModal,
@@ -127,7 +126,7 @@ export const ModalInsumo = ({
               await apiInsumo.post(values);
             }
             getInsumos();
-            handleClose();
+            handleClose()
           }}
         >
           {() => (

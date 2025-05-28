@@ -66,10 +66,7 @@ const ColumnsTableInsumo = [
       checked={insumo.activo}
       onChange={async () => {
         try {
-          await insumoService.patch(insumo.id!, {
-            ...insumo,
-            activo: !insumo.activo,
-          });
+          await insumoService.updateEstado(insumo.id)
           getInsumos(); // Actualizás la tabla
         } catch (error) {
           Swal.fire("Error", "No se pudo actualizar el estado", "error");

@@ -7,6 +7,7 @@ import Menu from '../pages/MenuPage';
 import PedidosCocinero from '../pages/pedidosCocinero';
 import { ScreenInsumo } from '../pages/ScreenInsumo';
 import Configuracion from '../pages/admin/Configuracion';
+import { ScreenProducto } from '../pages/ScreenProducto';
 const RoutesApp = () => {
   return (
     <BrowserRouter>
@@ -17,6 +18,7 @@ const RoutesApp = () => {
         <Route path="/Menu" element={<Menu />} />
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
         <Route path="/Insumos" element={<ScreenInsumo />} />
+        <Route path="/productos" element={<ScreenProducto />} />
         <Route path='/admin/Configuracion' element={<Configuracion />} />
       </Routes>
     </BrowserRouter>
