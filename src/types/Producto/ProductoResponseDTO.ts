@@ -2,6 +2,7 @@ import { DetalleProductoResponseDTO } from "../DetalleProducto/DetalleProductoRe
 import { RubroProductoResponseDTO } from "../RubroProducto/RubroProductoResponseDTO";
 
 export interface ProductoResponseDTO {
+    id: number;
     denominacion: string;
     descripcion: string;
     tiempoEstimadoPreparacion: number;
