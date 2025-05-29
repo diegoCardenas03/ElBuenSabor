@@ -11,14 +11,11 @@ import {
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { removeElementActive } from "../../hooks/redux/slices/TableReducer";
-import { UnidadMedida } from "../../types/enums/UnidadMedida";
 import { ProductoDTO } from "../../types/Producto/ProductoDTO";
 import TextFieldValue from "../TextFildValue/TextFildValue";
-import SelectField from "../SelectField/SelectField";
 import { useEffect, useState } from "react";
-import { RubroProductoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
+import { RubroProductoResponseDTO } from "../../types/RubroProducto/RubroProductoResponseDTO";
 import { DetalleProductoDTO } from "../../types/DetalleProducto/DetalleProductoDTO";
-// const API_URL = import.meta.env.VITE_API_URL;
 import "./ModalInsumo.css";
 import { ProductoService } from "../../services/ProductoService";
 
@@ -38,7 +35,7 @@ export const ModalProducto = ({
     (state) => state.tablaReducer.elementActive
   );
 
- const apiProducto = new ProductoService();
+  const apiProducto = new ProductoService();
   const [rubros, setRubros] = useState<RubroProductoResponseDTO[]>([]);
   const [insumos, setInsumos] = useState<any[]>([]);
   const [insumoId, setInsumoId] = useState<number>(0);
@@ -57,24 +54,21 @@ export const ModalProducto = ({
 
     fetchRubros();
   }, []);
- useEffect(() => {
-  fetch("http://localhost:8080/api/insumos") 
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Data de insumos:", data); 
-      if (Array.isArray(data)) {
-        setInsumos(data);
-      } else {
-        console.error("El resultado de insumos no es un array:", data);
-        setInsumos([]);
-      }
-    })
-    .catch((err) => {
-      console.error("Error al cargar insumos:", err);
-      setInsumos([]);
-    });
-}, []);
 
+  useEffect(() => {
+    fetch("http://localhost:8080/api/insumos")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setInsumos(data);
+        } else {
+          setInsumos([]);
+        }
+      })
+      .catch((err) => {
+        setInsumos([]);
+      });
+  }, []);
 
   const rubroOptions = rubros.map((r) => ({
     value: r.id,
@@ -88,15 +82,15 @@ export const ModalProducto = ({
   const initialValues: ProductoDTO = elementActive
     ? elementActive
     : {
-      denominacion: "",
-      urlImagen: "",
-      descripcion: "",
-      tiempoEstimadoPreparacion: 0,
-      precioVenta: 0,
-      activo: true,
-      detalleProductos: [],
-      rubroId: 0,
-    };
+        denominacion: "",
+        urlImagen: "",
+        descripcion: "",
+        tiempoEstimadoPreparacion: 0,
+        precioVenta: 0,
+        activo: true,
+        detalleProductos: [],
+        rubroId: 0,
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -139,21 +133,24 @@ export const ModalProducto = ({
             descripcion: Yup.string().required("Campo requerido"),
           })}
           enableReinitialize
-          onSubmit={async (values) => {
-            console.log("Valores del formulario:", values);
-            if (elementActive?.id) {
-              await apiProducto.patch(elementActive.id, values);
-            
-            } else {
-              await apiProducto.post(values);
+          onSubmit={async (values, { setSubmitting, setStatus }) => {
+            try {
+              if (elementActive?.id) {
+                await apiProducto.patch(elementActive.id, values);
+              } else {
+                await apiProducto.post(values);
+              }
+              getProductos();
+              handleClose();
+            } catch (error) {
+              setStatus("Ocurrió un error al guardar el producto");
+            } finally {
+              setSubmitting(false);
             }
-            getProductos();
-            handleClose();
           }}
         >
           {({ values, setFieldValue }) => (
             <Form>
-
               <div className="container_Form_Ingredientes">
                 {/* Columna izquierda */}
                 <div className="input-col">
@@ -305,7 +302,7 @@ export const ModalProducto = ({
                       );
                       return (
                         <li
-                          key={detalle.insumoId}
+                          key={`${detalle.insumoId}-${idx}`}
                           style={{
                             display: "flex",
                             alignItems: "center",
@@ -337,7 +334,6 @@ export const ModalProducto = ({
 
               {/* Switches */}
               <div style={{ display: "flex", gap: "30px", padding: "20px" }}>
-
                 <FormControlLabel
                   control={
                     <Field
@@ -373,7 +369,6 @@ export const ModalProducto = ({
                     px: 4,
                     borderRadius: "25px",
                   }}
-                  
                 >
                   Guardar
                 </Button>
