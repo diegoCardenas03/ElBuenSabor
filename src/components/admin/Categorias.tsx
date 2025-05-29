@@ -31,8 +31,8 @@ function rubroPadreIdEnData(rubros: RubroInsumo[], id: number): boolean {
 }
 
 // Para el select: recorre todo el árbol y cada rubro aparece SOLO UNA VEZ (aunque el backend lo mande duplicado)
-const obtenerTodosRubrosUnicosAnidados = (rubros: RubroInsumo[], depth = 0, visitados = new Set<number>()): {rubro: RubroInsumo, depth: number}[] => {
-  let result: {rubro: RubroInsumo, depth: number}[] = [];
+const obtenerTodosRubrosUnicosAnidados = (rubros: RubroInsumo[], depth = 0, visitados = new Set<number>()): { rubro: RubroInsumo, depth: number }[] => {
+  let result: { rubro: RubroInsumo, depth: number }[] = [];
   for (const rubro of rubros) {
     if (!visitados.has(rubro.id)) {
       visitados.add(rubro.id);
@@ -53,10 +53,10 @@ const Categorias = () => {
   const [busqueda, setBusqueda] = useState<string>("");
   const [opcionFiltrar, setOpcionFiltrar] = useState<"Insumo" | "Producto" | "">("Insumo");
   const [abiertos, setAbiertos] = useState<{ [id: number]: boolean }>({});
+  const [errorRubrosInsumo, setErrorRubrosInsumo] = useState(false);
 
   const [editando, setEditando] = useState<boolean>(false);
   const [rubroEditando, setRubroEditando] = useState<Rubro | null>(null);
-
   // Función para cargar rubros desde el backend
   const cargarRubros = useCallback(async () => {
     // Traer todos los Rubros Insumo
@@ -74,16 +74,20 @@ const Categorias = () => {
         }
       }
       setRubrosInsumos(data.map(mapRubroInsumo));
+      setErrorRubrosInsumo(false); // Reset error si carga bien
     } catch (error) {
-      Swal.fire({
-        position: "bottom-end",
-        icon: "error",
-        title: "Error al cargar rubros insumo",
-        showConfirmButton: false,
-        timer: 1000,
-        width: "20em"
-      });
-      console.error("Error fetch rubros insumo", error);
+      if (!errorRubrosInsumo) {
+        setErrorRubrosInsumo(true);
+        Swal.fire({
+          position: "bottom-end",
+          icon: "error",
+          title: "Error al cargar rubros insumo",
+          showConfirmButton: false,
+          timer: 1000,
+          width: "20em"
+        });
+        console.error("Error fetch rubros insumo", error);
+      }
     }
 
     // Traer todos los Rubros Producto
@@ -115,6 +119,7 @@ const Categorias = () => {
   // Cargar datos iniciales
   useEffect(() => {
     cargarRubros();
+    return () => setErrorRubrosInsumo(false);
   }, [cargarRubros]);
 
   const toggleAbierto = (id: number) => {
@@ -125,20 +130,20 @@ const Categorias = () => {
   const handleEliminar = async (rubro: Rubro) => {
     try {
       if (rubro.tipo === "Insumo") {
-        const res = await fetch(`http://localhost:8080/api/rubroinsumos/delete/${rubro.id}`, { 
-          method: "DELETE" 
+        const res = await fetch(`http://localhost:8080/api/rubroinsumos/delete/${rubro.id}`, {
+          method: "DELETE"
         });
         if (!res.ok) throw new Error('Error al eliminar rubro insumo');
       } else {
-        const res = await fetch(`http://localhost:8080/api/rubroproductos/delete/${rubro.id}`, { 
-          method: "DELETE" 
+        const res = await fetch(`http://localhost:8080/api/rubroproductos/delete/${rubro.id}`, {
+          method: "DELETE"
         });
         if (!res.ok) throw new Error('Error al eliminar rubro producto');
       }
-      
+
       // Recargar datos después de eliminar
       await cargarRubros();
-      
+
       Swal.fire({
         position: "bottom-end",
         icon: "success",
@@ -181,13 +186,13 @@ const Categorias = () => {
     .filter(rubro => rubro.denominacion.toLowerCase().includes(busqueda.toLowerCase()) && rubro.activo);
 
   // Handler para editar rubro y abrir modal
-  const handleEditar = (rubro: Rubro) => { 
-    setEditando(true); 
-    setRubroEditando(rubro); 
-    setNombreRubro(rubro.denominacion); 
-    setTipoRubro(rubro.tipo); 
+  const handleEditar = (rubro: Rubro) => {
+    setEditando(true);
+    setRubroEditando(rubro);
+    setNombreRubro(rubro.denominacion);
+    setTipoRubro(rubro.tipo);
     setModalAbierto(true);
-    
+
     if (rubro.tipo === "Insumo") {
       const buscarPadre = (rubros: RubroInsumo[], id: number, padreId?: number): number | "" => {
         for (const rubroItem of rubros) {
@@ -232,8 +237,8 @@ const Categorias = () => {
           <FaSearch className={`relative right-7 ${busqueda ? "hidden" : "block"}`} />
         </form>
         <div className='flex gap-2'>
-          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Insumo")} type="button" > Insumos </button>
-          <button className={`font-bold py-2 rounded-lg px-3 ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Producto")} type="button"> Productos </button>
+          <button className={`font-bold py-2 rounded-lg px-3 cursor-pointer ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Insumo")} type="button" > Insumos </button>
+          <button className={`font-bold py-2 rounded-lg px-3 cursor-pointer ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Producto")} type="button"> Productos </button>
         </div>
         <button className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer' onClick={handleAbrirModalNuevo} > +Agregar Categoría
         </button>
