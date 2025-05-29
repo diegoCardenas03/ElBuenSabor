@@ -67,6 +67,7 @@ export const ModalProducto = ({
     fetch("http://localhost:8080/api/insumos")
       .then((res) => res.json())
       .then((data) => {
+        alert(data);''
         if (Array.isArray(data)) {
           setInsumos(data);
         } else {
