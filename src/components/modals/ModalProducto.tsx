@@ -16,10 +16,11 @@ import { ProductoDTO } from "../../types/Producto/ProductoDTO";
 import TextFieldValue from "../TextFildValue/TextFildValue";
 import SelectField from "../SelectField/SelectField";
 import { useEffect, useState } from "react";
-import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
+import { RubroProductoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
 import { DetalleProductoDTO } from "../../types/DetalleProducto/DetalleProductoDTO";
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
 import "./ModalInsumo.css";
+import { ProductoService } from "../../services/ProductoService";
 
 interface IModalProducto {
   getProductos: () => void;
@@ -36,32 +37,52 @@ export const ModalProducto = ({
   const elementActive = useAppSelector(
     (state) => state.tablaReducer.elementActive
   );
-  // Cambia esto por tu servicio real de productos
-  const apiProducto = {
-    post: async (data: any) => fetch(`${API_URL}/productos`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }),
-    patch: async (id: number, data: any) => fetch(`${API_URL}/productos/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) }),
-  };
 
-  const [rubros, setRubros] = useState<RubroInsumoResponseDTO[]>([]);
+ const apiProducto = new ProductoService();
+  const [rubros, setRubros] = useState<RubroProductoResponseDTO[]>([]);
   const [insumos, setInsumos] = useState<any[]>([]);
   const [insumoId, setInsumoId] = useState<number>(0);
   const [cantidad, setCantidad] = useState<number>(1);
 
   useEffect(() => {
-    fetch(`${API_URL}/rubros`)
-      .then((res) => res.json())
-      .then((data) => setRubros(data));
-  }, []);
+    const fetchRubros = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/rubroProducto");
+        const data = await response.json();
+        setRubros(data);
+      } catch (error) {
+        console.error("Error al cargar rubros:", error);
+      }
+    };
 
-  useEffect(() => {
-    fetch(`${API_URL}/insumos`)
-      .then((res) => res.json())
-      .then((data) => setInsumos(data));
+    fetchRubros();
   }, []);
+ useEffect(() => {
+  fetch("http://localhost:8080/api/insumos") 
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("Data de insumos:", data); 
+      if (Array.isArray(data)) {
+        setInsumos(data);
+      } else {
+        console.error("El resultado de insumos no es un array:", data);
+        setInsumos([]);
+      }
+    })
+    .catch((err) => {
+      console.error("Error al cargar insumos:", err);
+      setInsumos([]);
+    });
+}, []);
 
-  const unidadMedidaOptions = Object.values(UnidadMedida).map((value) => ({
-    value,
-    label: value,
+
+  const rubroOptions = rubros.map((r) => ({
+    value: r.id,
+    label: r.nombre,
+  }));
+  const insumoOptions = insumos.map((r) => ({
+    value: r.id,
+    label: r.nombre,
   }));
 
   const initialValues: ProductoDTO = elementActive
@@ -85,7 +106,7 @@ export const ModalProducto = ({
   return (
     <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
-        <h2
+        <p
           className="font-tertiary"
           style={{
             color: "#c62828",
@@ -95,7 +116,7 @@ export const ModalProducto = ({
           }}
         >
           {elementActive ? "EDITAR PRODUCTO" : "CREAR UN NUEVO PRODUCTO"}
-        </h2>
+        </p>
       </DialogTitle>
 
       <DialogContent dividers>
@@ -119,8 +140,10 @@ export const ModalProducto = ({
           })}
           enableReinitialize
           onSubmit={async (values) => {
+            console.log("Valores del formulario:", values);
             if (elementActive?.id) {
               await apiProducto.patch(elementActive.id, values);
+            
             } else {
               await apiProducto.post(values);
             }
@@ -155,9 +178,9 @@ export const ModalProducto = ({
                     className="form-control input-formulario"
                   >
                     <option value="">Seleccione una categoría</option>
-                    {rubros.map((rubro) => (
-                      <option key={rubro.id} value={rubro.id}>
-                        {rubro.denominacion || rubro.nombre}
+                    {rubros.map((rubroproducto) => (
+                      <option key={rubroproducto.id} value={rubroproducto.id}>
+                        {rubroproducto.denominacion || rubroproducto.nombre}
                       </option>
                     ))}
                   </Field>
@@ -234,9 +257,9 @@ export const ModalProducto = ({
                     className="form-control"
                   >
                     <option value={0}>Seleccione un insumo</option>
-                    {insumos.map((insumo) => (
-                      <option key={insumo.id} value={insumo.id}>
-                        {insumo.denominacion}
+                    {insumos.map((insumoproducto) => (
+                      <option key={insumoproducto.id} value={insumoproducto.id}>
+                        {insumoproducto.denominacion}
                       </option>
                     ))}
                   </select>
@@ -314,17 +337,7 @@ export const ModalProducto = ({
 
               {/* Switches */}
               <div style={{ display: "flex", gap: "30px", padding: "20px" }}>
-                <FormControlLabel
-                  control={
-                    <Field
-                      type="checkbox"
-                      name="esParaElaborar"
-                      as={Switch}
-                      color="warning"
-                    />
-                  }
-                  label="¿Es para elaborar?"
-                />
+
                 <FormControlLabel
                   control={
                     <Field
@@ -360,6 +373,7 @@ export const ModalProducto = ({
                     px: 4,
                     borderRadius: "25px",
                   }}
+                  
                 >
                   Guardar
                 </Button>

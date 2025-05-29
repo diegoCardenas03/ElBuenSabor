@@ -61,7 +61,7 @@ const ColumnsTableInsumo = [
 {
   label: "Activo",
   key: "activo",
-  render: (insumo: InsumoDTO) => (
+  render: (insumo: InsumoResponseDTO) => (
     <Switch
       checked={insumo.activo}
       onChange={async () => {
@@ -69,8 +69,12 @@ const ColumnsTableInsumo = [
           await insumoService.updateEstado(insumo.id)
           getInsumos(); // Actualizás la tabla
         } catch (error) {
-          Swal.fire("Error", "No se pudo actualizar el estado", "error");
-        }
+                      Swal.fire(
+                        error instanceof Error ? error.message : String(error),
+                        "No se pudo actualizar el estado",
+                        "error"
+                      );
+                    }
       }}
       color="primary"
     />

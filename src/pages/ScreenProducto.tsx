@@ -45,7 +45,11 @@ export const ScreenProducto = () => {
               await productoService.updateEstado(producto.id);
               getProductos();
             } catch (error) {
-              Swal.fire("Error", "No se pudo actualizar el estado", "error");
+              Swal.fire(
+                error instanceof Error ? error.message : String(error),
+                "No se pudo actualizar el estado",
+                "error"
+              );
             }
           }}
           color="primary"

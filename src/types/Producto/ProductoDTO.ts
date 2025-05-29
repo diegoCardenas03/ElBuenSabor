@@ -1,7 +1,7 @@
 import { DetalleProductoDTO } from '../DetalleProducto/DetalleProductoDTO';
 
 export interface ProductoDTO {
-    id?: number;
+    id: number;
     denominacion: string;
     descripcion: string;
     tiempoEstimadoPreparacion: number;
