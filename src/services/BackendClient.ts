@@ -21,18 +21,31 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
   }
 
   async post(data: RequestType): Promise<ResponseType> {
-    const response = await fetch(`${this.baseUrl}/save`, {
+     await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
-    const newData = await response.json();
-    return newData as ResponseType;
+    // const newData = await response.json();
+    return "objeto creado" as ResponseType;
   }
 
   async patch(id: number | string, data: RequestType): Promise<ResponseType> {
+    // const response = 
+    await fetch(`${this.baseUrl}/update/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    // const newData = await response.json();
+    return "objeto actualizado" as ResponseType;
+  }
+
+  async put(id: number, data: RequestType): Promise<ResponseType> {
     const response = await fetch(`${this.baseUrl}/update/${id}`, {
       method: "PUT",
       headers: {

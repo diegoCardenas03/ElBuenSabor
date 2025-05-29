@@ -3,13 +3,14 @@ import { Field, ErrorMessage } from "formik";
 interface Props {
   label: string;
   name: string;
+  id?: string;
   options: { value: any; label: string }[];
 }
 
-const SelectField = ({ label, name, options }: Props) => (
+const SelectField = ({ label, name, id, options }: Props) => (
   <div className="mb-3">
-    <label htmlFor={name}>{label}</label>
-    <Field as="select" name={name} className="form-select">
+    <label htmlFor={id ?? name}>{label}</label>
+    <Field as="select" id={id ?? name} name={name} className="form-select">
       <option value="">Seleccione una opción</option>
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>

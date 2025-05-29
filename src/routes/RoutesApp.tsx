@@ -17,8 +17,8 @@ const RoutesApp = () => {
         {/* <Route path="/MisDirecciones" element={<MisDirecciones />} /> */}
         <Route path="/Menu" element={<Menu />} />
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
-        <Route path="/Insumos" element={<ScreenInsumo />} />
-        <Route path="/productos" element={<ScreenProducto />} />
+        <Route path="/admin/Insumos" element={<ScreenInsumo />} />
+        <Route path="/admin/productos" element={<ScreenProducto />} />
         <Route path='/admin/Configuracion' element={<Configuracion />} />
       </Routes>
     </BrowserRouter>

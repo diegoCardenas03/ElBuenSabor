@@ -171,7 +171,7 @@ const CategoriaModal = ({
     <div className="fixed inset-0 bg-black/50 z-40">
       <div className="rounded-3xl p-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary w-1/2">
         <button onClick={handleCerrarModal} className="absolute top-4 right-4 text-gray-500 hover:text-red-600" >
-          <FaTimes className="text-secondary h-6 w-6" />
+          <FaTimes className="text-secondary h-6 w-6 cursor-pointer" />
         </button>
         <h2 className="text-2xl font-bold mb-4 text-secondary">
           {editando ? "Editar Categoría" : "Nueva Categoría"}

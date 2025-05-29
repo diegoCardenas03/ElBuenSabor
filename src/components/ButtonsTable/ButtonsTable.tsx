@@ -38,7 +38,7 @@ export const ButtonsTable = ({
       }}
     >
       {/* Botón para editar el elemento */}
-      <button className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg"  onClick={handleModalSelected}>
+      <button className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"  onClick={handleModalSelected}>
         <FaPencilAlt />
       </button>
        {/* Botón para eliminar el elemento */}

@@ -13,11 +13,15 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { removeElementActive } from "../../hooks/redux/slices/TableReducer";
 import { ProductoDTO } from "../../types/Producto/ProductoDTO";
 import TextFieldValue from "../TextFildValue/TextFildValue";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RubroProductoResponseDTO } from "../../types/RubroProducto/RubroProductoResponseDTO";
 import { DetalleProductoDTO } from "../../types/DetalleProducto/DetalleProductoDTO";
 import "./ModalInsumo.css";
 import { ProductoService } from "../../services/ProductoService";
+import { FaTimes } from "react-icons/fa";
+import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
+const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
+const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
 
 interface IModalProducto {
   getProductos: () => void;
@@ -40,6 +44,10 @@ export const ModalProducto = ({
   const [insumos, setInsumos] = useState<any[]>([]);
   const [insumoId, setInsumoId] = useState<number>(0);
   const [cantidad, setCantidad] = useState<number>(1);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     const fetchRubros = async () => {
@@ -70,27 +78,29 @@ export const ModalProducto = ({
       });
   }, []);
 
-  const rubroOptions = rubros.map((r) => ({
-    value: r.id,
-    label: r.nombre,
-  }));
-  const insumoOptions = insumos.map((r) => ({
-    value: r.id,
-    label: r.nombre,
-  }));
+  // const rubroOptions = rubros.map((r) => ({
+  //   value: r.id,
+  //   label: r.nombre,
+  // }));
+  // const insumoOptions = insumos.map((r) => ({
+  //   value: r.id,
+  //   label: r.nombre,
+  // }));
 
-  const initialValues: ProductoDTO = elementActive
-    ? elementActive
-    : {
-      denominacion: "",
-      urlImagen: "",
-      descripcion: "",
-      tiempoEstimadoPreparacion: 0,
-      precioVenta: 0,
-      activo: true,
-      detalleProductos: [],
-      rubroId: 0,
-    };
+  const initialValues: ProductoDTO =
+    elementActive && "descripcion" in elementActive
+      ? (elementActive as ProductoDTO)
+      : {
+        id: 0,
+        denominacion: "",
+        urlImagen: "",
+        descripcion: "",
+        tiempoEstimadoPreparacion: 0,
+        precioVenta: 0,
+        activo: true,
+        detalleProductos: [],
+        rubroId: 0,
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -100,6 +110,9 @@ export const ModalProducto = ({
   return (
     <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
+        <button onClick={handleClose} className="absolute top-7 right-4 text-gray-500 hover:text-red-600" >
+          <FaTimes className="text-secondary h-6 w-6 cursor-pointer" />
+        </button>
         <p
           className="font-tertiary"
           style={{
@@ -118,24 +131,43 @@ export const ModalProducto = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            urlImagen: Yup.string()
-              .url("URL inválida")
-              .required("Campo requerido"),
+            //urlImagen: Yup.string()
+            // .url("URL inválida")
+            // .required("Campo requerido"),
             precioVenta: Yup.number()
-              .min(0, "Debe ser positivo")
+              .min(0.01, "Debe ser mayor a 0")
               .required("Campo requerido"),
-            rubroId: Yup.number().required("Campo requerido"),
+            rubroId: Yup.number()
+              .min(1, "Seleccione una categoría")
+              .required("Campo requerido"),
             tiempoEstimadoPreparacion: Yup.number()
-              .min(0, "Debe ser positivo")
+              .min(1, "Debe ser mayor a 0")
               .required("Campo requerido"),
             activo: Yup.boolean(),
-            detalleProductos: Yup.array(),
+            detalleProductos: Yup.array()
+              .min(1, "Debe agregar al menos un insumo al producto")
+              .required("Debe agregar al menos un insumo al producto"),
             descripcion: Yup.string().required("Campo requerido"),
           })}
           enableReinitialize
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             try {
-              // Transformar detalleProductos: si tienen 'insumo', usar 'insumo.id'
+              let imageUrl = values.urlImagen;
+              if (selectedImage) {
+                const formData = new FormData();
+                formData.append("file", selectedImage);
+                formData.append("upload_preset", `${API_CLOUDINARY_UPLOAD_PRESET}`);
+                const res = await fetch(
+                  `${API_CLOUDINARY_URL}`,
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+                const data = await res.json();
+                imageUrl = data.secure_url;
+              }
+
               const detalleProductos = values.detalleProductos.map((detalle: any) => ({
                 insumoId: detalle.insumoId ?? detalle.insumo?.id,
                 cantidad: detalle.cantidad
@@ -143,6 +175,7 @@ export const ModalProducto = ({
 
               const payload = {
                 ...values,
+                urlImagen: imageUrl,
                 detalleProductos
               };
 
@@ -188,7 +221,7 @@ export const ModalProducto = ({
                     <option value="">Seleccione una categoría</option>
                     {rubros.map((rubroproducto) => (
                       <option key={rubroproducto.id} value={rubroproducto.id}>
-                        {rubroproducto.denominacion || rubroproducto.nombre}
+                        {rubroproducto.denominacion}
                       </option>
                     ))}
                   </Field>
@@ -208,37 +241,88 @@ export const ModalProducto = ({
 
                 {/* Columna derecha */}
                 <div className="input-col">
-                  <TextFieldValue
-                    label="Imagen del producto:"
-                    name="urlImagen"
-                    type="text"
-                    placeholder="https://..."
-                  />
+      
+
 
                   {/* Miniatura */}
-                  <Field name="urlImagen">
-                    {({ field }: any) =>
-                      field.value && (
-                        <div style={{ marginTop: "10px" }}>
+                  <label style={{ fontWeight: "bold" }}>Imagen del producto:</label>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px" }}>
+                    <div
+                      className="image-upload-area"
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        borderRadius: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        marginBottom: "10px",
+                        position: "relative",
+                        overflow: "hidden",
+                      }}
+                      onClick={() => fileInputRef.current?.click()}
+                      onMouseEnter={() => setIsHovering(true)}
+                      onMouseLeave={() => setIsHovering(false)}
+                    >
+                      {(previewUrl || values.urlImagen) ? (
+                        <>
                           <img
-                            src={field.value}
+                            src={previewUrl || values.urlImagen}
                             alt="Vista previa"
-                            style={{
-                              width: "100px",
-                              height: "100px",
-                              objectFit: "cover",
-                              borderRadius: "10px",
-                              border: "2px solid #ddd",
-                            }}
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "https://via.placeholder.com/100?text=No+Image";
-                            }}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "10px" }}
                           />
-                        </div>
-                      )
-                    }
-                  </Field>
+                          {/* Overlay solo visible en hover */}
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              background: "rgba(0,0,0,0.4)",
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              opacity: isHovering ? 1 : 0,
+                              transition: "opacity 0.2s",
+                              fontWeight: "bold",
+                              fontSize: "1.1rem",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            Editar
+                          </div>
+                        </>
+                      ) : (
+                        <img
+                          src={AddImageIcon}
+                          alt="Agregar imagen"
+                          style={{ width: "100px", height: "100px", objectFit: "contain" }}
+                        />
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      ref={fileInputRef}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSelectedImage(file);
+                          setPreviewUrl(URL.createObjectURL(file));
+                          setFieldValue("urlImagen", ""); // Limpiar para evitar validación
+                        }
+                      }}
+                    />
+                    {(!previewUrl && !values.urlImagen) && (
+                      <div className="error" style={{ textAlign: "center" }}>Debe seleccionar una imagen</div>
+                    )}
+                  </div>
+
+                  
                   <TextFieldValue
                     label="Precio de venta:"
                     name="precioVenta"
@@ -380,6 +464,7 @@ export const ModalProducto = ({
                     px: 4,
                     borderRadius: "25px",
                   }}
+                  disabled={values.detalleProductos.length === 0}
                 >
                   Guardar
                 </Button>

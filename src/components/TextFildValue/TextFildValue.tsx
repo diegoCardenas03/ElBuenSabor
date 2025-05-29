@@ -4,13 +4,14 @@ import "./textFildValue.css"; // Importación del archivo de estilos CSS
 // Interfaz para los props del componente TextFieldValue
 interface props {
   label: string; // Etiqueta del campo
+  id?: string;
   name: string; // Nombre del campo
   type: string; // Tipo de campo (text, number, etc.)
   placeholder: string; // Placeholder del campo
 }
 
 // Componente TextFieldValue
-const TextFieldValue = ({ label, name, type, placeholder }: props) => {
+const TextFieldValue = ({ label, name, id, type, placeholder }: props) => {
   // Componente para crear los input de un formulario con Formik
   return (
     <div className="mt-2" style={{ display: "flex", flexDirection: "column" }}>
@@ -24,7 +25,7 @@ const TextFieldValue = ({ label, name, type, placeholder }: props) => {
       >
         {/* Etiqueta del campo */}
         <label
-          htmlFor={label}
+          htmlFor={id ?? name}
           style={{
             color: "black",
             fontFamily: "sans-serif",
@@ -40,6 +41,7 @@ const TextFieldValue = ({ label, name, type, placeholder }: props) => {
       <Field
         className={`form-control  mb-3  input-formulario `}
         placeholder={placeholder}
+        id={id ?? name}
         name={name}
         type={type}
         autoComplete="off"

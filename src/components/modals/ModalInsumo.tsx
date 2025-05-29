@@ -17,11 +17,17 @@ import { InsumoDTO } from "../../types/Insumo/InsumoDTO";
 import { InsumoService } from "../../services/InsumoService";
 import TextFieldValue from "../TextFildValue/TextFildValue";
 import SelectField from "../SelectField/SelectField"; // Componente personalizado tipo select
-import { useEffect, useState } from "react";
-import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
+import { useEffect, useRef, useState } from "react";
+// import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
 import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
-const API_URL = import.meta.env.VITE_API_URL;
+const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
+const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
 import "./ModalInsumo.css";
+import { FaTimes } from "react-icons/fa";
+import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png"
+
+
+
 interface IModalInsumo {
   getInsumos: () => void;
   openModal: boolean;
@@ -39,6 +45,10 @@ export const ModalInsumo = ({
   const apiInsumo = new InsumoService();
 
   const [rubros, setRubros] = useState<RubroInsumoResponseDTO[]>([]);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [isHovering, setIsHovering] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchRubros = async () => {
@@ -54,36 +64,39 @@ export const ModalInsumo = ({
     fetchRubros();
   }, []);
 
-  useEffect(() => {
-    fetch(`${API_URL}/rubros`)
-      .then((res) => res.json())
-      .then((data) => setRubros(data));
-  }, []);
-
   const unidadMedidaOptions = Object.values(UnidadMedida).map((value) => ({
     value,
     label: value,
   }));
 
-  const rubroOptions = rubros.map((r) => ({
-    value: r.id,
-    label: r.nombre,
-  }));
-
-  const initialValues: InsumoDTO = elementActive
-    ? elementActive
-    : {
-      denominacion: "",
-      urlImagen: "",
-      precioCosto: 0,
-      precioVenta: 0,
-      stockActual: 0,
-      stockMinimo: 0,
-      esParaElaborar: false,
-      activo: true,
-      unidadMedida: UnidadMedida.UNIDADES,
-      rubroId: 0,
-    };
+  const initialValues: InsumoDTO =
+    elementActive && "precioCosto" in elementActive
+      ? {
+        id: elementActive.id,
+        denominacion: elementActive.denominacion,
+        urlImagen: elementActive.urlImagen,
+        precioCosto: elementActive.precioCosto,
+        precioVenta: elementActive.precioVenta,
+        stockActual: elementActive.stockActual,
+        stockMinimo: elementActive.stockMinimo,
+        esParaElaborar: elementActive.esParaElaborar,
+        activo: elementActive.activo,
+        unidadMedida: elementActive.unidadMedida,
+        rubroId: elementActive.rubro?.id ?? 0,
+      }
+      : {
+        id: 0,
+        denominacion: "",
+        urlImagen: "",
+        precioCosto: 0,
+        precioVenta: 0,
+        stockActual: 0,
+        stockMinimo: 0,
+        esParaElaborar: false,
+        activo: true,
+        unidadMedida: UnidadMedida.UNIDADES,
+        rubroId: 0,
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -91,9 +104,12 @@ export const ModalInsumo = ({
   };
 
   return (
-   <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
+    <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
-        <h2 className="font-tertiary"
+        <button onClick={handleClose} className="absolute top-7 right-4 text-gray-500 hover:text-red-600" >
+          <FaTimes className="text-secondary h-6 w-6 cursor-pointer" />
+        </button>
+        <p className="font-tertiary"
           style={{
             color: "#c62828",
             fontWeight: "bold",
@@ -102,7 +118,7 @@ export const ModalInsumo = ({
           }}
         >
           {elementActive ? "EDITAR INSUMO" : "CREAR UN NUEVO INSUMO"}
-        </h2>
+        </p>
       </DialogTitle>
 
       <DialogContent dividers>
@@ -120,13 +136,34 @@ export const ModalInsumo = ({
           })}
           enableReinitialize
           onSubmit={async (values) => {
+            let imageUrl = values.urlImagen;
+            if (selectedImage) {
+              const formData = new FormData();
+              formData.append("file", selectedImage);
+              formData.append("upload_preset", `${API_CLOUDINARY_UPLOAD_PRESET}`);
+              const res = await fetch(
+                `${API_CLOUDINARY_URL}`,
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              );
+              const data = await res.json();
+              imageUrl = data.secure_url;
+            }
+
+            const payload = {
+              ...values,
+              urlImagen: imageUrl,
+            };
+
             if (elementActive?.id) {
-              await apiInsumo.patch(elementActive.id, values);
+              await apiInsumo.patch(elementActive.id, payload);
             } else {
-              await apiInsumo.post(values);
+              await apiInsumo.post(payload);
             }
             getInsumos();
-            handleClose()
+            handleClose();
           }}
         >
           {() => (
@@ -137,13 +174,15 @@ export const ModalInsumo = ({
                   <TextFieldValue
                     label="Nombre del insumo:"
                     name="denominacion"
+                    id="denominacion"
                     type="text"
                     placeholder="Ingrese el nombre"
                   />
 
-                  <label style={{ fontWeight: "bold" }}>Categoría:</label>
+                  <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>Categoría:</label>
                   <Field
                     as="select"
+                    id="rubroId"
                     name="rubroId"
                     className="form-control input-formulario"
                   >
@@ -163,12 +202,14 @@ export const ModalInsumo = ({
                   <TextFieldValue
                     label="Stock mínimo:"
                     name="stockMinimo"
+                    id="stockMinimo"
                     type="number"
                     placeholder="Ingrese el stock mínimo"
                   />
                   <TextFieldValue
                     label="Stock actual:"
                     name="stockActual"
+                    id="stockActual"
                     type="number"
                     placeholder="Ingrese el stock actual"
                   />
@@ -179,47 +220,108 @@ export const ModalInsumo = ({
                   <SelectField
                     label="Unidad de medida:"
                     name="unidadMedida"
+                    id="unidadMedida"
                     options={unidadMedidaOptions}
                   />
-<TextFieldValue
-  label="Imagen del insumo:"
-  name="urlImagen"
-  type="text"
-  placeholder="https://..."
-/>
+                  {/* <TextFieldValue
+                    label="Imagen del insumo:"
+                    name="urlImagen"
+                    id="urlImagen"
+                    type="text"
+                    placeholder="https://..."
+                  /> */}
 
-{/* Miniatura */}
-<Field name="urlImagen">
-  {({ field }: any) => (
-    field.value && (
-      <div style={{ marginTop: "10px" }}>
-        <img
-          src={field.value}
-          alt="Vista previa"
-          style={{
-            width: "100px",
-            height: "100px",
-            objectFit: "cover",
-            borderRadius: "10px",
-            border: "2px solid #ddd",
-          }}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "https://via.placeholder.com/100?text=No+Image";
-          }}
-        />
-      </div>
-    )
-  )}
-</Field>
+                  {/* Miniatura */}
+                  <Field name="urlImagen">
+                    {({ field, form: { setFieldValue } }: any) => (
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px" }}>
+                        <div
+                          className="image-upload-area"
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "10px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            marginBottom: "10px",
+                            position: "relative",
+                            overflow: "hidden",
+                          }}
+                          onClick={() => fileInputRef.current?.click()}
+                          onMouseEnter={() => setIsHovering(true)}
+                          onMouseLeave={() => setIsHovering(false)}
+                        >
+                          {(previewUrl || field.value) ? (
+                            <>
+                              <img
+                                src={previewUrl || field.value}
+                                alt="Vista previa"
+                                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "10px" }}
+                              />
+                              {/* Overlay solo visible en hover */}
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: 0,
+                                  left: 0,
+                                  width: "100%",
+                                  height: "100%",
+                                  background: "rgba(0,0,0,0.4)",
+                                  color: "#fff",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  opacity: isHovering ? 1 : 0,
+                                  transition: "opacity 0.2s",
+                                  fontWeight: "bold",
+                                  fontSize: "1.1rem",
+                                  pointerEvents: "none",
+                                }}
+                              >
+                                Editar
+                              </div>
+                            </>
+                          ) : (
+                            <img
+                              src={AddImageIcon}
+                              alt="Agregar imagen"
+                              style={{ width: "100px", height: "100px", objectFit: "contain" }}
+                            />
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: "none" }}
+                          ref={fileInputRef}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setSelectedImage(file);
+                              setPreviewUrl(URL.createObjectURL(file));
+                              setFieldValue("urlImagen", ""); // Limpiar para evitar validación
+                            }
+                          }}
+                        />
+                        {(!previewUrl && !field.value) && (
+                          <div className="error" style={{ textAlign: "center" }}>Debe seleccionar una imagen</div>
+                        )}
+                      </div>
+                    )}
+                  </Field>
                   <TextFieldValue
                     label="Precio de costo:"
                     name="precioCosto"
+                    id="precioCosto"
                     type="number"
                     placeholder="0.00"
                   />
                   <TextFieldValue
                     label="Precio de venta:"
                     name="precioVenta"
+                    id="precioVenta"
                     type="number"
                     placeholder="0.00"
                   />

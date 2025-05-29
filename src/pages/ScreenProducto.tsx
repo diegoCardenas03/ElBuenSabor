@@ -85,7 +85,23 @@ export const ScreenProducto = () => {
   // Función para obtener los productos
   const getProductos = async () => {
     await productoService.getAll().then((productoData) => {
-      dispatch(setDataTable(productoData));
+      // Mapeo ProductoResponseDTO a ProductoDTO
+      const productosDTO = productoData.map((p) => ({
+        id: p.id,
+        denominacion: p.denominacion,
+        descripcion: p.descripcion,
+        tiempoEstimadoPreparacion: p.tiempoEstimadoPreparacion,
+        precioVenta: p.precioVenta,
+        urlImagen: p.urlImagen,
+        activo: p.activo,
+        rubroId: p.rubro?.id ?? 0,
+        detalleProductos: p.detalleProductos.map((d) => ({
+          id: d.id,
+          cantidad: d.cantidad,
+          insumoId: d.insumo?.id ?? 0, 
+        })),
+      }));
+      dispatch(setDataTable(productosDTO));
       setLoading(false);
     });
   };
@@ -108,7 +124,8 @@ export const ScreenProducto = () => {
           }}
         >
           <button
-            className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg"
+            className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold 
+            shadow hover:scale-105 transition text-lg cursor-pointer"
             style={{ borderRadius: "9999px" }}
             onClick={() => setOpenModal(true)}
           >
