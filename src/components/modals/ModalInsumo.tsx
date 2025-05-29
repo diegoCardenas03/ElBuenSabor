@@ -43,7 +43,7 @@ export const ModalInsumo = ({
   useEffect(() => {
     const fetchRubros = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/rubroinsumo");
+        const response = await fetch("http://localhost:8080/api/rubroinsumos");
         const data = await response.json();
         setRubros(data);
       } catch (error) {

@@ -44,7 +44,7 @@ export const ModalProducto = ({
   useEffect(() => {
     const fetchRubros = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/rubroProducto");
+        const response = await fetch("http://localhost:8080/api/rubroproductos");
         const data = await response.json();
         setRubros(data);
       } catch (error) {
@@ -82,15 +82,15 @@ export const ModalProducto = ({
   const initialValues: ProductoDTO = elementActive
     ? elementActive
     : {
-        denominacion: "",
-        urlImagen: "",
-        descripcion: "",
-        tiempoEstimadoPreparacion: 0,
-        precioVenta: 0,
-        activo: true,
-        detalleProductos: [],
-        rubroId: 0,
-      };
+      denominacion: "",
+      urlImagen: "",
+      descripcion: "",
+      tiempoEstimadoPreparacion: 0,
+      precioVenta: 0,
+      activo: true,
+      detalleProductos: [],
+      rubroId: 0,
+    };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -135,10 +135,21 @@ export const ModalProducto = ({
           enableReinitialize
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             try {
+              // Transformar detalleProductos: si tienen 'insumo', usar 'insumo.id'
+              const detalleProductos = values.detalleProductos.map((detalle: any) => ({
+                insumoId: detalle.insumoId ?? detalle.insumo?.id,
+                cantidad: detalle.cantidad
+              }));
+
+              const payload = {
+                ...values,
+                detalleProductos
+              };
+
               if (elementActive?.id) {
-                await apiProducto.patch(elementActive.id, values);
+                await apiProducto.patch(elementActive.id, payload);
               } else {
-                await apiProducto.post(values);
+                await apiProducto.post(payload);
               }
               getProductos();
               handleClose();
