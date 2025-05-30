@@ -94,7 +94,7 @@ export const ModalInsumo = ({
         stockMinimo: 0,
         esParaElaborar: false,
         activo: true,
-        unidadMedida: UnidadMedida.UNIDADES,
+        unidadMedida: "",
         rubroId: 0,
       };
 
@@ -332,7 +332,10 @@ export const ModalInsumo = ({
                     )}
                   </Field>
                   <TextFieldValue
-                    label="Precio de costo:"
+                    label={`Precio de costo${values.unidadMedida
+                        ? ` (Por ${values.unidadMedida.toLowerCase()}):`
+                        : " (Por unidad de medida):"
+                      }`}
                     name="precioCosto"
                     id="precioCosto"
                     type="number"
@@ -347,7 +350,8 @@ export const ModalInsumo = ({
                       placeholder="0.00"
                     />
                   )}
-                   {/* <TextFieldValue
+                  {/* ESTO POR SI SE NECESITA EL PRECIO DE VENTA AUNQUE SEA ELABORABLE*/}
+                  {/* <TextFieldValue
                       label="Precio de venta:"
                       name="precioVenta"
                       id="precioVenta"
