@@ -321,7 +321,7 @@ export const ModalInsumo = ({
                             if (file) {
                               setSelectedImage(file);
                               setPreviewUrl(URL.createObjectURL(file));
-                              setFieldValue("urlImagen", ""); // Limpiar para evitar validación
+                              setFieldValue("urlImagen", "temp"); // Valor temporal para pasar la validación
                             }
                           }}
                         />
