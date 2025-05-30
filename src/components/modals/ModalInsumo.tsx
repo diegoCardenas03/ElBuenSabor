@@ -347,6 +347,13 @@ export const ModalInsumo = ({
                       placeholder="0.00"
                     />
                   )}
+                   {/* <TextFieldValue
+                      label="Precio de venta:"
+                      name="precioVenta"
+                      id="precioVenta"
+                      type="number"
+                      placeholder="0.00"
+                    /> */}
                 </div>
               </div>
 
