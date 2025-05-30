@@ -101,6 +101,8 @@ export const ModalInsumo = ({
   const handleClose = () => {
     setOpenModal(false);
     dispatch(removeElementActive());
+    setSelectedImage(null);
+    setPreviewUrl("");
   };
 
   return (
@@ -126,13 +128,13 @@ export const ModalInsumo = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            urlImagen: Yup.string().url("URL inválida"),
-            precioCosto: Yup.number().min(0, "Debe ser positivo"),
-            precioVenta: Yup.number().min(0, "Debe ser positivo"),
-            stockActual: Yup.number().min(0),
+            // urlImagen: Yup.string().required("Debe seleccionar una imagen"),
+            precioCosto: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
+            precioVenta: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
+            stockActual: Yup.number().min(0).required("Campo requerido"),
             stockMinimo: Yup.number().min(0),
-            rubroId: Yup.number().required("Campo requerido"),
-            unidadMedida: Yup.string().required("Campo requerido"),
+            rubroId: Yup.number().required("Campo requerido").required("Campo requerido"),
+            unidadMedida: Yup.string().required("Campo requerido").required("Campo requerido"),
           })}
           enableReinitialize
           onSubmit={async (values) => {
@@ -166,7 +168,7 @@ export const ModalInsumo = ({
             handleClose();
           }}
         >
-          {() => (
+          {({ isValid, dirty, isSubmitting }) => (
             <Form>
               <div className="container_Form_Ingredientes">
                 {/* Columna izquierda */}
@@ -217,11 +219,29 @@ export const ModalInsumo = ({
 
                 {/* Columna derecha */}
                 <div className="input-col">
-                  <SelectField
-                    label="Unidad de medida:"
+                  <label htmlFor="unidadMedida" style={{
+                    color: "black",
+                    fontFamily: "sans-serif",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}>Unidad de medida:</label>
+                  <Field
+                    as="select"
                     name="unidadMedida"
                     id="unidadMedida"
-                    options={unidadMedidaOptions}
+                    className="form-control input-formulario"
+                  >
+                    <option value="">Seleccione una unidad</option>
+                    {unidadMedidaOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Field>
+                  <ErrorMessage
+                    name="unidadMedida"
+                    component="div"
+                    className="error"
                   />
                   {/* <TextFieldValue
                     label="Imagen del insumo:"
@@ -376,6 +396,12 @@ export const ModalInsumo = ({
                     px: 4,
                     borderRadius: "25px",
                   }}
+                  disabled={
+                    !isValid ||
+                    !dirty ||
+                    isSubmitting ||
+                    (!previewUrl) 
+                  }
                 >
                   Guardar
                 </Button>

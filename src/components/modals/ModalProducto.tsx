@@ -67,7 +67,6 @@ export const ModalProducto = ({
     fetch("http://localhost:8080/api/insumos")
       .then((res) => res.json())
       .then((data) => {
-        alert(data);''
         if (Array.isArray(data)) {
           setInsumos(data);
         } else {
@@ -106,6 +105,8 @@ export const ModalProducto = ({
   const handleClose = () => {
     setOpenModal(false);
     dispatch(removeElementActive());
+    setSelectedImage(null);
+    setPreviewUrl("");
   };
 
   return (
@@ -194,9 +195,10 @@ export const ModalProducto = ({
             }
           }}
         >
-          {({ values, setFieldValue }) => (
+          {({ values, setFieldValue, isValid, dirty, isSubmitting }) => (
+            // ...existing code...
             <Form>
-              <div className="container_Form_Ingredientes">
+              <div className="container_Form_Ingredientes" >
                 {/* Columna izquierda */}
                 <div className="input-col">
                   <TextFieldValue
@@ -204,13 +206,6 @@ export const ModalProducto = ({
                     name="denominacion"
                     type="text"
                     placeholder="Ingrese el nombre"
-                  />
-
-                  <TextFieldValue
-                    label="Descripción:"
-                    name="descripcion"
-                    type="text"
-                    placeholder="Ingrese la descripción"
                   />
 
                   <label style={{ fontWeight: "bold" }}>Categoría:</label>
@@ -233,19 +228,147 @@ export const ModalProducto = ({
                   />
 
                   <TextFieldValue
-                    label="Tiempo estimado de preparación (min):"
-                    name="tiempoEstimadoPreparacion"
+                    label="Descripción:"
+                    name="descripcion"
+                    type="text"
+                    placeholder="Ingrese la descripción"
+                  />
+
+                  <TextFieldValue
+                    label="Precio de venta:"
+                    name="precioVenta"
                     type="number"
-                    placeholder="Ej: 30"
+                    placeholder="0.00"
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Field
+                        type="checkbox"
+                        name="activo"
+                        as={Switch}
+                        color="error"
+                      />
+                    }
+                    label="Activo"
                   />
                 </div>
 
                 {/* Columna derecha */}
                 <div className="input-col">
-      
+                  <TextFieldValue
+                    label="Tiempo estimado de preparación (min):"
+                    name="tiempoEstimadoPreparacion"
+                    type="number"
+                    placeholder="Ej: 30"
+                  />
 
+                  {/* Insumos y cantidad */}
+                  <div style={{ margin: "15px 0" }}>
+                    <label
+                      style={{ fontWeight: "bold", fontSize: "1em" }}
+                    >
+                      Agregar Insumos al Producto
+                    </label>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <select
+                        value={insumoId}
+                        onChange={(e) => setInsumoId(Number(e.target.value))}
+                        className="form-control input-formulario"
+                        style={{
 
-                  {/* Miniatura */}
+                          width: "15em"
+
+                        }}
+                      >
+                        <option value={0}>Seleccione un insumo</option>
+                        {insumos.map((insumoproducto) => (
+                          <option key={insumoproducto.id} value={insumoproducto.id}>
+                            {insumoproducto.denominacion}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        min={1}
+                        value={cantidad}
+                        onChange={(e) => setCantidad(Number(e.target.value))}
+                        className="form-control input-formulario"
+                        style={{
+
+                          width: "5em"
+
+                        }}
+                        placeholder="Cantidad"
+                      />
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                          if (
+                            insumoId &&
+                            cantidad > 0 &&
+                            !values.detalleProductos.some(
+                              (d: DetalleProductoDTO) => d.insumoId === insumoId
+                            )
+                          ) {
+                            setFieldValue("detalleProductos", [
+                              ...values.detalleProductos,
+                              { insumoId, cantidad },
+                            ]);
+                            setInsumoId(0);
+                            setCantidad(1);
+                          }
+                        }}
+                        disabled={!insumoId || cantidad <= 0}
+
+                      >
+                        Agregar
+                      </Button>
+                    </div>
+                    {/* Lista de insumos agregados */}
+                    <ul style={{ marginTop: "10px" }}>
+                      {values.detalleProductos.map(
+                        (detalle: DetalleProductoDTO, idx: number) => {
+                          const insumo = insumos.find(
+                            (i) => i.id === detalle.insumoId
+                          );
+                          return (
+                            <li
+                              key={`${detalle.insumoId}-${idx}`}
+
+                            >
+                              {insumo ? insumo.denominacion : "Insumo"} - Cantidad:{" "}
+                              {detalle.cantidad}
+                              <Button
+                                size="small"
+                                color="error"
+                                onClick={() => {
+                                  setFieldValue(
+                                    "detalleProductos",
+                                    values.detalleProductos.filter(
+                                      (_: any, i: number) => i !== idx
+                                    )
+                                  );
+                                }}
+                              >
+                                Quitar
+                              </Button>
+                            </li>
+                          );
+                        }
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Imagen del producto */}
                   <label style={{ fontWeight: "bold" }}>Imagen del producto:</label>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px" }}>
                     <div
@@ -322,126 +445,10 @@ export const ModalProducto = ({
                       <div className="error" style={{ textAlign: "center" }}>Debe seleccionar una imagen</div>
                     )}
                   </div>
-
-                  
-                  <TextFieldValue
-                    label="Precio de venta:"
-                    name="precioVenta"
-                    type="number"
-                    placeholder="0.00"
-                  />
                 </div>
               </div>
 
-              {/* Sección para agregar insumos */}
-              <div style={{ margin: "20px 0" }}>
-                <h4>Agregar Insumos al Producto</h4>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <select
-                    value={insumoId}
-                    onChange={(e) => setInsumoId(Number(e.target.value))}
-                    className="form-control"
-                  >
-                    <option value={0}>Seleccione un insumo</option>
-                    {insumos.map((insumoproducto) => (
-                      <option key={insumoproducto.id} value={insumoproducto.id}>
-                        {insumoproducto.denominacion}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    min={1}
-                    value={cantidad}
-                    onChange={(e) => setCantidad(Number(e.target.value))}
-                    className="form-control"
-                    style={{ width: "100px" }}
-                    placeholder="Cantidad"
-                  />
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      if (
-                        insumoId &&
-                        cantidad > 0 &&
-                        !values.detalleProductos.some(
-                          (d: DetalleProductoDTO) => d.insumoId === insumoId
-                        )
-                      ) {
-                        setFieldValue("detalleProductos", [
-                          ...values.detalleProductos,
-                          { insumoId, cantidad },
-                        ]);
-                        setInsumoId(0);
-                        setCantidad(1);
-                      }
-                    }}
-                    disabled={!insumoId || cantidad <= 0}
-                  >
-                    Agregar
-                  </Button>
-                </div>
-                {/* Lista de insumos agregados */}
-                <ul style={{ marginTop: "10px" }}>
-                  {values.detalleProductos.map(
-                    (detalle: DetalleProductoDTO, idx: number) => {
-                      const insumo = insumos.find(
-                        (i) => i.id === detalle.insumoId
-                      );
-                      return (
-                        <li
-                          key={`${detalle.insumoId}-${idx}`}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                          }}
-                        >
-                          {insumo ? insumo.denominacion : "Insumo"} - Cantidad:{" "}
-                          {detalle.cantidad}
-                          <Button
-                            size="small"
-                            color="error"
-                            onClick={() => {
-                              setFieldValue(
-                                "detalleProductos",
-                                values.detalleProductos.filter(
-                                  (_: any, i: number) => i !== idx
-                                )
-                              );
-                            }}
-                          >
-                            Quitar
-                          </Button>
-                        </li>
-                      );
-                    }
-                  )}
-                </ul>
-              </div>
 
-              {/* Switches */}
-              <div style={{ display: "flex", gap: "30px", padding: "20px" }}>
-                <FormControlLabel
-                  control={
-                    <Field
-                      type="checkbox"
-                      name="activo"
-                      as={Switch}
-                      color="error"
-                    />
-                  }
-                  label="Activo"
-                />
-              </div>
 
               <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
                 <Button
@@ -465,7 +472,13 @@ export const ModalProducto = ({
                     px: 4,
                     borderRadius: "25px",
                   }}
-                  disabled={values.detalleProductos.length === 0}
+                  disabled={
+                    !isValid ||
+                    !dirty ||
+                    isSubmitting ||
+                    values.detalleProductos.length === 0 ||
+                    (!previewUrl && !values.urlImagen)
+                  }
                 >
                   Guardar
                 </Button>
