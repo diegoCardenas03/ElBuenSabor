@@ -332,9 +332,13 @@ export const ModalInsumo = ({
                     )}
                   </Field>
                   <TextFieldValue
-                    label={`Precio de costo${values.unidadMedida
-                        ? ` (Por ${values.unidadMedida.toLowerCase()}):`
-                        : " (Por unidad de medida):"
+                    label={`Precio de costo${values.unidadMedida === "GRAMOS"
+                        ? " (Por 100 Gramos):"
+                        : values.unidadMedida === "MILILITROS"
+                          ? " (Por 100 Mililitros):"
+                          : values.unidadMedida
+                            ? ` (Por ${values.unidadMedida.toLowerCase()}):`
+                            : " (Por unidad de medida):"
                       }`}
                     name="precioCosto"
                     id="precioCosto"
