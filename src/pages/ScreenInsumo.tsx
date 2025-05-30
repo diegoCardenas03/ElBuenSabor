@@ -40,6 +40,7 @@ const ColumnsTableInsumo = [
   {
     label: "Precio Venta",
     key: "precioVenta",
+    render: (insumo: InsumoResponseDTO) => insumo.precioVenta ? insumo.precioVenta : "Sin precio venta",
   },
   {
     label: "Stock Actual",
@@ -133,7 +134,7 @@ const ColumnsTableInsumo = [
   return (
     <>
     <AdminHeader />
-      <div className=" bg-[#FFF4E0]">
+      <div className=" bg-[#FFF4E0] h-screen">
         <div
           style={{
             padding: ".4rem",

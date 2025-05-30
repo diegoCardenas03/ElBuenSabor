@@ -21,6 +21,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
   }
 
   async post(data: RequestType): Promise<ResponseType> {
+    //  const response = 
      await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: {
@@ -29,6 +30,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
       body: JSON.stringify(data),
     });
     // const newData = await response.json();
+    // return newData as ResponseType;
     return "objeto creado" as ResponseType;
   }
 

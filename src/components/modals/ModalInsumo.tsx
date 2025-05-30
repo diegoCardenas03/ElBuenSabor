@@ -94,13 +94,15 @@ export const ModalInsumo = ({
         stockMinimo: 0,
         esParaElaborar: false,
         activo: true,
-        unidadMedida: UnidadMedida.UNIDADES,
+        unidadMedida: UnidadMedida.UNIDADES, // O el valor por defecto que corresponda
         rubroId: 0,
       };
 
   const handleClose = () => {
     setOpenModal(false);
     dispatch(removeElementActive());
+    setSelectedImage(null);
+    setPreviewUrl("");
   };
 
   return (
@@ -126,13 +128,13 @@ export const ModalInsumo = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            urlImagen: Yup.string().url("URL inválida"),
-            precioCosto: Yup.number().min(0, "Debe ser positivo"),
+            urlImagen: Yup.string().required("Debe seleccionar una imagen"),
+            precioCosto: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
             precioVenta: Yup.number().min(0, "Debe ser positivo"),
-            stockActual: Yup.number().min(0),
+            stockActual: Yup.number().min(0).required("Campo requerido"),
             stockMinimo: Yup.number().min(0),
-            rubroId: Yup.number().required("Campo requerido"),
-            unidadMedida: Yup.string().required("Campo requerido"),
+            rubroId: Yup.number().required("Campo requerido").required("Campo requerido"),
+            unidadMedida: Yup.string().required("Campo requerido").required("Campo requerido"),
           })}
           enableReinitialize
           onSubmit={async (values) => {
@@ -166,7 +168,7 @@ export const ModalInsumo = ({
             handleClose();
           }}
         >
-          {() => (
+          {({ isValid, dirty, isSubmitting, values }) => (
             <Form>
               <div className="container_Form_Ingredientes">
                 {/* Columna izquierda */}
@@ -217,11 +219,29 @@ export const ModalInsumo = ({
 
                 {/* Columna derecha */}
                 <div className="input-col">
-                  <SelectField
-                    label="Unidad de medida:"
+                  <label htmlFor="unidadMedida" style={{
+                    color: "black",
+                    fontFamily: "sans-serif",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}>Unidad de medida:</label>
+                  <Field
+                    as="select"
                     name="unidadMedida"
                     id="unidadMedida"
-                    options={unidadMedidaOptions}
+                    className="form-control input-formulario"
+                  >
+                    <option value="">Seleccione una unidad</option>
+                    {unidadMedidaOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </Field>
+                  <ErrorMessage
+                    name="unidadMedida"
+                    component="div"
+                    className="error"
                   />
                   {/* <TextFieldValue
                     label="Imagen del insumo:"
@@ -301,7 +321,7 @@ export const ModalInsumo = ({
                             if (file) {
                               setSelectedImage(file);
                               setPreviewUrl(URL.createObjectURL(file));
-                              setFieldValue("urlImagen", ""); // Limpiar para evitar validación
+                              setFieldValue("urlImagen", "temp"); // Valor temporal para pasar la validación
                             }
                           }}
                         />
@@ -312,19 +332,36 @@ export const ModalInsumo = ({
                     )}
                   </Field>
                   <TextFieldValue
-                    label="Precio de costo:"
+                    label={`Precio de costo${values.unidadMedida === "GRAMOS"
+                        ? " (Por 100 Gramos):"
+                        : values.unidadMedida === "MILILITROS"
+                          ? " (Por 100 Mililitros):"
+                          : values.unidadMedida
+                            ? ` (Por ${values.unidadMedida.toLowerCase()}):`
+                            : " (Por unidad de medida):"
+                      }`}
                     name="precioCosto"
                     id="precioCosto"
                     type="number"
                     placeholder="0.00"
                   />
-                  <TextFieldValue
-                    label="Precio de venta:"
-                    name="precioVenta"
-                    id="precioVenta"
-                    type="number"
-                    placeholder="0.00"
-                  />
+                  {!values.esParaElaborar && (
+                    <TextFieldValue
+                      label="Precio de venta:"
+                      name="precioVenta"
+                      id="precioVenta"
+                      type="number"
+                      placeholder="0.00"
+                    />
+                  )}
+                  {/* ESTO POR SI SE NECESITA EL PRECIO DE VENTA AUNQUE SEA ELABORABLE*/}
+                  {/* <TextFieldValue
+                      label="Precio de venta:"
+                      name="precioVenta"
+                      id="precioVenta"
+                      type="number"
+                      placeholder="0.00"
+                    /> */}
                 </div>
               </div>
 
@@ -376,6 +413,12 @@ export const ModalInsumo = ({
                     px: 4,
                     borderRadius: "25px",
                   }}
+                  disabled={
+                    !isValid ||
+                    !dirty ||
+                    isSubmitting ||
+                    (!previewUrl && !values.urlImagen)
+                  }
                 >
                   Guardar
                 </Button>

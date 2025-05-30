@@ -28,7 +28,7 @@ const menuPorRol: Record<Rol, { path: string; label: string }[]> = {
     { path: '/admin/insumos', label: 'Insumos' },
     { path: '/admin/productos', label: 'Productos' },
     { path: '/admin/empleados', label: 'Empleados' },
-    { path: '/admin/clientes', label: 'Clients' },
+    { path: '/admin/clientes', label: 'Clientes' },
     { path: '/admin/estadistica', label: 'Estadísticas' },
     { path: '/admin/configuracion', label: 'Configuración' },
   ],
