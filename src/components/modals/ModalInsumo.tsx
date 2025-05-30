@@ -128,7 +128,7 @@ export const ModalInsumo = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            // urlImagen: Yup.string().required("Debe seleccionar una imagen"),
+            urlImagen: Yup.string().required("Debe seleccionar una imagen"),
             precioCosto: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
             precioVenta: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
             stockActual: Yup.number().min(0).required("Campo requerido"),
@@ -168,7 +168,7 @@ export const ModalInsumo = ({
             handleClose();
           }}
         >
-          {({ isValid, dirty, isSubmitting }) => (
+          {({ isValid, dirty, isSubmitting, values }) => (
             <Form>
               <div className="container_Form_Ingredientes">
                 {/* Columna izquierda */}
@@ -338,13 +338,15 @@ export const ModalInsumo = ({
                     type="number"
                     placeholder="0.00"
                   />
-                  <TextFieldValue
-                    label="Precio de venta:"
-                    name="precioVenta"
-                    id="precioVenta"
-                    type="number"
-                    placeholder="0.00"
-                  />
+                  {!values.esParaElaborar && (
+                    <TextFieldValue
+                      label="Precio de venta:"
+                      name="precioVenta"
+                      id="precioVenta"
+                      type="number"
+                      placeholder="0.00"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -400,7 +402,7 @@ export const ModalInsumo = ({
                     !isValid ||
                     !dirty ||
                     isSubmitting ||
-                    (!previewUrl) 
+                    (!previewUrl && !values.urlImagen)
                   }
                 >
                   Guardar
