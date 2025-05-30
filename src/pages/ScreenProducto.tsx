@@ -114,7 +114,7 @@ export const ScreenProducto = () => {
   return (
     <>
       <AdminHeader />
-      <div className="bg-[#FFF4E0]">
+      <div className="bg-[#FFF4E0] h-screen" >
         <div
           style={{
             padding: ".4rem",
