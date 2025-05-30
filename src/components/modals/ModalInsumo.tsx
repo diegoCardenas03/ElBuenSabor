@@ -94,7 +94,7 @@ export const ModalInsumo = ({
         stockMinimo: 0,
         esParaElaborar: false,
         activo: true,
-        unidadMedida: "",
+        unidadMedida: UnidadMedida.UNIDADES, // O el valor por defecto que corresponda
         rubroId: 0,
       };
 
