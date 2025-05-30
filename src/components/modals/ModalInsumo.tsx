@@ -130,7 +130,7 @@ export const ModalInsumo = ({
             denominacion: Yup.string().required("Campo requerido"),
             urlImagen: Yup.string().required("Debe seleccionar una imagen"),
             precioCosto: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
-            precioVenta: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
+            precioVenta: Yup.number().min(0, "Debe ser positivo"),
             stockActual: Yup.number().min(0).required("Campo requerido"),
             stockMinimo: Yup.number().min(0),
             rubroId: Yup.number().required("Campo requerido").required("Campo requerido"),
