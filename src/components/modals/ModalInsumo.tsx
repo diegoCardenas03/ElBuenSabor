@@ -16,7 +16,6 @@ import { UnidadMedida } from "../../types/enums/UnidadMedida";
 import { InsumoDTO } from "../../types/Insumo/InsumoDTO";
 import { InsumoService } from "../../services/InsumoService";
 import TextFieldValue from "../TextFildValue/TextFildValue";
-import SelectField from "../SelectField/SelectField"; // Componente personalizado tipo select
 import { useEffect, useRef, useState } from "react";
 // import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
 import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
@@ -49,6 +48,7 @@ export const ModalInsumo = ({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isHovering, setIsHovering] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedRubros, setSelectedRubros] = useState<RubroInsumoResponseDTO[]>([]);
 
   useEffect(() => {
     const fetchRubros = async () => {
@@ -58,6 +58,7 @@ export const ModalInsumo = ({
         setRubros(data);
       } catch (error) {
         console.error("Error al cargar rubros:", error);
+  
       }
     };
 
@@ -103,6 +104,21 @@ export const ModalInsumo = ({
     dispatch(removeElementActive());
     setSelectedImage(null);
     setPreviewUrl("");
+  };
+
+  const handleRubroSelect = (nivel: number, rubroId: number, setFieldValue: any) => {
+    let options = nivel === 0 ? rubros : selectedRubros[nivel - 1]?.subRubros || [];
+    const rubro = options.find(r => r.id === rubroId);
+    if (!rubro) return;
+    const nuevosSeleccionados = [...selectedRubros.slice(0, nivel), rubro];
+    setSelectedRubros(nuevosSeleccionados);
+
+    // Si no tiene más subRubros, es el último
+    if (!rubro.subRubros || rubro.subRubros.length === 0) {
+      setFieldValue("rubroId", rubro.id);
+    } else {
+      setFieldValue("rubroId", ""); // Limpiar hasta que elija el último
+    }
   };
 
   return (
@@ -162,10 +178,14 @@ export const ModalInsumo = ({
             if (elementActive?.id) {
               await apiInsumo.patch(elementActive.id, payload);
             } else {
+                
               await apiInsumo.post(payload);
+
             }
+             console.log(payload)
             getInsumos();
             handleClose();
+         
           }}
         >
           {({ isValid, dirty, isSubmitting, values }) => (
@@ -182,24 +202,45 @@ export const ModalInsumo = ({
                   />
 
                   <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>Categoría:</label>
-                  <Field
-                    as="select"
-                    id="rubroId"
-                    name="rubroId"
-                    className="form-control input-formulario"
-                  >
-                    <option value="">Seleccione una categoría</option>
-                    {rubros.map((rubro) => (
-                      <option key={rubro.id} value={rubro.id}>
-                        {rubro.denominacion}
-                      </option>
-                    ))}
-                  </Field>
-                  <ErrorMessage
-                    name="rubroId"
-                    component="div"
-                    className="error"
-                  />
+<Field name="rubroId">
+  {({ form: { setFieldValue } }: any) => {
+    
+    const allChildIds = rubros.flatMap(r => r.subRubros?.map(sr => sr.id) || []);
+    const parentRubros = rubros.filter(r => !allChildIds.includes(r.id));
+
+    const selects = [];
+    for (let nivel = 0; ; nivel++) {
+      const options = nivel === 0
+        ? parentRubros 
+        : selectedRubros[nivel - 1]?.subRubros || [];
+
+      selects.push(
+        <select
+          key={nivel}
+          value={selectedRubros[nivel]?.id ?? ""}
+          onChange={e => handleRubroSelect(nivel, Number(e.target.value), setFieldValue)}
+          className="form-control input-formulario"
+          style={{ minWidth: 180, marginRight: 8 }}
+          
+        >
+          <option value="">Seleccione...</option>
+          {options.map(rubro => (
+            <option key={rubro.id} value={rubro.id}>
+              {rubro.denominacion}
+            </option>
+          ))}
+        </select>
+      );
+
+      const selected = selectedRubros[nivel];
+      if (!selected || !selected.subRubros || selected.subRubros.length === 0) break;
+    }
+
+    return <>{selects}</>;
+  }}
+</Field>
+
+                  <ErrorMessage name="rubroId" component="div" className="error" />
 
                   <TextFieldValue
                     label="Stock mínimo:"
