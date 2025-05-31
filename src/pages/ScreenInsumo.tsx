@@ -7,12 +7,10 @@ import { ModalInsumo } from "../components/modals/ModalInsumo";
 import { useAppDispatch } from "../hooks/redux";
 import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
-import { RubroInsumoResponseDTO } from "../types/RubroInsumo/RubroInsumoResponseDTO";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { Switch } from "@mui/material";
 // Definición de la URL base de la API
 // const API_URL = import.meta.env.VITE_API_URL;
-import { InsumoDTO } from "../types/Insumo/InsumoDTO";
 export const ScreenInsumo = () => {
   // Estado para controlar la carga de datos
   const [loading, setLoading] = useState(false);

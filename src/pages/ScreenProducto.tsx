@@ -18,6 +18,18 @@ export const ScreenProducto = () => {
 
   // Columnas de la tabla de productos
   const ColumnsTableProducto = [
+        {
+      label: "Imagen",
+      key: "urlImagen",
+      render: (producto: ProductoDTO) => (
+        <img
+          src={producto.urlImagen}
+          alt={producto.denominacion}
+          style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
+        />
+      )
+
+    },
     {
       label: "Denominación",
       key: "denominacion",
@@ -55,6 +67,18 @@ export const ScreenProducto = () => {
           color="primary"
         />
       ),
+    },
+    {
+      label: "Rubro",
+      key: "rubroId",
+      render: (producto: ProductoDTO) => producto.rubroId.toString(),
+    },
+
+    {
+      label: "Precio de venta",
+      key: "precioVenta",
+      render: (producto: ProductoDTO) => producto.precioVenta,
+
     },
     {
       label: "Acciones",

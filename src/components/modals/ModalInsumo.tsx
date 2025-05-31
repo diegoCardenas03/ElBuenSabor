@@ -20,12 +20,12 @@ import { useEffect, useRef, useState } from "react";
 // import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
 import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
-const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
+const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env
+  .VITE_API_CLOUDINARY_UPLOAD_PRESET;
 import "./ModalInsumo.css";
 import { FaTimes } from "react-icons/fa";
-import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png"
-
-
+import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
+import Swal from "sweetalert2";
 
 interface IModalInsumo {
   getInsumos: () => void;
@@ -48,7 +48,9 @@ export const ModalInsumo = ({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isHovering, setIsHovering] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedRubros, setSelectedRubros] = useState<RubroInsumoResponseDTO[]>([]);
+  const [selectedRubros, setSelectedRubros] = useState<
+    RubroInsumoResponseDTO[]
+  >([]);
 
   useEffect(() => {
     const fetchRubros = async () => {
@@ -58,7 +60,6 @@ export const ModalInsumo = ({
         setRubros(data);
       } catch (error) {
         console.error("Error al cargar rubros:", error);
-  
       }
     };
 
@@ -73,31 +74,31 @@ export const ModalInsumo = ({
   const initialValues: InsumoDTO =
     elementActive && "precioCosto" in elementActive
       ? {
-        id: elementActive.id,
-        denominacion: elementActive.denominacion,
-        urlImagen: elementActive.urlImagen,
-        precioCosto: elementActive.precioCosto,
-        precioVenta: elementActive.precioVenta,
-        stockActual: elementActive.stockActual,
-        stockMinimo: elementActive.stockMinimo,
-        esParaElaborar: elementActive.esParaElaborar,
-        activo: elementActive.activo,
-        unidadMedida: elementActive.unidadMedida,
-        rubroId: elementActive.rubro?.id ?? 0,
-      }
+          id: elementActive.id,
+          denominacion: elementActive.denominacion,
+          urlImagen: elementActive.urlImagen,
+          precioCosto: elementActive.precioCosto,
+          precioVenta: elementActive.precioVenta,
+          stockActual: elementActive.stockActual,
+          stockMinimo: elementActive.stockMinimo,
+          esParaElaborar: elementActive.esParaElaborar,
+          activo: elementActive.activo,
+          unidadMedida: elementActive.unidadMedida,
+          rubroId: elementActive.rubro?.id ?? 0,
+        }
       : {
-        id: 0,
-        denominacion: "",
-        urlImagen: "",
-        precioCosto: 0,
-        precioVenta: 0,
-        stockActual: 0,
-        stockMinimo: 0,
-        esParaElaborar: false,
-        activo: true,
-        unidadMedida: "",
-        rubroId: 0,
-      };
+          id: 0,
+          denominacion: "",
+          urlImagen: "",
+          precioCosto: 0,
+          precioVenta: 0,
+          stockActual: 0,
+          stockMinimo: 0,
+          esParaElaborar: false,
+          activo: true,
+          unidadMedida: "",
+          rubroId: 0,
+        };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -106,9 +107,14 @@ export const ModalInsumo = ({
     setPreviewUrl("");
   };
 
-  const handleRubroSelect = (nivel: number, rubroId: number, setFieldValue: any) => {
-    let options = nivel === 0 ? rubros : selectedRubros[nivel - 1]?.subRubros || [];
-    const rubro = options.find(r => r.id === rubroId);
+  const handleRubroSelect = (
+    nivel: number,
+    rubroId: number,
+    setFieldValue: any
+  ) => {
+    let options =
+      nivel === 0 ? rubros : selectedRubros[nivel - 1]?.subRubros || [];
+    const rubro = options.find((r) => r.id === rubroId);
     if (!rubro) return;
     const nuevosSeleccionados = [...selectedRubros.slice(0, nivel), rubro];
     setSelectedRubros(nuevosSeleccionados);
@@ -124,10 +130,14 @@ export const ModalInsumo = ({
   return (
     <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
-        <button onClick={handleClose} className="absolute top-7 right-4 text-gray-500 hover:text-red-600" >
+        <button
+          onClick={handleClose}
+          className="absolute top-7 right-4 text-gray-500 hover:text-red-600"
+        >
           <FaTimes className="text-secondary h-6 w-6 cursor-pointer" />
         </button>
-        <p className="font-tertiary"
+        <p
+          className="font-tertiary"
           style={{
             color: "#c62828",
             fontWeight: "bold",
@@ -145,12 +155,18 @@ export const ModalInsumo = ({
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
             urlImagen: Yup.string().required("Debe seleccionar una imagen"),
-            precioCosto: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
+            precioCosto: Yup.number()
+              .min(0, "Debe ser positivo")
+              .required("Campo requerido"),
             precioVenta: Yup.number().min(0, "Debe ser positivo"),
             stockActual: Yup.number().min(0).required("Campo requerido"),
             stockMinimo: Yup.number().min(0),
-            rubroId: Yup.number().required("Campo requerido").required("Campo requerido"),
-            unidadMedida: Yup.string().required("Campo requerido").required("Campo requerido"),
+            rubroId: Yup.number()
+              .required("Campo requerido")
+              .required("Campo requerido"),
+            unidadMedida: Yup.string()
+              .required("Campo requerido")
+              .required("Campo requerido"),
           })}
           enableReinitialize
           onSubmit={async (values) => {
@@ -158,14 +174,14 @@ export const ModalInsumo = ({
             if (selectedImage) {
               const formData = new FormData();
               formData.append("file", selectedImage);
-              formData.append("upload_preset", `${API_CLOUDINARY_UPLOAD_PRESET}`);
-              const res = await fetch(
-                `${API_CLOUDINARY_URL}`,
-                {
-                  method: "POST",
-                  body: formData,
-                }
+              formData.append(
+                "upload_preset",
+                `${API_CLOUDINARY_UPLOAD_PRESET}`
               );
+              const res = await fetch(`${API_CLOUDINARY_URL}`, {
+                method: "POST",
+                body: formData,
+              });
               const data = await res.json();
               imageUrl = data.secure_url;
             }
@@ -177,15 +193,24 @@ export const ModalInsumo = ({
 
             if (elementActive?.id) {
               await apiInsumo.patch(elementActive.id, payload);
+              Swal.fire({
+                title: "¡Éxito!",
+                text: "Insumo actualizado correctamente.",
+                icon: "success",
+                confirmButtonText: "Aceptar",
+              });
             } else {
-                
               await apiInsumo.post(payload);
-
-            }
-             console.log(payload)
+              Swal.fire({
+                title: "¡Éxito!", 
+                text: "Insumo creado correctamente.",
+                icon: "success",
+                confirmButtonText: "Aceptar",
+              });
+            } 
+            console.log(payload);
             getInsumos();
             handleClose();
-         
           }}
         >
           {({ isValid, dirty, isSubmitting, values }) => (
@@ -201,46 +226,66 @@ export const ModalInsumo = ({
                     placeholder="Ingrese el nombre"
                   />
 
-                  <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>Categoría:</label>
-<Field name="rubroId">
-  {({ form: { setFieldValue } }: any) => {
-    
-    const allChildIds = rubros.flatMap(r => r.subRubros?.map(sr => sr.id) || []);
-    const parentRubros = rubros.filter(r => !allChildIds.includes(r.id));
+                  <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>
+                    Categoría:
+                  </label>
+                  <Field name="rubroId">
+                    {({ form: { setFieldValue } }: any) => {
+                      const allChildIds = rubros.flatMap(
+                        (r) => r.subRubros?.map((sr) => sr.id) || []
+                      );
+                      const parentRubros = rubros.filter(
+                        (r) => !allChildIds.includes(r.id)
+                      );
 
-    const selects = [];
-    for (let nivel = 0; ; nivel++) {
-      const options = nivel === 0
-        ? parentRubros 
-        : selectedRubros[nivel - 1]?.subRubros || [];
+                      const selects = [];
+                      for (let nivel = 0; ; nivel++) {
+                        const options =
+                          nivel === 0
+                            ? parentRubros
+                            : selectedRubros[nivel - 1]?.subRubros || [];
 
-      selects.push(
-        <select
-          key={nivel}
-          value={selectedRubros[nivel]?.id ?? ""}
-          onChange={e => handleRubroSelect(nivel, Number(e.target.value), setFieldValue)}
-          className="form-control input-formulario"
-          style={{ minWidth: 180, marginRight: 8 }}
-          
-        >
-          <option value="">Seleccione...</option>
-          {options.map(rubro => (
-            <option key={rubro.id} value={rubro.id}>
-              {rubro.denominacion}
-            </option>
-          ))}
-        </select>
-      );
+                        selects.push(
+                          <select
+                            key={nivel}
+                            value={selectedRubros[nivel]?.id ?? ""}
+                            onChange={(e) =>
+                              handleRubroSelect(
+                                nivel,
+                                Number(e.target.value),
+                                setFieldValue
+                              )
+                            }
+                            className="form-control input-formulario"
+                            style={{ minWidth: 180, marginRight: 8 }}
+                          >
+                            <option value="">Seleccione...</option>
+                            {options.map((rubro) => (
+                              <option key={rubro.id} value={rubro.id}>
+                                {rubro.denominacion}
+                              </option>
+                            ))}
+                          </select>
+                        );
 
-      const selected = selectedRubros[nivel];
-      if (!selected || !selected.subRubros || selected.subRubros.length === 0) break;
-    }
+                        const selected = selectedRubros[nivel];
+                        if (
+                          !selected ||
+                          !selected.subRubros ||
+                          selected.subRubros.length === 0
+                        )
+                          break;
+                      }
 
-    return <>{selects}</>;
-  }}
-</Field>
+                      return <>{selects}</>;
+                    }}
+                  </Field>
 
-                  <ErrorMessage name="rubroId" component="div" className="error" />
+                  <ErrorMessage
+                    name="rubroId"
+                    component="div"
+                    className="error"
+                  />
 
                   <TextFieldValue
                     label="Stock mínimo:"
@@ -260,12 +305,17 @@ export const ModalInsumo = ({
 
                 {/* Columna derecha */}
                 <div className="input-col">
-                  <label htmlFor="unidadMedida" style={{
-                    color: "black",
-                    fontFamily: "sans-serif",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}>Unidad de medida:</label>
+                  <label
+                    htmlFor="unidadMedida"
+                    style={{
+                      color: "black",
+                      fontFamily: "sans-serif",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Unidad de medida:
+                  </label>
                   <Field
                     as="select"
                     name="unidadMedida"
@@ -295,7 +345,14 @@ export const ModalInsumo = ({
                   {/* Miniatura */}
                   <Field name="urlImagen">
                     {({ field, form: { setFieldValue } }: any) => (
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
+                      >
                         <div
                           className="image-upload-area"
                           style={{
@@ -314,12 +371,17 @@ export const ModalInsumo = ({
                           onMouseEnter={() => setIsHovering(true)}
                           onMouseLeave={() => setIsHovering(false)}
                         >
-                          {(previewUrl || field.value) ? (
+                          {previewUrl || field.value ? (
                             <>
                               <img
                                 src={previewUrl || field.value}
                                 alt="Vista previa"
-                                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "10px" }}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: "10px",
+                                }}
                               />
                               {/* Overlay solo visible en hover */}
                               <div
@@ -348,7 +410,11 @@ export const ModalInsumo = ({
                             <img
                               src={AddImageIcon}
                               alt="Agregar imagen"
-                              style={{ width: "100px", height: "100px", objectFit: "contain" }}
+                              style={{
+                                width: "100px",
+                                height: "100px",
+                                objectFit: "contain",
+                              }}
                             />
                           )}
                         </div>
@@ -366,21 +432,27 @@ export const ModalInsumo = ({
                             }
                           }}
                         />
-                        {(!previewUrl && !field.value) && (
-                          <div className="error" style={{ textAlign: "center" }}>Debe seleccionar una imagen</div>
+                        {!previewUrl && !field.value && (
+                          <div
+                            className="error"
+                            style={{ textAlign: "center" }}
+                          >
+                            Debe seleccionar una imagen
+                          </div>
                         )}
                       </div>
                     )}
                   </Field>
                   <TextFieldValue
-                    label={`Precio de costo${values.unidadMedida === "GRAMOS"
+                    label={`Precio de costo${
+                      values.unidadMedida === "GRAMOS"
                         ? " (Por 100 Gramos):"
                         : values.unidadMedida === "MILILITROS"
-                          ? " (Por 100 Mililitros):"
-                          : values.unidadMedida
-                            ? ` (Por ${values.unidadMedida.toLowerCase()}):`
-                            : " (Por unidad de medida):"
-                      }`}
+                        ? " (Por 100 Mililitros):"
+                        : values.unidadMedida
+                        ? ` (Por ${values.unidadMedida.toLowerCase()}):`
+                        : " (Por unidad de medida):"
+                    }`}
                     name="precioCosto"
                     id="precioCosto"
                     type="number"
