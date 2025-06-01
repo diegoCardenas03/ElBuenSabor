@@ -74,7 +74,7 @@ export const ModalProducto = ({
           setInsumos([]);
         }
       })
-      .catch((err)  => {
+      .catch((err) => {
         console.error("Error al cargar insumos:", err);
         setInsumos([]);
       });
@@ -84,16 +84,16 @@ export const ModalProducto = ({
     elementActive && "descripcion" in elementActive
       ? (elementActive as ProductoDTO)
       : {
-          id: 0,
-          denominacion: "",
-          urlImagen: "",
-          descripcion: "",
-          tiempoEstimadoPreparacion: 0,
-          precioVenta: 0,
-          activo: true,
-          detalleProductos: [],
-          rubroId: 0,
-        };
+        id: 0,
+        denominacion: "",
+        urlImagen: "",
+        descripcion: "",
+        tiempoEstimadoPreparacion: 0,
+        precioVenta: 0,
+        activo: true,
+        detalleProductos: [],
+        rubroId: 0,
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -223,11 +223,14 @@ export const ModalProducto = ({
                     className="form-control input-formulario"
                   >
                     <option value="">Seleccione una categoría</option>
-                    {rubros.map((rubroproducto) => (
-                      <option key={rubroproducto.id} value={rubroproducto.id}>
-                        {rubroproducto.denominacion}
-                      </option>
-                    ))}
+                    {rubros
+                      .filter((rubroproducto) => rubroproducto.activo)
+                      .map((rubroproducto) => (
+                        <option key={rubroproducto.id} value={rubroproducto.id}>
+                          {rubroproducto.denominacion}
+                        </option>
+                      ))}
+
                   </Field>
                   <ErrorMessage
                     name="rubroId"
@@ -295,12 +298,17 @@ export const ModalProducto = ({
                         }}
                       >
                         <option value={0}>Seleccione un insumo</option>
-                        {insumos.map((insumoproducto) => (
-                          <option key={insumoproducto.id} value={insumoproducto.id}>
-                            {insumoproducto.denominacion}
-                            {insumoproducto.unidadMedida ? ` (${insumoproducto.unidadMedida})` : ""}
-                          </option>
-                        ))}
+                        {insumos
+                          .filter(
+                            (insumoproducto) =>
+                              !values.detalleProductos.some((d) => d.insumoId === insumoproducto.id)
+                          )
+                          .map((insumoproducto) => (
+                            <option key={insumoproducto.id} value={insumoproducto.id}>
+                              {insumoproducto.denominacion}
+                              {insumoproducto.unidadMedida ? ` (${insumoproducto.unidadMedida})` : ""}
+                            </option>
+                          ))}
                       </select>
                       <input
                         type="number"
