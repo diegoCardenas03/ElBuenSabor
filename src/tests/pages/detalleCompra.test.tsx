@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import DetalleCompra from '../../pages/detalleCompra';
+import DetalleCompra from '../../pages/DetalleCompra';
 import '@testing-library/jest-dom';
 
 describe('DetalleCompra', () => {

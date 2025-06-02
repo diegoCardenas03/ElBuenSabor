@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // import { Header } from '../components/Header';  
 import DetalleCompra from '../pages/detalleCompra';
-// import MisDirecciones from '../pages/misDirecciones';
 import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
 import PedidosCocinero from '../pages/pedidosCocinero';
@@ -9,6 +8,7 @@ import { ScreenInsumo } from '../pages/ScreenInsumo';
 import Configuracion from '../pages/admin/Configuracion';
 import { ScreenProducto } from '../pages/ScreenProducto';
 import MisPedidos from '../pages/MisPedidos';
+import MisDirecciones from '../pages/MisDirecciones';
 
 const RoutesApp = () => {
   return (
@@ -16,7 +16,7 @@ const RoutesApp = () => {
       <Routes>
         <Route path="/" element={<Landing />}/> 
         <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
-        {/* <Route path="/MisDirecciones" element={<MisDirecciones />} /> */}
+        <Route path="/MisDirecciones" element={<MisDirecciones />} />
         <Route path="/Menu" element={<Menu />} />
         <Route path='/MisPedidos' element={<MisPedidos/>}/>
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />

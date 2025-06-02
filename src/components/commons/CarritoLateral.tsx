@@ -5,7 +5,7 @@ import { ProductoDTO } from '../../types/Producto/ProductoDTO';
 import { DetallePedidoDTO } from '../../types/DetallePedido/DetallePedidoDTO';
 import { TipoEnvio } from '../../types/enums/TipoEnvio';
 import { DomicilioDTO } from '../../types/Domicilio/DomicilioDTO';
-import { domicilio } from '../../pages/misDirecciones';
+import { domicilio } from '../../pages/MisDirecciones';
 
 type Props = {
   onClose: () => void;
