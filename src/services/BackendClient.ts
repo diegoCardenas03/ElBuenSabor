@@ -59,9 +59,9 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     return newData as ResponseType;
   }
 
-  // Metodo para actualizar el estado
+  // Metodo para actualizar el estado (activo = true o activo = false)
   async updateEstado(id: number): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/actualizar-estado/${id}`, {
+    const response = await fetch(`${this.baseUrl}/toggle-activo/${id}`, {
       method: "PUT",
     });
     if (!response.ok) {
