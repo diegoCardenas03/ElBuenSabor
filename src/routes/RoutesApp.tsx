@@ -4,7 +4,7 @@ import DetalleCompra from '../pages/detalleCompra';
 // import MisDirecciones from '../pages/misDirecciones';
 import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
-import PedidosCocinero from '../pages/pedidosCocinero';
+import PedidosCocinero from '../pages/PedidosCocinero';
 import { ScreenInsumo } from '../pages/ScreenInsumo';
 import Configuracion from '../pages/admin/Configuracion';
 import { ScreenProducto } from '../pages/ScreenProducto';
