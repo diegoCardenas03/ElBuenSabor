@@ -1,7 +1,8 @@
 export interface RubroInsumo {
-    id?: number;
+    id: number;
     denominacion: string;
     activo: boolean;
+    tipo: "Insumo";
     rubroPadre?: RubroInsumo;
     subRubros: RubroInsumo[];
 }

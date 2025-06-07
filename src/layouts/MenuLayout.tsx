@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
+import { Header } from '../components/commons/Header';
+import { Footer } from '../components/commons/Footer';
 import { ProductFilterModal } from '../features/products/ProductFilterModal';
 import { FaSearch } from "react-icons/fa";
 import { HiOutlineAdjustments } from "react-icons/hi";

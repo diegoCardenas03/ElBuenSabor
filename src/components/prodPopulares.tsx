@@ -4,7 +4,7 @@ import { products } from "../utils/products/productsData.ts"; // Cambiado a "pro
 const ProdPopulares = () => {
     return (
         <div className="flex flex-col items-center justify-center mt-10 mb-10">
-            <ProductCards products={products.slice(0, 4)} /> {/* Cambiado a "products" */}
+            <ProductCards showBadges products={products.slice(0, 4)} /> {/* Cambiado a "products" */}
         </div>
     );
 };
