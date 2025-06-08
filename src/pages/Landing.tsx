@@ -26,7 +26,7 @@ const Landing = () => {
 
 
       {/* Círculo rojo derecho (atrás del texto) */}
-    
+
       <div className="absolute bg-[#BD1E22] rounded-[300%] z-0 
   w-[90vw] h-[90vw] 
   md:w-[1000px] md:h-[900px] 

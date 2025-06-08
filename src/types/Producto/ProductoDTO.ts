@@ -1,4 +1,5 @@
 import { DetalleProductoDTO } from '../DetalleProducto/DetalleProductoDTO';
+import { RubroProductoDTO } from '../RubroProducto/RubroProductoDTO';
 
 export interface ProductoDTO {
     id: number;
@@ -8,6 +9,6 @@ export interface ProductoDTO {
     precioVenta: number;
     urlImagen: string;
     activo: boolean;
-    rubroId: number;
+    rubro: RubroProductoDTO;
     detalleProductos: DetalleProductoDTO[];
 }

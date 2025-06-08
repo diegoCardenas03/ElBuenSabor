@@ -1,34 +1,31 @@
 import React from 'react';
-import clsx from 'clsx'; // clsx nos permite condicionar clases fácilmente
+import clsx from 'clsx';
 
 interface CategoriesProps {
-  categories: { name: string; image: string }[]; // Lista de categorías con nombre e imagen
-  selectedCategory?: string | null; // Categoría actualmente seleccionada
-  onSelectCategory: (category: string) => void; // Función para cambiar la categoría
+  categories: { name: string }[];
+  selectedCategories: string[]; // Cambiar a array para múltiples selecciones
+  onSelectCategory: (category: string) => void;
 }
 
-// Componente funcional que recibe props y muestra las tarjetas de categoría
 export const Categories: React.FC<CategoriesProps> = ({
   categories,
-  selectedCategory,
+  selectedCategories,
   onSelectCategory,
 }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-6 md:gap-8 mb-5">
-      {/* Mapeamos cada categoría y creamos un botón cuadrado */}
+    <div className="flex flex-wrap justify-center gap-4 mb-8">
       {categories.map((cat) => (
         <button
           key={cat.name}
-          onClick={() => onSelectCategory(cat.name)} // Al hacer clic, se cambia la categoría activa
+          onClick={() => onSelectCategory(cat.name)}
           className={clsx(
-            'flex flex-col items-center w-24 min-w-[96px] py-2 px-2 rounded-sm text-white transition duration-200 cursor-pointer',
-            selectedCategory === cat.name ? 'bg-[#9e1c1c]' : 'bg-[#d32f2f] hover:bg-[#c62828]'
+            'px-4 py-2 rounded-full border-2 transition-colors font-medium cursor-pointer',
+            selectedCategories.includes(cat.name)
+              ? 'bg-red-600 text-white border-red-600 shadow-lg'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-red-600 hover:text-red-600'
           )}
         >
-          {/* Imagen de la categoría */}
-          <img src={cat.image} alt={cat.name} className="h-18 object-contain mb-2" />
-          {/* Nombre de la categoría */}
-          <span className="text-xs font-semibold">{cat.name}</span>
+          {cat.name}
         </button>
       ))}
     </div>

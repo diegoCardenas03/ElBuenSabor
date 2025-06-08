@@ -1,67 +1,91 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MenuLayout } from '../layouts/MenuLayout';
 import { Categories } from '../features/products/Categories';
 import { ProductCards } from '../features/products/ProductCards';
 import { ProductModal } from '../features/products/ProductModal';
-import { products } from '../utils/products/productsData';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { fetchProducts, setSearchTerm, toggleCategory, setFilters } from '../hooks/redux/slices/ProductReducer';
+import { fetchRubrosProductos } from '../hooks/redux/slices/RubroReducer';
+import { ProductoDTO } from '../types/Producto/ProductoDTO';
 
 export const MenuPage: React.FC = () => {
-  // Lista de categorías (nombre + imagen)
-  const categories = [
-    { name: 'Bebidas', image: 'src\\assets\\bebida.png' },
-    { name: 'Hamburguesas', image: 'src\\assets\\hamburguesa.png' },
-    { name: 'Papas', image: 'src\\assets\\papas-fritas.png' },
-    { name: 'Pizzas', image: 'src\\assets\\pizza.png' },
-    { name: 'Panchos', image: 'src\\assets\\pancho.png' },
-    { name: 'Bebidas Alcoholicas', image: 'src\\assets\\fernet.png' }
-  ];
+  const dispatch = useAppDispatch();
+  const { 
+    filteredProducts, 
+    loading: productsLoading, 
+    error: productsError, 
+    selectedCategories,
+    searchTerm,
+    filters 
+  } = useAppSelector((state) => state.products);
 
-  // Estado de categoría seleccionada
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filters, setFilters] = useState<{ order: string; bestseller: boolean }>({ order: '', bestseller: false });
+  const { 
+    rubros, 
+    loading: rubrosLoading 
+  } = useAppSelector((state) => state.rubros);
+
+  // Estados locales
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductoDTO | null>(null);
 
+  // Cargar datos al montar
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchRubrosProductos());
+  }, [dispatch]);
 
-  // Filtrado de productos
-  let filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesBestseller = filters.bestseller ? product.isTopSeller : true;
-    return matchesCategory && matchesSearch && matchesBestseller;
-  });
+  // Convertir rubros a formato categories
+  const categories = rubros.map(rubro => ({
+    name: rubro.denominacion
+  }));
 
-  // Ordenar productos
-  if (filters.order === 'asc') {
-    filteredProducts = filteredProducts.sort((a, b) => a.price - b.price);
-  } else if (filters.order === 'desc') {
-    filteredProducts = filteredProducts.sort((a, b) => b.price - a.price);
-  }
-
-  // Manejar la selección de categorías
-  const handleSelectCategory = (category: string) => {
-    setSelectedCategory((prevCategory) => (prevCategory === category ? null : category));
+  // Manejar selección de categoría (usar toggleCategory para selección múltiple)
+  const handleSelectCategory = (categoryName: string) => {
+    const rubro = rubros.find(r => r.denominacion === categoryName);
+    console.log('Rubro encontrado:', rubro); // Debug
+    // Cambiar para usar product.rubro.id en lugar de product.rubroId
+    console.log('Productos:', filteredProducts.map(p => ({ 
+      nombre: p.denominacion, 
+      rubroId: p.rubro?.id 
+    }))); // Debug
+    if (rubro && rubro.id) {
+      dispatch(toggleCategory(rubro.id));
+    }
   };
 
-  // Función para abrir el modal con el producto seleccionado
-  const handleCardClick = (product: any) => {
-    setSelectedProduct({
-      ...product
-    });
+  // Función para abrir modal
+  const handleCardClick = (product: ProductoDTO) => {
+    setSelectedProduct(product);
     setModalOpen(true);
   };
 
-  // Función para añadir al carrito (puedes personalizarla)
+  // Función para añadir al carrito
   const handleAddToCart = () => {
-    // Lógica para añadir al carrito
     setModalOpen(false);
   };
 
+  // Convertir IDs seleccionados a nombres para el componente Categories
+  const selectedCategoryNames = selectedCategories.map(id => {
+    const rubro = rubros.find(r => r.id === id);
+    return rubro ? rubro.denominacion : '';
+  }).filter(Boolean);
+
+  const loading = productsLoading || rubrosLoading;
+
+  if (loading) {
+    return (
+      <MenuLayout onSearch={(term) => dispatch(setSearchTerm(term))} onFiltersChange={(f) => dispatch(setFilters(f))}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", width: "100%", gap: "2vh", height: "50vh" }}>
+          <p>Cargando...</p>
+        </div>
+      </MenuLayout>
+    );
+  }
+
   return (
     <MenuLayout
-      onSearch={setSearchTerm}
-      onFiltersChange={setFilters}
+      onSearch={(term) => dispatch(setSearchTerm(term))}
+      onFiltersChange={(f) => dispatch(setFilters(f))}
     >
       <div className="flex flex-col items-center">
         {/* Categorías */}
@@ -70,12 +94,12 @@ export const MenuPage: React.FC = () => {
         </h3>
         <Categories
           categories={categories}
-          selectedCategory={selectedCategory}
+          selectedCategories={selectedCategoryNames}
           onSelectCategory={handleSelectCategory}
         />
 
         {/* Productos */}
-        {!selectedCategory && !searchTerm && (
+        {selectedCategories.length === 0 && !searchTerm && (
           <h2 className="text-4xl font-tertiary text-center text-[#9e1c1c] mb-4">
             Novedades Populares
           </h2>
