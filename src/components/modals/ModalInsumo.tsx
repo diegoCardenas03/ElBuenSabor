@@ -1,4 +1,3 @@
-// import { Button, Modal } from "react-bootstrap";
 import * as Yup from "yup";
 import {
   Dialog,
@@ -17,7 +16,6 @@ import { InsumoDTO } from "../../types/Insumo/InsumoDTO";
 import { InsumoService } from "../../services/InsumoService";
 import TextFieldValue from "../TextFildValue/TextFildValue";
 import { useEffect, useRef, useState } from "react";
-// import { RubroInsumoDTO } from "../../types/RubroInsumo/RubroInsumoDTO";
 import { RubroInsumoResponseDTO } from "../../types/RubroInsumo/RubroInsumoResponseDTO";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env
@@ -65,6 +63,38 @@ export const ModalInsumo = ({
 
     fetchRubros();
   }, []);
+
+  
+  useEffect(() => {
+    if (!openModal) {
+      setSelectedRubros([]);
+      return;
+    }
+    if (!elementActive || !elementActive.rubro) {
+      setSelectedRubros([]);
+      return;
+    }
+
+   
+    const findRubroPath = (rubrosList, rubroId, path = []) => {
+      for (const rubro of rubrosList) {
+        if (rubro.id === rubroId) {
+          return [...path, rubro];
+        }
+        if (rubro.subRubros && rubro.subRubros.length > 0) {
+          const found = findRubroPath(rubro.subRubros, rubroId, [...path, rubro]);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    if (rubros.length > 0) {
+      const rubroPath = findRubroPath(rubros, elementActive.rubro.id);
+      setSelectedRubros(rubroPath || []);
+    }
+  }, [openModal, elementActive, rubros]);
+
 
   const unidadMedidaOptions = Object.values(UnidadMedida).map((value) => ({
     value,
@@ -202,13 +232,12 @@ export const ModalInsumo = ({
             } else {
               await apiInsumo.post(payload);
               Swal.fire({
-                title: "¡Éxito!", 
+                title: "¡Éxito!",
                 text: "Insumo creado correctamente.",
                 icon: "success",
                 confirmButtonText: "Aceptar",
               });
-            } 
-            console.log(payload);
+            }
             getInsumos();
             handleClose();
           }}
@@ -334,13 +363,6 @@ export const ModalInsumo = ({
                     component="div"
                     className="error"
                   />
-                  {/* <TextFieldValue
-                    label="Imagen del insumo:"
-                    name="urlImagen"
-                    id="urlImagen"
-                    type="text"
-                    placeholder="https://..."
-                  /> */}
 
                   {/* Miniatura */}
                   <Field name="urlImagen">
@@ -467,14 +489,6 @@ export const ModalInsumo = ({
                       placeholder="0.00"
                     />
                   )}
-                  {/* ESTO POR SI SE NECESITA EL PRECIO DE VENTA AUNQUE SEA ELABORABLE*/}
-                  {/* <TextFieldValue
-                      label="Precio de venta:"
-                      name="precioVenta"
-                      id="precioVenta"
-                      type="number"
-                      placeholder="0.00"
-                    /> */}
                 </div>
               </div>
 
