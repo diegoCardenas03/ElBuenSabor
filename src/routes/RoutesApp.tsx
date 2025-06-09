@@ -3,12 +3,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import DetalleCompra from '../pages/detalleCompra';
 import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
-import PedidosCocinero from '../pages/pedidosCocinero';
+import PedidosCocinero from '../pages/PedidosCocinero';
 import { ScreenInsumo } from '../pages/ScreenInsumo';
 import Configuracion from '../pages/admin/Configuracion';
 import { ScreenProducto } from '../pages/ScreenProducto';
 import MisPedidos from '../pages/MisPedidos';
-import MisDirecciones from '../pages/MisDirecciones';
+import MisDirecciones from '../pages/misDirecciones';
 
 const RoutesApp = () => {
   return (

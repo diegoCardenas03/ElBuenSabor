@@ -17,8 +17,9 @@ export interface PedidoResponseDTO {
     totalVenta: number;      // Double se convierte a number
     totalCosto: number;      // Double se convierte a number
     formaPago: FormaPago;
+    comentario?: string;
     cliente: ClienteResponseDTO;
     domicilio: DomicilioResponseDTO;
-    detallePedido: DetallePedidoResponseDTO[];
+    detallePedidos: DetallePedidoResponseDTO[];
     factura: FacturaResponseDTO;
 }
