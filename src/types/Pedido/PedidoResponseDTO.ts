@@ -7,18 +7,18 @@ import { TipoEnvio } from "../enums/TipoEnvio";
 import { FacturaResponseDTO } from "../Factura/FacturaResponseDTO";
 
 export interface PedidoResponseDTO {
-    id?: number;
+    id: number;
     fecha: string;           // LocalDate se convierte a string
-    hora?: string;           // LocalTime se convierte a string
+    hora: string;           // LocalTime se convierte a string
     codigo: string;
     estado: Estado;
     horaEstimadaFin?: string; // LocalTime se convierte a string
     tipoEnvio: TipoEnvio;
     totalVenta: number;      // Double se convierte a number
-    totalCosto?: number;      // Double se convierte a number
-    formaPago?: FormaPago;
-    cliente?: ClienteResponseDTO;
-    domicilio?: DomicilioResponseDTO;
-    detallePedido?: DetallePedidoResponseDTO[];
-    factura?: FacturaResponseDTO;
+    totalCosto: number;      // Double se convierte a number
+    formaPago: FormaPago;
+    cliente: ClienteResponseDTO;
+    domicilio: DomicilioResponseDTO;
+    detallePedidos: DetallePedidoResponseDTO[];
+    factura: FacturaResponseDTO;
 }

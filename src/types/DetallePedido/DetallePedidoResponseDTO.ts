@@ -6,6 +6,6 @@ export interface DetallePedidoResponseDTO {
     cantidad: number;
     subTotal: number;
     subTotalCosto: number;
-    producto: ProductoResponseDTO;
-    insumo: InsumoResponseDTO;
+    producto?: ProductoResponseDTO;
+    insumo?: InsumoResponseDTO;
 }
