@@ -1,60 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MenuLayout } from '../layouts/MenuLayout';
 import { Categories } from '../features/products/Categories';
 import { ProductCards } from '../features/products/ProductCards';
 import { ProductModal } from '../features/products/ProductModal';
+import { Loader } from '../components/commons/Loader';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchProducts, setSearchTerm, toggleCategory, setFilters } from '../hooks/redux/slices/ProductReducer';
-import { fetchRubrosProductos } from '../hooks/redux/slices/RubroReducer';
-import { ProductoDTO } from '../types/Producto/ProductoDTO';
+import { useCategories } from '../hooks/useCategories';
+import { fetchProducts, fetchInsumosVendibles, setSearchTerm, setFilters } from '../hooks/redux/slices/ProductReducer';
+import { fetchRubrosProductos, fetchRubrosInsumos } from '../hooks/redux/slices/RubroReducer';
+import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado';
 
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { 
     filteredProducts, 
-    loading: productsLoading, 
-    error: productsError, 
-    selectedCategories,
+    loading: productsLoading,
     searchTerm,
-    filters 
+    selectedCategories: rawSelectedCategories
   } = useAppSelector((state) => state.products);
 
+  const { loading: rubrosLoading } = useAppSelector((state) => state.rubros);
+
+  // Usar el hook personalizado para categorías
   const { 
-    rubros, 
-    loading: rubrosLoading 
-  } = useAppSelector((state) => state.rubros);
+    categories, 
+    selectedCategories, 
+    handleSelectCategory,
+  } = useCategories();
 
   // Estados locales
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductoDTO | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductoUnificado | null>(null);
 
   // Cargar datos al montar
   useEffect(() => {
     dispatch(fetchProducts());
+    dispatch(fetchInsumosVendibles());
     dispatch(fetchRubrosProductos());
+    dispatch(fetchRubrosInsumos());
   }, [dispatch]);
 
-  // Convertir rubros a formato categories
-  const categories = rubros.map(rubro => ({
-    name: rubro.denominacion
-  }));
+  // Debug logs
 
-  // Manejar selección de categoría (usar toggleCategory para selección múltiple)
-  const handleSelectCategory = (categoryName: string) => {
-    const rubro = rubros.find(r => r.denominacion === categoryName);
-    console.log('Rubro encontrado:', rubro); // Debug
-    // Cambiar para usar product.rubro.id en lugar de product.rubroId
-    console.log('Productos:', filteredProducts.map(p => ({ 
-      nombre: p.denominacion, 
-      rubroId: p.rubro?.id 
-    }))); // Debug
-    if (rubro && rubro.id) {
-      dispatch(toggleCategory(rubro.id));
-    }
-  };
 
   // Función para abrir modal
-  const handleCardClick = (product: ProductoDTO) => {
+  const handleCardClick = (product: ProductoUnificado) => {
     setSelectedProduct(product);
     setModalOpen(true);
   };
@@ -64,20 +54,12 @@ export const MenuPage: React.FC = () => {
     setModalOpen(false);
   };
 
-  // Convertir IDs seleccionados a nombres para el componente Categories
-  const selectedCategoryNames = selectedCategories.map(id => {
-    const rubro = rubros.find(r => r.id === id);
-    return rubro ? rubro.denominacion : '';
-  }).filter(Boolean);
-
   const loading = productsLoading || rubrosLoading;
 
   if (loading) {
     return (
       <MenuLayout onSearch={(term) => dispatch(setSearchTerm(term))} onFiltersChange={(f) => dispatch(setFilters(f))}>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", width: "100%", gap: "2vh", height: "50vh" }}>
-          <p>Cargando...</p>
-        </div>
+        <Loader message="Cargando productos..." />
       </MenuLayout>
     );
   }
@@ -94,12 +76,12 @@ export const MenuPage: React.FC = () => {
         </h3>
         <Categories
           categories={categories}
-          selectedCategories={selectedCategoryNames}
+          selectedCategories={selectedCategories}
           onSelectCategory={handleSelectCategory}
         />
 
         {/* Productos */}
-        {selectedCategories.length === 0 && !searchTerm && (
+        {rawSelectedCategories.length === 0 && !searchTerm && (
           <h2 className="text-4xl font-tertiary text-center text-[#9e1c1c] mb-4">
             Novedades Populares
           </h2>
@@ -111,6 +93,7 @@ export const MenuPage: React.FC = () => {
         ) : (
           <ProductCards products={filteredProducts} onCardClick={handleCardClick} />
         )}
+
         {/* Modal de producto */}
         {selectedProduct && (
           <ProductModal
