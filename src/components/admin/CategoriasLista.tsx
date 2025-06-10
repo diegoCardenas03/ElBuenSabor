@@ -43,7 +43,7 @@ const CategoriasLista = ({
           <FaPencilAlt className="cursor-pointer hover:text-tertiary" onClick={() => handleEditar(rubro)} />
           <FaRegTrashAlt className="cursor-pointer hover:text-tertiary" onClick={() => handleEliminar(rubro)} />
           {rubro.tipo === "Insumo" && (rubro as RubroInsumo).subRubros.length > 0 && (
-            <FaAngleUp onClick={onToggle} className={`cursor-pointer h-5 ${abierto ? "rotate-180" : ""}`} />
+            <FaAngleUp onClick={onToggle} className={`cursor-pointer h-5 ${abierto ? "" : "rotate-180"}`} />
           )}
         </div>
       </div>

@@ -20,188 +20,6 @@ type FiltroState = {
   searchTerm: string;
 };
 
-/*const pedidoEjemplo: PedidoResponseDTO[] = [
-  {
-    id: 1,
-    codigo: "001",
-    estado: Estado.EN_PREPARACION,
-    tipoEnvio: TipoEnvio.DELIVERY,
-    fecha: "2025-06-05",
-    totalVenta: 4500.75,
-    detallePedido: [{
-      id: 1,
-      cantidad: 2,
-      subTotal: 3000,
-      subTotalCosto: 1800,
-      producto: {
-        id: 101,
-        denominacion: "Hamburguesa Doble",
-        descripcion: "Doble carne, cheddar, lechuga y tomate",
-        tiempoEstimadoPreparacion: 15,
-        precioVenta: 1500,
-        precioCosto: 900,
-        urlImagen: "https://example.com/img/hamburguesa.jpg",
-        activo: true,
-      },
-      insumo: {
-        id: 202,
-        denominacion: "Cheddar en fetas",
-        urlImagen: "https://example.com/img/cheddar.jpg",
-        precioCosto: 100,
-        precioVenta: 150,
-        stockActual: 200,
-        stockMinimo: 30,
-        esParaElaborar: false,
-        activo: true,
-        unidadMedida: UnidadMedida.GRAMOS,
-      },
-    }],
-
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-06-03",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 2,
-    codigo: "002",
-    estado: Estado.EN_CAMINO,
-    tipoEnvio: TipoEnvio.RETIRO_LOCAL,
-    fecha: "2025-06-02",
-    totalVenta: 4500.75,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-06-07",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 3,
-    codigo: "003",
-    estado: Estado.ENTREGADO,
-    tipoEnvio: TipoEnvio.DELIVERY,
-    fecha: "2025-06-04",
-    totalVenta: 4500.75,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-06-06",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 4,
-    codigo: "004",
-    estado: Estado.ENTREGADO,
-    tipoEnvio: TipoEnvio.DELIVERY,
-    fecha: "2025-05-30",
-    totalVenta: 4500.75,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-05-30",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 5,
-    codigo: "005",
-    estado: Estado.ENTREGADO,
-    tipoEnvio: TipoEnvio.RETIRO_LOCAL,
-    fecha: "2025-05-30",
-    totalVenta: 4500,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-05-30",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 5,
-    codigo: "005",
-    estado: Estado.ENTREGADO,
-    tipoEnvio: TipoEnvio.DELIVERY,
-    fecha: "2025-05-30",
-    totalVenta: 4500,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-05-30",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 6,
-    codigo: "006",
-    estado: Estado.ENTREGADO,
-    tipoEnvio: TipoEnvio.RETIRO_LOCAL,
-    fecha: "2025-05-30",
-    totalVenta: 4500.75,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-05-30",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  },
-  {
-    id: 7,
-    codigo: "007",
-    estado: Estado.ENTREGADO,
-    tipoEnvio: TipoEnvio.DELIVERY,
-    fecha: "2025-05-30",
-    totalVenta: 4500,
-    detallePedido: [],
-    factura: {
-      id: 1,
-      fechaFacturacion: "2025-05-30",
-      horaFacturacion: "14:30",
-      numeroComprobante: 123456,
-      formaPago: FormaPago.MERCADO_PAGO,
-      totalVenta: "4500.75",
-      montoDescuento: 0,
-      costoEnvio: 500,
-    }
-  }
-];*/
 
 const MisPedidos = () => {
   const [loading, setLoading] = useState<Boolean>(false);
@@ -348,7 +166,6 @@ const MisPedidos = () => {
   const getPedidos = async () => {
     try {
       const pedidoData = await misPedidosService.getAll();
-      //const pedidosDTO = pedidoEjemplo;
       // Mapeo PedidoResponseDTO a PedidoDTO
       const pedidosDTO = pedidoData.map((p) => ({
         id: p.id,
@@ -416,7 +233,6 @@ const MisPedidos = () => {
               </button>
             </div>
           </div>
-          {/* <div className='flex items-left md:justify-center w-[90%] md:w-[20%] lg:w-[20%] mt-3 ml-30 md:ml-0'> */}
           <div className='flex justify-left items-left md:justify-center w-[60%] md:w-[20%] mt-3'>
             <span className="inline-block w-4 h-4 bg-green-300/70 rounded mr-2"></span>
             <p>Pedidos en curso</p>

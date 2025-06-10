@@ -6,7 +6,7 @@ import { Header } from '../components/commons/Header';
 import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { FormaPago } from '../types/enums/FormaPago';
-import { domicilio } from './MisDirecciones';
+import { domicilio } from './misDirecciones';
 
 const DetalleCompra = () => {
     const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
