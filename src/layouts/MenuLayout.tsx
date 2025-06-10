@@ -93,7 +93,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
             />
           </div>
           <button
-            className="bg-[#d32f2f] hover:bg-[#c62828] rounded-full p-2 flex items-center justify-center w-10 h-10 self-center cursor-pointer"
+            className="bg-secondary hover:bg-[#c62828] rounded-full p-2 flex items-center justify-center w-10 h-10 self-center cursor-pointer"
             onClick={() => setFilterModalOpen(true)}
           >
             <HiOutlineAdjustments className='rotate-90 w-6 h-6' color="white"/>

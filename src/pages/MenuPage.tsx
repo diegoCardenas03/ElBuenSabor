@@ -82,7 +82,7 @@ export const MenuPage: React.FC = () => {
 
         {/* Productos */}
         {rawSelectedCategories.length === 0 && !searchTerm && (
-          <h2 className="text-4xl font-tertiary text-center text-[#9e1c1c] mb-4">
+          <h2 className="text-4xl font-tertiary text-center text-secondary mb-4">
             Novedades Populares
           </h2>
         )}
