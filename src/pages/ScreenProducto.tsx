@@ -16,8 +16,22 @@ export const ScreenProducto = () => {
   const productoService = new ProductoService();
   const dispatch = useAppDispatch();
 
+  // Estado para los rubros productos
+  const [rubrosProductos, setRubrosProductos] = useState<{ id: number; denominacion: string }[]>([]);
+
   // Columnas de la tabla de productos
   const ColumnsTableProducto = [
+    {
+      label: "Imagen",
+      key: "urlImagen",
+      render: (producto: ProductoDTO) => (
+        <img
+          src={producto.urlImagen}
+          alt={producto.denominacion}
+          style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "8px" }}
+        />
+      )
+    },
     {
       label: "Denominación",
       key: "denominacion",
@@ -55,6 +69,19 @@ export const ScreenProducto = () => {
           color="primary"
         />
       ),
+    },
+    {
+      label: "Rubro",
+      key: "rubroId",
+      render: (producto: ProductoDTO) => {
+        const rubro = rubrosProductos.find(r => r.id === producto.rubroId);
+        return rubro ? rubro.denominacion : "-";
+      },
+    },
+    {
+      label: "Precio de venta",
+      key: "precioVenta",
+      render: (producto: ProductoDTO) => producto.precioVenta,
     },
     {
       label: "Acciones",
@@ -105,6 +132,25 @@ export const ScreenProducto = () => {
       setLoading(false);
     });
   };
+
+  // Traer rubros productos al montar el componente
+  useEffect(() => {
+    const fetchRubros = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/rubroproductos');
+        const data = await res.json();
+        setRubrosProductos(
+          data.map((r: any) => ({
+            id: r.id,
+            denominacion: r.denominacion
+          }))
+        );
+      } catch (error) {
+        setRubrosProductos([]);
+      }
+    };
+    fetchRubros();
+  }, []);
 
   useEffect(() => {
     setLoading(true);

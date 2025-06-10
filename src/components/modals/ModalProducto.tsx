@@ -20,6 +20,7 @@ import "./ModalInsumo.css";
 import { ProductoService } from "../../services/ProductoService";
 import { FaTimes } from "react-icons/fa";
 import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
+import Swal from "sweetalert2";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
 
@@ -74,18 +75,10 @@ export const ModalProducto = ({
         }
       })
       .catch((err) => {
+        console.error("Error al cargar insumos:", err);
         setInsumos([]);
       });
   }, []);
-
-  // const rubroOptions = rubros.map((r) => ({
-  //   value: r.id,
-  //   label: r.nombre,
-  // }));
-  // const insumoOptions = insumos.map((r) => ({
-  //   value: r.id,
-  //   label: r.nombre,
-  // }));
 
   const initialValues: ProductoDTO =
     elementActive && "descripcion" in elementActive
@@ -133,9 +126,6 @@ export const ModalProducto = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            //urlImagen: Yup.string()
-            // .url("URL inválida")
-            // .required("Campo requerido"),
             precioVenta: Yup.number()
               .min(0.01, "Debe ser mayor a 0")
               .required("Campo requerido"),
@@ -183,20 +173,38 @@ export const ModalProducto = ({
 
               if (elementActive?.id) {
                 await apiProducto.patch(elementActive.id, payload);
+                Swal.fire({
+                  title: "Producto actualizado",
+                  text: "El producto se ha actualizado correctamente.",
+                  icon: "success",
+                });
               } else {
                 await apiProducto.post(payload);
+                Swal.fire({
+                  title: "Producto creado",
+                  text: "El producto se ha creado correctamente.",
+                  icon: "success",
+                });
               }
               getProductos();
               handleClose();
             } catch (error) {
-              setStatus("Ocurrió un error al guardar el producto");
+              setStatus(
+                error instanceof Error
+                  ? error.message
+                  : "Ocurrió un error al guardar el producto"
+              );
+              Swal.fire(
+                "Error",
+                error instanceof Error ? error.message : String(error),
+                "error"
+              );
             } finally {
               setSubmitting(false);
             }
           }}
         >
           {({ values, setFieldValue, isValid, dirty, isSubmitting }) => (
-            // ...existing code...
             <Form>
               <div className="container_Form_Ingredientes" >
                 {/* Columna izquierda */}
@@ -215,11 +223,14 @@ export const ModalProducto = ({
                     className="form-control input-formulario"
                   >
                     <option value="">Seleccione una categoría</option>
-                    {rubros.map((rubroproducto) => (
-                      <option key={rubroproducto.id} value={rubroproducto.id}>
-                        {rubroproducto.denominacion}
-                      </option>
-                    ))}
+                    {rubros
+                      .filter((rubroproducto) => rubroproducto.activo)
+                      .map((rubroproducto) => (
+                        <option key={rubroproducto.id} value={rubroproducto.id}>
+                          {rubroproducto.denominacion}
+                        </option>
+                      ))}
+
                   </Field>
                   <ErrorMessage
                     name="rubroId"
@@ -283,17 +294,21 @@ export const ModalProducto = ({
                         onChange={(e) => setInsumoId(Number(e.target.value))}
                         className="form-control input-formulario"
                         style={{
-
                           width: "15em"
-
                         }}
                       >
                         <option value={0}>Seleccione un insumo</option>
-                        {insumos.map((insumoproducto) => (
-                          <option key={insumoproducto.id} value={insumoproducto.id}>
-                            {insumoproducto.denominacion}
-                          </option>
-                        ))}
+                        {insumos
+                          .filter(
+                            (insumoproducto) =>
+                              !values.detalleProductos.some((d) => d.insumoId === insumoproducto.id)
+                          )
+                          .map((insumoproducto) => (
+                            <option key={insumoproducto.id} value={insumoproducto.id}>
+                              {insumoproducto.denominacion}
+                              {insumoproducto.unidadMedida ? ` (${insumoproducto.unidadMedida})` : ""}
+                            </option>
+                          ))}
                       </select>
                       <input
                         type="number"
@@ -302,9 +317,7 @@ export const ModalProducto = ({
                         onChange={(e) => setCantidad(Number(e.target.value))}
                         className="form-control input-formulario"
                         style={{
-
                           width: "5em"
-
                         }}
                         placeholder="Cantidad"
                       />
@@ -343,10 +356,30 @@ export const ModalProducto = ({
                           return (
                             <li
                               key={`${detalle.insumoId}-${idx}`}
-
+                              style={{ display: "flex", alignItems: "center", gap: "1em" }}
                             >
-                              {insumo ? insumo.denominacion : "Insumo"} - Cantidad:{" "}
-                              {detalle.cantidad}
+                              {/* Nombre y unidad de medida */}
+                              <span>
+                                {insumo ? insumo.denominacion : "Insumo"}
+                                {insumo?.unidadMedida ? ` (${insumo.unidadMedida})` : ""}
+                              </span>
+                              {/* Input para editar cantidad */}
+                              <input
+                                type="number"
+                                min={1}
+                                value={detalle.cantidad}
+                                onChange={(e) => {
+                                  const nuevaCantidad = Number(e.target.value);
+                                  setFieldValue(
+                                    "detalleProductos",
+                                    values.detalleProductos.map((d, i) =>
+                                      i === idx ? { ...d, cantidad: nuevaCantidad } : d
+                                    )
+                                  );
+                                }}
+                                className="form-control input-formulario"
+                                style={{ width: "5em" }}
+                              />
                               <Button
                                 size="small"
                                 color="error"
@@ -447,8 +480,6 @@ export const ModalProducto = ({
                   </div>
                 </div>
               </div>
-
-
 
               <DialogActions sx={{ justifyContent: "space-between", p: 2 }}>
                 <Button

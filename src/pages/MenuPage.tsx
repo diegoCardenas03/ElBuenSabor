@@ -1,67 +1,73 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MenuLayout } from '../layouts/MenuLayout';
 import { Categories } from '../features/products/Categories';
 import { ProductCards } from '../features/products/ProductCards';
 import { ProductModal } from '../features/products/ProductModal';
-import { products } from '../utils/products/productsData';
+import { Loader } from '../components/commons/Loader';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { useCategories } from '../hooks/useCategories';
+import { fetchProducts, fetchInsumosVendibles, setSearchTerm, setFilters } from '../hooks/redux/slices/ProductReducer';
+import { fetchRubrosProductos, fetchRubrosInsumos } from '../hooks/redux/slices/RubroReducer';
+import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado';
 
 export const MenuPage: React.FC = () => {
-  // Lista de categorías (nombre + imagen)
-  const categories = [
-    { name: 'Bebidas', image: 'src\\assets\\bebida.png' },
-    { name: 'Hamburguesas', image: 'src\\assets\\hamburguesa.png' },
-    { name: 'Papas', image: 'src\\assets\\papas-fritas.png' },
-    { name: 'Pizzas', image: 'src\\assets\\pizza.png' },
-    { name: 'Panchos', image: 'src\\assets\\pancho.png' },
-    { name: 'Bebidas Alcoholicas', image: 'src\\assets\\fernet.png' }
-  ];
+  const dispatch = useAppDispatch();
+  const { 
+    filteredProducts, 
+    loading: productsLoading,
+    searchTerm,
+    selectedCategories: rawSelectedCategories
+  } = useAppSelector((state) => state.products);
 
-  // Estado de categoría seleccionada
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filters, setFilters] = useState<{ order: string; bestseller: boolean }>({ order: '', bestseller: false });
+  const { loading: rubrosLoading } = useAppSelector((state) => state.rubros);
+
+  // Usar el hook personalizado para categorías
+  const { 
+    categories, 
+    selectedCategories, 
+    handleSelectCategory,
+  } = useCategories();
+
+  // Estados locales
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductoUnificado | null>(null);
+
+  // Cargar datos al montar
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchInsumosVendibles());
+    dispatch(fetchRubrosProductos());
+    dispatch(fetchRubrosInsumos());
+  }, [dispatch]);
+
+  // Debug logs
 
 
-  // Filtrado de productos
-  let filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesBestseller = filters.bestseller ? product.isTopSeller : true;
-    return matchesCategory && matchesSearch && matchesBestseller;
-  });
-
-  // Ordenar productos
-  if (filters.order === 'asc') {
-    filteredProducts = filteredProducts.sort((a, b) => a.price - b.price);
-  } else if (filters.order === 'desc') {
-    filteredProducts = filteredProducts.sort((a, b) => b.price - a.price);
-  }
-
-  // Manejar la selección de categorías
-  const handleSelectCategory = (category: string) => {
-    setSelectedCategory((prevCategory) => (prevCategory === category ? null : category));
-  };
-
-  // Función para abrir el modal con el producto seleccionado
-  const handleCardClick = (product: any) => {
-    setSelectedProduct({
-      ...product
-    });
+  // Función para abrir modal
+  const handleCardClick = (product: ProductoUnificado) => {
+    setSelectedProduct(product);
     setModalOpen(true);
   };
 
-  // Función para añadir al carrito (puedes personalizarla)
+  // Función para añadir al carrito
   const handleAddToCart = () => {
-    // Lógica para añadir al carrito
     setModalOpen(false);
   };
 
+  const loading = productsLoading || rubrosLoading;
+
+  if (loading) {
+    return (
+      <MenuLayout onSearch={(term) => dispatch(setSearchTerm(term))} onFiltersChange={(f) => dispatch(setFilters(f))}>
+        <Loader message="Cargando productos..." />
+      </MenuLayout>
+    );
+  }
+
   return (
     <MenuLayout
-      onSearch={setSearchTerm}
-      onFiltersChange={setFilters}
+      onSearch={(term) => dispatch(setSearchTerm(term))}
+      onFiltersChange={(f) => dispatch(setFilters(f))}
     >
       <div className="flex flex-col items-center">
         {/* Categorías */}
@@ -70,12 +76,12 @@ export const MenuPage: React.FC = () => {
         </h3>
         <Categories
           categories={categories}
-          selectedCategory={selectedCategory}
+          selectedCategories={selectedCategories}
           onSelectCategory={handleSelectCategory}
         />
 
         {/* Productos */}
-        {!selectedCategory && !searchTerm && (
+        {rawSelectedCategories.length === 0 && !searchTerm && (
           <h2 className="text-4xl font-tertiary text-center text-[#9e1c1c] mb-4">
             Novedades Populares
           </h2>
@@ -87,6 +93,7 @@ export const MenuPage: React.FC = () => {
         ) : (
           <ProductCards products={filteredProducts} onCardClick={handleCardClick} />
         )}
+
         {/* Modal de producto */}
         {selectedProduct && (
           <ProductModal
