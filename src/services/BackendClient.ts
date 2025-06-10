@@ -65,7 +65,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
       method: "PUT",
     });
     if (!response.ok) {
-      throw new Error(`Error al actualizar el estadod el elemento con ID ${id}`);
+      throw new Error(`Error al actualizar el estado del elemento con ID ${id}`);
     }
   }
 

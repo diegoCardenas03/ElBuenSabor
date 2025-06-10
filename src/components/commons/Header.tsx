@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Logo centrado solo cuando hay botón de volver */}
       <Link to={"/"}>
         {showBackButton && (
-          <div className="md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
           </div>
         )}

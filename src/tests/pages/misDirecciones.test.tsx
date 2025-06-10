@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import MisDirecciones from '../../pages/misDirecciones';
+import MisDirecciones from '../../pages/MisDirecciones';
 
 describe('MisDirecciones', () => {
   test('muestra las direcciones iniciales', () => {

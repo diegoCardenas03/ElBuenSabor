@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { InsumoResponseDTO } from "../../../types/Insumo/InsumoResponseDTO";
 import { ProductoDTO } from "../../../types/Producto/ProductoDTO";
+import { PedidoResponseDTO } from "../../../types/Pedido/PedidoResponseDTO";
 
 // El tipo de dato puede ser insumo o producto (o ambos)
-type TableElement = InsumoResponseDTO | ProductoDTO;
+type TableElement = InsumoResponseDTO | ProductoDTO |  PedidoResponseDTO;
 
 interface IInitialState {
   dataTable: TableElement[]; // Datos de la tabla (pueden ser insumos o productos)
