@@ -2,12 +2,13 @@ export const products = [
     {
       id: 1,
       name: 'Mega Crunch Bite',
-      price: 1200,
+      price: 1000,
+      oldPrice: 1200,
       category: 'Hamburguesas',
       image: 'src\\assets\\hamburguesa.png',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.',
       isTopSeller: true,
-      tag: 'OFERTA',
+      isOffer: true
     },
     {
       id: 2,
@@ -16,7 +17,8 @@ export const products = [
       category: 'Hamburguesas',
       image: 'src\\assets\\hamburguesa.png',
       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce aliquam massa id sodales venenatis. Phasellus tellus ipsum, maximus aclacus nec, fringilla dignissim ligula. In congue nibh et lectus rhoncus, at posuere massa gravida. Aliquam sagittis, augue at aliquet malesuada.',
-      isTopSeller: false
+      isTopSeller: false,
+      isNew: true
   
     },
     {

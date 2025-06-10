@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
-import logo from "../assets/el_buen_sabor_logo.png";
+import logo from "../../assets/el_buen_sabor_logo.png";
 import CarritoLateral from './CarritoLateral';
 import { Link } from 'react-router-dom';
 
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Logo centrado solo cuando hay botón de volver */}
       <Link to={"/"}>
         {showBackButton && (
-          <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <div className="md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
           </div>
         )}

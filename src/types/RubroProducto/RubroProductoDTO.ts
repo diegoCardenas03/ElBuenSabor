@@ -1,5 +1,5 @@
 export interface RubroProductoDTO {
-    // id?: number;
+    id?: number;
     denominacion: string;
     activo: boolean;
 }

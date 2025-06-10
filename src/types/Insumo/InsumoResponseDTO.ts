@@ -2,7 +2,7 @@ import { UnidadMedida } from "../enums/UnidadMedida";
 import { RubroInsumoResponseDTO } from "../RubroInsumo/RubroInsumoResponseDTO";
 
 export interface InsumoResponseDTO {
-    id?: number;
+    id: number;
     denominacion: string;
     urlImagen: string;
     precioCosto: number;

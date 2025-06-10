@@ -1,7 +1,7 @@
-import usuarioImg from '../assets/img/usuarioLogeado.jpg';
+import usuarioImg from '../../assets/img/usuarioLogeado.jpg';
 import { useState } from 'react';
-import ModalLogin from './modals/ModalLogin';
-import ModalRegister from './modals/ModalRegister';
+import ModalLogin from '../modals/ModalLogin';
+import ModalRegister from '../modals/ModalRegister';
 import { FaTimes, FaUser, FaClipboardList, FaMapMarkerAlt, FaUtensils, FaSignOutAlt  } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ interface NavbarProps {
 }
 
 const navbarLinks = [
-  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mi Perfil', to:'' },
+  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mi Perfil', to:'/MiPerfil' },
   { icon: <FaClipboardList  stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Ordenes', to:'' },
   { icon: <FaMapMarkerAlt stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Direcciones', to:'/MisDirecciones' }
 ];
@@ -30,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   nombreUsuario,
 }) => {
   const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
+
 
   // Si no está logeado, muestra solo el botón de login
   if (!usuarioLogeado) {
@@ -52,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {abrirModalLogin && (
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
             <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
-              <ModalLogin />
+              <ModalRegister />
               {/* <ModalRegister/> */}
               <FaTimes stroke='4' onClick={() => setAbrirModalLogin(false)} className="w-6 h-6 absolute top-4 right-4 cursor-pointer"/>
 
