@@ -7,7 +7,7 @@ import { TipoEnvio } from "../enums/TipoEnvio";
 import { FacturaResponseDTO } from "../Factura/FacturaResponseDTO";
 
 export interface PedidoResponseDTO {
-    id?: number;
+    id: number;
     fecha: string;           // LocalDate se convierte a string
     hora?: string;           // LocalTime se convierte a string
     codigo: string;

@@ -9,6 +9,7 @@ import PedidosCocinero from '../pages/pedidosCocinero';
 import { ScreenInsumo } from '../pages/ScreenInsumo';
 import Configuracion from '../pages/admin/Configuracion';
 import { ScreenProducto } from '../pages/ScreenProducto';
+import { PantallaCajero } from '../pages/admin/PantallaCajero';
 const RoutesApp = () => {
   return (
     <BrowserRouter>
@@ -22,6 +23,8 @@ const RoutesApp = () => {
         <Route path="/admin/Insumos" element={<ScreenInsumo />} />
         <Route path="/admin/productos" element={<ScreenProducto />} />
         <Route path='/admin/Configuracion' element={<Configuracion />} />
+        <Route path="/admin/PantallaCajero" element={<PantallaCajero />} />
+        
       </Routes>
     </BrowserRouter>
   );
