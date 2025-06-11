@@ -24,7 +24,7 @@ const nombreRol: Record<Rol, string> = {
 // Menú por rol de usuario
 const menuPorRol: Record<Rol, { path: string; label: string }[]> = {
   [Rol.ADMIN]: [
-    { path: '/admin/perfil', label: 'Mi Perfil' },
+    { path: '/admin/MiPerfil', label: 'Mi Perfil' },
     { path: '/admin/insumos', label: 'Insumos' },
     { path: '/admin/productos', label: 'Productos' },
     { path: '/admin/empleados', label: 'Empleados' },
