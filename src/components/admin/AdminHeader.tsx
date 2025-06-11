@@ -46,7 +46,7 @@ const menuPorRol: Record<Rol, { path: string; label: string }[]> = {
     { path: '/admin/perfil', label: 'Mi Perfil' },
     { path: '/admin/entregas', label: 'Entregas' }
   ],
-  [Rol.CLIENTE]: [] // Menú vacío para clientes (puedes agregar rutas si es necesario)
+  [Rol.CLIENTE]: []
 };
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({

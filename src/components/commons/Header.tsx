@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
 import logo from "../../assets/el_buen_sabor_logo.png";
@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`relative flex items-center justify-between h-20 px-7 ${backgroundColor}`}
+      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50  ${backgroundColor}`}
     >
       {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
@@ -92,6 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
         onClose={handleCloseNavbar}
         usuarioLogeado={usuarioLogeado}
         nombreUsuario={nombreUsuario}
+        whiteUserBar={navbarOpen ? true : whiteUserBar} // <- SIEMPRE BLANCO SI ESTÁ ABIERTO
       />
     </header>
   );
