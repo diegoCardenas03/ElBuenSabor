@@ -10,7 +10,6 @@ import { ScreenProducto } from '../pages/ScreenProducto';
 import MisPedidos from '../pages/MisPedidos';
 import MisDirecciones from '../pages/misDirecciones';
 
-import MisDirecciones from '../pages/misDirecciones';
 const RoutesApp = () => {
   return (
     <BrowserRouter>
