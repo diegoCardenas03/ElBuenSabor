@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import imgDireccion from '../assets/icons/imgdireccion.png';
 import { useLocation } from 'react-router-dom';
 import { FaMoneyBillAlt, FaAngleRight } from "react-icons/fa";
@@ -61,7 +61,7 @@ const DetalleCompra = () => {
     return (
         <>
             <Header backgroundColor='bg-primary' />
-            <div className='bg-primary h-[100%] py-8 px-10 pt-10'>
+            <div className='bg-primary h-[100%] py-8 px-10 pt-25 '>
                 <div className='lg:flex justify-between'>
                     <div>
                         {tipoEntregaState ? (
@@ -124,7 +124,7 @@ const DetalleCompra = () => {
 
                                     <div className="flex items-center justify-between">
                                         <p className="font-bold text-[16px] pl-2">En tienda</p>
-                                        <p className="text-gray-500 pr-10">5 min</p>
+                                        <p className="text-gray-500 pr-10">{}</p>
                                     </div>
                                 </div>
                             </div>

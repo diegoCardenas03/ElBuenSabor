@@ -15,7 +15,8 @@ interface ITableColumn<T> {
   label: string; // Etiqueta de la columna
   key: string; // Clave que corresponde a la propiedad del objeto en los datos
   render?: (item: T) => React.ReactNode; // Función opcional para personalizar la renderización del contenido de la celda
- 
+  className?: string; // Clase CSS opcional para aplicar estilos a la celda
+
 }
 
 export interface ITableProps<T> {
@@ -77,7 +78,13 @@ export const TableGeneric = <T extends { id: any }>({
             <TableHead>
               <TableRow>
                 {columns.map((column, i: number) => (
-                  <TableCell key={i} align={"center"}>
+                  <TableCell key={i} align={"center"} className={column.className}
+                    sx={{
+                      display: {
+                        xs: column.className?.includes("hidden") ? "none" : "table-cell",
+                        sm: "table-cell",
+                      },
+                    }}>
                     {column.label}
                   </TableCell>
                 ))}
@@ -89,17 +96,23 @@ export const TableGeneric = <T extends { id: any }>({
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index: number) => {
                   return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        key={index}
-                        className={getRowClassName ? getRowClassName(row) : ""}
-                      >
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={index}
+                      className={getRowClassName ? getRowClassName(row) : ""}
+                    >
                       {/* Celdas de la fila */}
                       {columns.map((column, i: number) => {
                         return (
-                          <TableCell key={i} align={"center"}>
+                          <TableCell key={i} align={"center"} className={column.className}
+                            sx={{
+                              display: {
+                                xs: column.className?.includes("hidden") ? "none" : "table-cell",
+                                sm: "table-cell",
+                              },
+                            }}>
                             {
                               column.render ? ( // Si existe la función "render" se ejecuta
                                 column.render(row)

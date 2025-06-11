@@ -1,4 +1,3 @@
-import React from 'react';
 import { ProductoUnificado, isInsumo } from '../../types/ProductoUnificado/ProductoUnificado';
 
 interface ProductCardsProps {

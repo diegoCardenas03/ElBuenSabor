@@ -9,6 +9,7 @@ import { Header } from "../components/commons/Header";
 import { Footer } from "../components/commons/Footer";
 import ProdPopulares from "../components/prodPopulares";
 import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 
 const items = [
   { id: 1, titulo: "Hamburguesas", imagen: burger1 },
@@ -21,25 +22,58 @@ const items = [
 ];
 
 const Landing = () => {
+  const [navbarWhite, setNavbarWhite] = useState(true);
+  const redCircleRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const updateSentinel = () => {
+      if (redCircleRef.current && sentinelRef.current) {
+        sentinelRef.current.style.top = `${redCircleRef.current.offsetTop + redCircleRef.current.offsetHeight}px`;
+      }
+    };
+    updateSentinel();
+    window.addEventListener("resize", updateSentinel);
+    return () => window.removeEventListener("resize", updateSentinel);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (sentinelRef.current) {
+        const rect = sentinelRef.current.getBoundingClientRect();
+        setNavbarWhite(rect.top > 0);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#FFF4E0] relative overflow-hidden font-sans">
-
-
-      {/* Círculo rojo derecho (atrás del texto) */}
-
-      <div className="absolute bg-[#BD1E22] rounded-[300%] z-0 
-  w-[90vw] h-[90vw] 
-  md:w-[1000px] md:h-[900px] 
-  lg:w-[1200px] lg:h-[940px] 
-  top-[-40vw] right-[-40vw] 
-  md:top-[-350px] md:right-[-500px]"/>
-
-      {/* Contenido principal */}
+      <div
+        ref={redCircleRef}
+        className="absolute bg-[#BD1E22] rounded-[300%] z-0 
+          w-[90vw] h-[90vw] 
+          md:w-[1000px] md:h-[900px] 
+          lg:w-[1200px] lg:h-[940px] 
+          top-[-40vw] right-[-40vw] 
+          md:top-[-350px] md:right-[-500px]"
+      />
+      <div
+        ref={sentinelRef}
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          height: 1,
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
       <div className="relative">
-        <Header whiteUserBar={true} showBackButton={false} />
-
-        <main className="h-screen flex flex-col md:flex-row items-center md:items-start justify-center px-4 md:px-16 gap-15 md:gap-40 relative">
-          {/* Pizza */}
+        <Header whiteUserBar={navbarWhite} showBackButton={false} />
+        <main className="pt-20 h-screen flex flex-col md:flex-row items-center md:items-start justify-center px-4 md:px-16 gap-15 md:gap-40 relative">
           <div className="w-full md:w-1/2 flex justify-center md:justify-end pt-0 md:pt-30">
             <img
               src={pizza}
@@ -47,8 +81,6 @@ const Landing = () => {
               className="w-[50vw] md:w-[40vw] lg:w-[35vw] max-w-[500px]"
             />
           </div>
-
-          {/* Texto */}
           <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left gap-4 md:gap-6 md:mt-15">
             <h1 className="text-[#FF9D3A] text-[48px] md:text-[80px] lg:text-[15vh] font-tertiary leading-none uppercase">
               El Buen <br /> Sabor
@@ -60,9 +92,6 @@ const Landing = () => {
             </Link>
           </div>
         </main>
-
-
-
         {/* Productos Populares */}
         <div className="flex flex-col items-center justify-center mt-0 md:mt-10 mb-10 p-6 md:p-20">
           <div className="flex items-center justify-center gap-6 relative mb-12 flex-wrap">
@@ -77,7 +106,6 @@ const Landing = () => {
           </div>
           <ProdPopulares />
         </div>
-
         {/* Menú */}
         <div className="px-4 md:px-0">
           <h2 className="font-tertiary text-5xl md:text-7xl text-center py-10">NUESTRO MENÚ</h2>
@@ -90,7 +118,6 @@ const Landing = () => {
             />
           </div>
         </div>
-
         {/* Formas de entrega y pago */}
         <h2 className="font-tertiary text-5xl md:text-7xl text-center py-10">
           Formas de entrega y pago
@@ -106,7 +133,6 @@ const Landing = () => {
             <p className="font-primary">Tiempo de entrega estimado de 45 minutos</p>
             <p className="font-primary">Aceptamos todos los medios de pago</p>
           </div>
-
           {/* Mapa */}
           <div className="w-full h-80 rounded-xl overflow-hidden shadow-md">
             <iframe
@@ -124,7 +150,6 @@ const Landing = () => {
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );

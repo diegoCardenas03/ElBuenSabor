@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Header } from '../components/commons/Header';
 import { Footer } from '../components/commons/Footer';
 import { ProductFilterModal } from '../features/products/ProductFilterModal';
@@ -56,7 +56,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
   ];
 
   return (
-    <div className="bg-[#FFF4E0] min-h-screen relative overflow-hidden">
+    <div className="bg-[#FFF4E0] min-h-screen relative overflow-hidden pt-20">
       {/* Imágenes decorativas de fondo */}
       <img
         src="src/assets/pizza-fondo-com.png"

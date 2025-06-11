@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MiPerfilUsuarioLayout } from "../layouts/MiPerfilUsuarioLayout";
 import usuarioImg from "../assets/img/usuarioLogeado.jpg";
@@ -11,9 +11,9 @@ type PerfilForm = {
   repeatPassword: string;
 };
 
-export const MiPerfilUsuarioPage: React.FC = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = React.useState(false);
+export const MiPerfilUsuarioPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const { register, handleSubmit, watch, formState: { errors, isDirty } } = useForm<PerfilForm>({
     defaultValues: {
@@ -40,15 +40,10 @@ export const MiPerfilUsuarioPage: React.FC = () => {
         <div className="flex-shrink-0 flex flex-col items-center w-full md:w-auto pt-8">
           <img src={usuarioImg} alt="Usuario" className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mb-2" />
         </div>
-        <form
-          className="flex-1 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col gap-2 mt-2 md:mt-0 pt-8 mx-auto"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <label className="font-semibold text-base mb-1">
-            Nombre
+        <form className="flex-1 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col gap-2 mt-2 md:mt-0 pt-8 mx-auto" onSubmit={handleSubmit(onSubmit)} >
+          <label className="font-semibold text-base mb-1">Nombre
             <div className="flex items-center">
-              <input
-                className="w-full border-b border-black bg-transparent font-bold outline-none py-1"
+              <input className="w-full border-b border-black bg-transparent font-bold outline-none py-1"
                 {...register("nombre", { required: true })}
                 type="text"
               />
@@ -56,8 +51,7 @@ export const MiPerfilUsuarioPage: React.FC = () => {
             </div>
             {errors.nombre && <span className="text-xs text-red-500">Este campo es requerido</span>}
           </label>
-          <label className="font-semibold text-base mb-1">
-            Teléfono
+          <label className="font-semibold text-base mb-1">Teléfono
             <div className="flex items-center">
               <input
                 className="w-full border-b border-black bg-transparent font-bold outline-none py-1"
@@ -67,9 +61,8 @@ export const MiPerfilUsuarioPage: React.FC = () => {
               <FaPen className="ml-2 text-[#222] cursor-pointer w-4 h-4" />
             </div>
             {errors.telefono && <span className="text-xs text-red-500">Este campo es requerido</span>}
-          </label>
-          <label className="font-semibold text-base mb-1">
-            Email
+          </label> 
+          <label className="font-semibold text-base mb-1">Email
             <div className="flex items-center">
               <input
                 className="w-full border-b border-black font-normal outline-none py-1 cursor-not-allowed"
@@ -80,8 +73,7 @@ export const MiPerfilUsuarioPage: React.FC = () => {
               />
             </div>
           </label>
-          <label className="font-semibold text-base mb-1 mt-2">
-            Contraseña
+          <label className="font-semibold text-base mb-1 mt-2">Contraseña
             <div className="flex items-center">
               <input
                 type={showPassword ? "text" : "password"}
@@ -104,17 +96,14 @@ export const MiPerfilUsuarioPage: React.FC = () => {
               </button>
               <FaPen className="ml-2 text-[#222] cursor-pointer w-4 h-4" />
             </div>
-            <span className="text-xs text-gray-500">
-              Debe contener un mínimo de 8 caracteres, una letra mayúscula, una minúscula y un símbolo
-            </span>
+            <span className="text-xs text-gray-500">Debe contener un mínimo de 8 caracteres, una letra mayúscula, una minúscula y un símbolo</span>
             {errors.password && (
               <span className="block text-xs text-red-500 mt-1">
                 {errors.password.message || "Contraseña inválida"}
               </span>
             )}
           </label>
-          <label className="font-semibold text-base mb-1">
-            Repetir contraseña
+          <label className="font-semibold text-base mb-1">Repetir contraseña
             <div className="flex items-center">
               <input
                 type={showRepeatPassword ? "text" : "password"}
@@ -134,28 +123,20 @@ export const MiPerfilUsuarioPage: React.FC = () => {
               </button>
               <FaPen className="ml-2 text-[#222] cursor-pointer w-4 h-4" />
             </div>
-            <span className="text-xs text-gray-500">
-              Debe contener un mínimo de 8 caracteres, una letra mayúscula, una minúscula y un símbolo
-            </span>
+            <span className="text-xs text-gray-500">Debe contener un mínimo de 8 caracteres, una letra mayúscula, una minúscula y un símbolo</span>
             {errors.repeatPassword && (
               <span className="block text-xs text-red-500 mt-1">
                 {errors.repeatPassword.message}
               </span>
             )}
           </label>
-          <a
-            href="/MisDirecciones"
-            className="text-[#d32f2f] font-semibold text-sm mt-2 hover:underline"
-          >
-            Editar mis direcciones &gt;
-          </a>
+          <a href="/MisDirecciones" className="text-[#d32f2f] font-semibold text-sm mt-2 hover:underline" >Editar mis direcciones &gt;</a>
           <button
             type="submit"
             className="w-full sm:w-auto mx-auto mt-6 bg-[#FF9D3A] hover:bg-[#e68a1f] text-black font-bold py-2 px-8 rounded-full text-base shadow cursor-pointer
               disabled:bg-[#FFD59E] disabled:hover:bg-[#FFD59E] disabled:text-black disabled:cursor-not-allowed disabled:opacity-100"
             disabled={!isDirty}
-          >
-            Guardar Cambios
+          >Guardar Cambios
           </button>
         </form>
       </div>
