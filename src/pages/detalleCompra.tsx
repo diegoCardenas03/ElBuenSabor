@@ -124,7 +124,7 @@ const DetalleCompra = () => {
 
                                     <div className="flex items-center justify-between">
                                         <p className="font-bold text-[16px] pl-2">En tienda</p>
-                                        <p className="text-gray-500 pr-10">5 min</p>
+                                        <p className="text-gray-500 pr-10">{}</p>
                                     </div>
                                 </div>
                             </div>

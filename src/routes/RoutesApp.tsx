@@ -7,6 +7,9 @@ import PedidosCocinero from '../pages/pedidosCocinero';
 import { ScreenInsumo } from '../pages/ScreenInsumo';
 import Configuracion from '../pages/admin/Configuracion';
 import { ScreenProducto } from '../pages/ScreenProducto';
+import MisPedidos from '../pages/MisPedidos';
+import MisDirecciones from '../pages/misDirecciones';
+
 import MisDirecciones from '../pages/misDirecciones';
 const RoutesApp = () => {
   return (
@@ -15,7 +18,9 @@ const RoutesApp = () => {
         <Route path="/" element={<Landing />}/> 
         <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
         <Route path="/MisDirecciones" element={<MisDirecciones />} /> 
+        <Route path="/MisDirecciones" element={<MisDirecciones />} />
         <Route path="/Menu" element={<Menu />} />
+        <Route path='/MisPedidos' element={<MisPedidos/>}/>
         <Route path="/MiPerfil" element={<MiPerfilUsuarioPage />} />
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
         <Route path="/admin/Insumos" element={<ScreenInsumo />} />

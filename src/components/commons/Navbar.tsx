@@ -14,9 +14,9 @@ interface NavbarProps {
 }
 
 const navbarLinks = [
-  { icon: <FaUser stroke='1' className="w-6 h-6" />, texto: 'Mi Perfil', to:'/MiPerfil' },
-  { icon: <FaClipboardList stroke='1' className="w-6 h-6" />, texto: 'Mis Ordenes', to:'' },
-  { icon: <FaMapMarkerAlt stroke='1' className="w-6 h-6" />, texto: 'Mis Direcciones', to:'/MisDirecciones' }
+  { icon: <FaUser stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mi Perfil', to:'/MiPerfil' },
+  { icon: <FaClipboardList  stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Ordenes', to:'/MisPedidos' },
+  { icon: <FaMapMarkerAlt stroke='1' fill='white' className="w-6 h-6" />, texto: 'Mis Direcciones', to:'/MisDirecciones' }
 ];
 
 const navbarLinks2 = [

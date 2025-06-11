@@ -9,7 +9,10 @@ export const domicilio = (): DomicilioDTO[] => {
     return [
         { id: "1", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
         { id: "2", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
-        { id: "3", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" }
+        { id: "3", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" },
+        { id: "4", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
+        { id: "5", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
+        { id: "6", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" }
     ];
 };
 
@@ -42,7 +45,7 @@ const MisDirecciones = () => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 mt-10 justify-center place-items-center sm:px-10 lg:px-40">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 justify-center place-items-center sm:px-5 lg:px-25">
                     {direcciones.map((d) => (
                         <div className="shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px]" key={d.id}>
                             <div className='flex text-primary '>
