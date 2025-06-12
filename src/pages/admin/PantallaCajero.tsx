@@ -49,18 +49,21 @@ export const PantallaCajero = () => {
       key: "horaEstimadaFin",
       render: (pedido: PedidoResponseDTO) => pedido.horaEstimadaFin || "Sin dato",
     },
-    {
-      label: "Agregar tiempo",
-      key: "agregarTiempo",
-      render: (pedido: PedidoResponseDTO) => (
-        <div className="flex justify-center items-center">
-          <AiOutlinePlus
-            className="text-red-600 text-xl cursor-pointer hover:scale-110 transition"
-            onClick={() => agregarTiempo(pedido)}
-          />
-        </div>
-      ),
-    },
+{
+  label: "Agregar tiempo",
+  key: "agregarTiempo",
+  render: (pedido: PedidoResponseDTO) =>
+    pedido.estado === Estado.ENTREGADO || pedido.estado === Estado.CANCELADO ? (
+      null
+    ) : (
+      <div className="flex justify-center items-center">
+        <AiOutlinePlus
+          className="text-red-600 text-xl cursor-pointer hover:scale-110 transition"
+          onClick={() => agregarTiempo(pedido)}
+        />
+      </div>
+    ),
+},
     {
       label: "Detalle",
       key: "detalle",
@@ -124,7 +127,11 @@ export const PantallaCajero = () => {
           getPedidos();
           Swal.fire("¡Listo!", "Se agregaron 5 minutos.", "success");
         } catch (error) {
-          Swal.fire("Error", "No se pudo agregar el tiempo.", "error");
+          Swal.fire(
+            "Error",
+            error instanceof Error ? error.message : "No se pudo agregar el tiempo.",
+            "error"
+          );
         }
       }
     });
@@ -175,11 +182,13 @@ return (
         getRowClassName={(row) => row.estado === Estado.PENDIENTE ? "pending-row" : ""}
       />
     )}
-    <PedidoDetalleModal
-      pedido={pedidoSeleccionado}
-      open={openModal}
-      onClose={() => setOpenModal(false)}
-    />
+    {pedidoSeleccionado && (
+      <PedidoDetalleModal
+        pedido={pedidoSeleccionado}
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+      />
+    )}
   </div>
 );
 };
