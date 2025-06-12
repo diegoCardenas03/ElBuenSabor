@@ -15,7 +15,7 @@ const PedidosCocinero: React.FC = () => {
             const res = await fetch("http://localhost:8080/api/pedidos");
             const data = await res.json();
             setPedidos(data);
-            setComandas(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.PENDIENTE));
+            setComandas(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.SOLICITADO));
             setEnPreparacion(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.EN_PREPARACION));
         } catch (error) {
             console.error("Error al traer productos", error);
@@ -34,7 +34,7 @@ const PedidosCocinero: React.FC = () => {
     const cambiarEstadoPedido = (pedido: PedidoResponseDTO) => {
         let nuevoEstado: PedidoResponseDTO['estado'];
 
-        if (pedido.estado === Estado.PENDIENTE) {
+        if (pedido.estado === Estado.SOLICITADO) {
             nuevoEstado = Estado.EN_PREPARACION
         } else if (pedido.estado === Estado.EN_PREPARACION) {
             nuevoEstado = Estado.TERMINADO
@@ -155,7 +155,7 @@ const PedidosCocinero: React.FC = () => {
                                 onClick={() => cambiarEstadoPedido(pedidoSeleccionado)}
                                 className="mt-5 bg-secondary hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-full w-full"
                             >
-                                {pedidoSeleccionado.estado === Estado.PENDIENTE ? 'Preparar' : 'Completado'}
+                                {pedidoSeleccionado.estado === Estado.SOLICITADO ? 'Preparar' : 'Completado'}
                             </button>
                         )}
 
