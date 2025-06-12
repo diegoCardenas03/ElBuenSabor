@@ -95,7 +95,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                   <span>{cantidad}</span>
                   <button onClick={() => dispatch(agregarProducto(item))} className="px-2 py-1 rounded-full cursor-pointer">+</button>
                 </div>
-                <button onClick={() => dispatch(quitarProducto(id))}
+                <button onClick={() => {dispatch(quitarProducto(id)); alert("producto eliminado");}}
                   className="cursor-pointer bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
                   Eliminar
                 </button>

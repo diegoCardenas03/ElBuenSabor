@@ -19,6 +19,14 @@ export const store = configureStore({
   },
 });
 
+store.subscribe(() => {
+    try {
+        const serialized = JSON.stringify(store.getState().carrito);
+        localStorage.setItem('carritoState', serialized);
+    } catch (e) {
+    }
+});
+
 // Inferimos los tipos `RootState` y `AppDispatch` del almacén de la tienda misma
 export type RootState = ReturnType<typeof store.getState>;
 // Tipo inferido: { modalReducer: ModalState, tablaReducer: TablaState }

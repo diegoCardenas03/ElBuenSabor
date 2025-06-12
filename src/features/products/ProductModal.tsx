@@ -5,7 +5,7 @@ interface ProductModalProps {
   product: ProductoUnificado;
   isOpen: boolean;
   onClose: () => void;
-  onAddToCart: () => void;
+  onAddToCart: (product: ProductoUnificado) => void;
 }
 
 export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose, onAddToCart }) => {
@@ -29,7 +29,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
         <p className="text-gray-700 mb-4 text-center">{description}</p>
         <button
           className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-2 rounded-full font-semibold cursor-pointer"
-          onClick={onAddToCart}
+          onClick={() => onAddToCart(product)}
         >
           Añadir al carrito
         </button>

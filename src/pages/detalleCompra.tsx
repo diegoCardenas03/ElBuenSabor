@@ -13,7 +13,6 @@ import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 
 const DetalleCompra = () => {
     const dispatch = useAppDispatch();
-    const carrito = useAppSelector((state) => state.carrito.items);
     const direcciones = useAppSelector((state) => state.domicilio.direcciones);
     const tipoEntrega = useAppSelector((state) => state.carrito.tipoEntrega);
     const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
@@ -102,7 +101,7 @@ const DetalleCompra = () => {
 
                                     <div className="flex items-center justify-between">
                                         <p className="font-bold text-[16px] pl-2">Delivery</p>
-                                        <p className="text-gray-500 pr-10">5-10 min</p>
+                                        <p className="text-gray-500 pr-10">{}</p>
                                     </div>
                                 </div>
                             </div>

@@ -11,6 +11,7 @@ import { fetchRubrosProductos, fetchRubrosInsumos } from '../hooks/redux/slices/
 import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado';
 import CarritoLateral from '../components/commons/CarritoLateral';
 import { abrirCarrito, cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
+import { agregarProducto } from '../hooks/redux/slices/CarritoReducer';
 
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -53,10 +54,11 @@ export const MenuPage: React.FC = () => {
   };
 
   // Función para añadir al carrito
-  const handleAddToCart = () => {
+  const handleAddToCart = (product: ProductoUnificado) => {
     setModalOpen(false);
+    alert("producto agregado")
+    dispatch(agregarProducto(product));
     dispatch(abrirCarrito());
-
   };
 
   const loading = productsLoading || rubrosLoading;
@@ -109,7 +111,7 @@ export const MenuPage: React.FC = () => {
               product={selectedProduct}
               isOpen={modalOpen}
               onClose={() => setModalOpen(false)}
-              onAddToCart={handleAddToCart}
+              onAddToCart={() => handleAddToCart(selectedProduct)}
             />
           )}
         </div>

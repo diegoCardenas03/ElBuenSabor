@@ -18,13 +18,23 @@ type CarritoState = {
     metodoPago: FormaPago | null;
 };
 
-const initialState: CarritoState = {
-    items: [],
-    tipoEntrega: null,
-    direccion: null,
-    comentario: '',
-    metodoPago: null,
-};
+const LOCALSTORAGE_KEY = 'carritoState';
+
+function loadCarritoState(): CarritoState {
+    try {
+        const serialized = localStorage.getItem(LOCALSTORAGE_KEY);
+        if (serialized) {
+            return JSON.parse(serialized);
+        }
+    } catch (e) {}
+    return {
+        items: [],
+        tipoEntrega: null,
+        direccion: null,
+        comentario: '',
+        metodoPago: null,
+    };
+}
 
 export const obtenerId = (item: ProductoUnificado): string => {
     if (isInsumo(item))
@@ -34,9 +44,8 @@ export const obtenerId = (item: ProductoUnificado): string => {
 
 const carritoReducer = createSlice({
     name: 'carrito',
-    initialState,
+    initialState: loadCarritoState(),
     reducers: {
-
         agregarProducto: (state, action: PayloadAction<ProductoUnificado>) => {
             const id = obtenerId(action.payload);
             const index = state.items.findIndex((i) => obtenerId(i.item) === id);
@@ -64,6 +73,8 @@ const carritoReducer = createSlice({
             state.items = [];
             state.direccion = null;
             state.tipoEntrega = null;
+            state.comentario = "";
+            state.metodoPago = null;
         },
 
         setTipoEntrega: (state, action: PayloadAction<TipoEnvio | null>) => {
