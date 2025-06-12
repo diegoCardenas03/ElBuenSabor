@@ -6,6 +6,8 @@ import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { crearDireccion, editarDireccion, eliminarDireccion, fetchDirecciones } from '../hooks/redux/slices/DomicilioReducer';
+import { DomicilioResponseDTO } from '../types/Domicilio/DomicilioResponseDTO';
+import { useEventCallback } from '@mui/material';
 
 const MisDirecciones = () => {
     const [mostrarModal, setMostrarModal] = useState<boolean>(false);
@@ -21,11 +23,12 @@ const MisDirecciones = () => {
     }
 
     const dispatch = useAppDispatch();
-    const { direcciones, cargando } = useAppSelector((state) => state.domicilio);
+    const direcciones = useAppSelector((state) => state.domicilio.direcciones);
 
     useEffect(() => {
-        dispatch(fetchDirecciones());
-    }, []);
+        dispatch(fetchDirecciones())
+    }, [dispatch])
+
 
     const handleEliminar = async (id: number) => {
         const result = await dispatch(eliminarDireccion(id));
@@ -54,7 +57,7 @@ const MisDirecciones = () => {
         }
     };
 
-    const formatearDireccion = (d: DomicilioDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
+    const formatearDireccion = (d: DomicilioResponseDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
     return (
         <>
@@ -70,7 +73,7 @@ const MisDirecciones = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 justify-center place-items-center sm:px-5 lg:px-25">
-                    {direcciones.map((d) => (
+                    {direcciones.map((d: DomicilioResponseDTO) => (
                         <div className="shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px]" key={d.id}>
                             <div className='flex text-primary '>
                                 <FaMapMarkerAlt stroke='2' className='relative top-[3px] w-5 h-5 mt-2' />
@@ -131,11 +134,11 @@ const MisDirecciones = () => {
                                     onChange={(e) => setDireccionNueva({ ...direccionNueva, calle: e.target.value })}
                                 />
                                 <input
-                                    type="text"
+                                    type="number"
                                     className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Número"
-                                    value={numero}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: parseInt(e.target.value) || 0 })}
+                                    value={numero === 0 ? "" : numero}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value === "" ? 0 : parseInt(e.target.value, 10),})}
                                 />
                                 <input
                                     type="text"
@@ -145,11 +148,11 @@ const MisDirecciones = () => {
                                     onChange={(e) => setDireccionNueva({ ...direccionNueva, localidad: e.target.value })}
                                 />
                                 <input
-                                    type="text"
+                                    type="number"
                                     className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Codigo Postal"
-                                    value={codigoPostal}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: parseInt(e.target.value) || 0 })}
+                                    value={codigoPostal === 0 ? "" : codigoPostal}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value === "" ? 0 : parseInt(e.target.value, 10),})}
                                 />
                                 <div className="flex justify-center items-center space-x-4">
                                     <button

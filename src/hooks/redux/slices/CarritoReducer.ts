@@ -84,9 +84,11 @@ const carritoReducer = createSlice({
         setDireccion: (state, action: PayloadAction<DomicilioDTO | null>) => {
             state.direccion = action.payload;
         },
+
         setComentario: (state, action: PayloadAction<string>) => {
             state.comentario = action.payload;
         },
+        
         setMetodoPago: (state, action: PayloadAction<FormaPago>) => {
             state.metodoPago = action.payload;
         },

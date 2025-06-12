@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaRegClock, FaMapMarkerAlt } from "react-icons/fa";
 import { TipoEnvio } from '../../types/enums/TipoEnvio';
-import { DomicilioDTO } from '../../types/Domicilio/DomicilioDTO';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDireccion, setTipoEntrega, vaciarCarrito } from '../../hooks/redux/slices/CarritoReducer';
 import { fetchDirecciones } from '../../hooks/redux/slices/DomicilioReducer';
+import { DomicilioResponseDTO } from '../../types/Domicilio/DomicilioResponseDTO';
 
 type Props = {
   onClose: () => void;
@@ -22,11 +22,11 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
 
   useEffect(() => {
-    dispatch(fetchDirecciones());
+    dispatch(fetchDirecciones())
     setLoading(false);
-  }, [direcciones])
+  }, [dispatch])
 
-  const formatearDireccion = (d: DomicilioDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
+  const formatearDireccion = (d: DomicilioResponseDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
   const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cantidad, 0);
   const envio = tipoEntrega == TipoEnvio.DELIVERY ? 200 : 0;
@@ -61,7 +61,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   return (
     <div className="fixed right-0 top-0 h-screen w-96 bg-primary shadow-lg p-6 rounded-xl z-9999 absolute flex flex-col transition-transform duration-300">
       <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-xl cursor-pointer">✕</button>
-      <h2 className="text-2xl font-bold text-gray-800 mb-3 pb-2">MI ORDEN</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">MI ORDEN</h2>
 
       <div className="flex-1 overflow-auto p-2">
         {loading &&
@@ -95,7 +95,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                   <span>{cantidad}</span>
                   <button onClick={() => dispatch(agregarProducto(item))} className="px-2 py-1 rounded-full cursor-pointer">+</button>
                 </div>
-                <button onClick={() => {dispatch(quitarProducto(id)); alert("producto eliminado");}}
+                <button onClick={() => { dispatch(quitarProducto(id)); alert("producto eliminado"); }}
                   className="cursor-pointer bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
                   Eliminar
                 </button>
@@ -106,9 +106,9 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
 
 
-        <h2 className="text-2xl font-bold text-gray-800 mt-4 mb-4 pb-2">ENTREGA</h2>
-        <div className='space-y-8'>
-          <div className="flex justify-around items-center space-x-5">
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-3">ENTREGA</h2>
+        <div className=''>
+          <div className="flex justify-around items-center space-x-5 mb-5">
             <button
               onClick={() => dispatch(setTipoEntrega(TipoEnvio.RETIRO_LOCAL))}
               className={`cursor-pointer border px-4 py-1 rounded-full ${tipoEntrega === TipoEnvio.RETIRO_LOCAL ? 'bg-secondary text-white' : 'text-gray-700 border-gray-300'}`}>
@@ -121,13 +121,13 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
             </button>
           </div>
 
-          <div className="flex items-center space-x-4 mb-4">
+          {/* <div className="flex items-center space-x-4 mb-4">
             <FaRegClock stroke='2' className='w-7 h-7' />
             <p className="text-gray-700">12:00</p>
-          </div>
+          </div> */}
 
           {tipoEntrega === TipoEnvio.DELIVERY && (
-            <div className="flex items-center space-x-4 mb-10">
+            <div className="flex items-center space-x-4 mb-5">
               <FaMapMarkerAlt stroke='2' className='w-7 h-7' />
               <select
                 className="cursor-pointer border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
@@ -150,23 +150,25 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       </div>
 
       <div className="space-y-4 border-t pt-4">
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-between mb-2">
           <p className="text-gray-700">Subtotal:</p>
           <p className="text-gray-700">${subTotal}</p>
         </div>
 
         {tipoEntrega === "DELIVERY" && (
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between mb-2">
             <p className="text-gray-700">Envio:</p>
             <p className="text-gray-700">${envio}</p>
           </div>)}
 
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-between mb-2">
           <p className="font-bold">Total:</p>
           <p className="font-bold">${total}</p>
         </div>
-        <button onClick={handleRealizarPedido} className="bg-secondary text-white px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Realizar pedido</button>
-        <button onClick={handleCancelarPedido} className="bg-tertiary border border-gray-300 px-4 py-2 rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Cancelar pedido</button>
+        <div className='flex flex-col gap-2'>
+          <button onClick={handleRealizarPedido} className="bg-secondary text-white px-3 py-[5px] rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Realizar pedido</button>
+          <button onClick={handleCancelarPedido} className="bg-tertiary border border-gray-300 px-3 py-[5px] rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Cancelar pedido</button>
+        </div>
       </div>
 
     </div>
