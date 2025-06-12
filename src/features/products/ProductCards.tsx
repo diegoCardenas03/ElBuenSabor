@@ -1,4 +1,3 @@
-import React from 'react';
 import { ProductoUnificado, isInsumo } from '../../types/ProductoUnificado/ProductoUnificado';
 import { useAppDispatch } from '../../hooks/redux';
 import { agregarProducto } from '../../hooks/redux/slices/CarritoReducer';

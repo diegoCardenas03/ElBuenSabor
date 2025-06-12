@@ -5,6 +5,8 @@ import { RubroProductoDTO } from '../../types/RubroProducto/RubroProductoDTO';
 import Swal from "sweetalert2";
 import CategoriasLista from "./CategoriasLista";
 import CategoriaModal from "./CategoriaModal";
+import { RubroInsumoClient } from "../../services/RubroInsumoClient";
+import { RubroProductoClient } from "../../services/RubroProductoClient";
 
 // Tipos internos para el manejo en frontend
 type RubroInsumo = RubroInsumoDTO & {
@@ -43,6 +45,9 @@ const obtenerTodosRubrosUnicosAnidados = (rubros: RubroInsumo[], depth = 0, visi
   return result;
 };
 
+const rubroInsumoClient = new RubroInsumoClient();
+const rubroProductoClient = new RubroProductoClient();
+
 const Categorias = () => {
   const [modalAbierto, setModalAbierto] = useState<boolean>(false);
   const [nombreRubro, setNombreRubro] = useState<string>("");
@@ -57,13 +62,12 @@ const Categorias = () => {
 
   const [editando, setEditando] = useState<boolean>(false);
   const [rubroEditando, setRubroEditando] = useState<Rubro | null>(null);
-  // Función para cargar rubros desde el backend
+
+  // Función para cargar rubros desde el backend usando los servicios
   const cargarRubros = useCallback(async () => {
     // Traer todos los Rubros Insumo
     try {
-      const res = await fetch('http://localhost:8080/api/rubroinsumos');
-      if (!res.ok) throw new Error('Fallo al traer rubros insumo');
-      const data: any[] = await res.json();
+      const data = await rubroInsumoClient.getAll();
       function mapRubroInsumo(dto: any): RubroInsumo {
         return {
           id: dto.id,
@@ -92,9 +96,7 @@ const Categorias = () => {
 
     // Traer todos los Rubros Producto
     try {
-      const res = await fetch('http://localhost:8080/api/rubroproductos');
-      if (!res.ok) throw new Error('Fallo al traer rubros producto');
-      const data: any[] = await res.json();
+      const data = await rubroProductoClient.getAll();
       setRubrosProductos(
         data.map(dto => ({
           id: dto.id,
@@ -126,22 +128,13 @@ const Categorias = () => {
     setAbiertos(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // ACTUALIZADO: ahora usa los endpoints nuevos para eliminar
   const handleEliminar = async (rubro: Rubro) => {
     try {
       if (rubro.tipo === "Insumo") {
-        const res = await fetch(`http://localhost:8080/api/rubroinsumos/delete/${rubro.id}`, {
-          method: "DELETE"
-        });
-        if (!res.ok) throw new Error('Error al eliminar rubro insumo');
+        await rubroInsumoClient.delete(rubro.id);
       } else {
-        const res = await fetch(`http://localhost:8080/api/rubroproductos/delete/${rubro.id}`, {
-          method: "DELETE"
-        });
-        if (!res.ok) throw new Error('Error al eliminar rubro producto');
+        await rubroProductoClient.delete(rubro.id);
       }
-
-      // Recargar datos después de eliminar
       await cargarRubros();
 
       Swal.fire({
@@ -165,6 +158,37 @@ const Categorias = () => {
     }
   };
 
+  // ACTIVAR/DESACTIVAR rubro usando updateEstado del service
+  const handleActivarDesactivar = async (rubro: Rubro) => {
+    try {
+      if (rubro.tipo === "Insumo") {
+        await rubroInsumoClient.updateEstado(rubro.id);
+      } else {
+        await rubroProductoClient.updateEstado(rubro.id);
+      }
+      await cargarRubros();
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        title: "Estado actualizado correctamente",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    } catch (error) {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "error",
+        title: "Error al actualizar estado",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+      console.error("Error al actualizar estado del rubro", error);
+    }
+  };
+
+  // Recursivo: filtra búsqueda en denominación y subRubros (no filtra por activo)
   const filtrarRubrosInsumos = (rubros: RubroInsumo[], termino: string): RubroInsumo[] => {
     const term = termino.toLowerCase();
     return rubros.filter(rubro => {
@@ -177,13 +201,13 @@ const Categorias = () => {
     }));
   };
 
-  // Filtrar solo los rubros raíz (los que no son hijos de nadie) y activos
+  // Mostrar TODOS los rubros raíz (activos e inactivos)
   const filteredInsumos = filtrarRubrosInsumos(rubrosInsumos, busqueda)
-    .filter(rubro => !rubroPadreIdEnData(rubrosInsumos, rubro.id) && rubro.activo);
+    .filter(rubro => !rubroPadreIdEnData(rubrosInsumos, rubro.id));
 
-  // Filtrar productos activos
+  // Filtrar productos (activos e inactivos)
   const filteredProductos = rubrosProductos
-    .filter(rubro => rubro.denominacion.toLowerCase().includes(busqueda.toLowerCase()) && rubro.activo);
+    .filter(rubro => rubro.denominacion.toLowerCase().includes(busqueda.toLowerCase()));
 
   // Handler para editar rubro y abrir modal
   const handleEditar = (rubro: Rubro) => {
@@ -240,8 +264,7 @@ const Categorias = () => {
           <button className={`font-bold py-2 rounded-lg px-3 cursor-pointer ${opcionFiltrar === "Insumo" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Insumo")} type="button" > Insumos </button>
           <button className={`font-bold py-2 rounded-lg px-3 cursor-pointer ${opcionFiltrar === "Producto" ? "bg-gray-200" : "bg-white"}`} onClick={() => setOpcionFiltrar("Producto")} type="button"> Productos </button>
         </div>
-        <button className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer' onClick={handleAbrirModalNuevo} > +Agregar Categoría
-        </button>
+        <button className='bg-secondary text-white px-2 py-2 rounded-2xl cursor-pointer' onClick={handleAbrirModalNuevo} > +Agregar Categoría </button>
       </div>
 
       <div className="mt-10 bg-white h-10 w-8/10 pl-10 flex items-center rounded-t-lg font-semibold">Nombre</div>
@@ -253,7 +276,7 @@ const Categorias = () => {
         abiertos={abiertos}
         toggleAbierto={toggleAbierto}
         handleEditar={handleEditar}
-        handleEliminar={handleEliminar}
+        handleActivarDesactivar={handleActivarDesactivar}
       />
 
       {modalAbierto && (

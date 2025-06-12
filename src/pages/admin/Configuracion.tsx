@@ -17,7 +17,7 @@ const Configuracion = () => {
   return (
     <>
       <AdminHeader rol={Rol.ADMIN} />
-      <main className='flex flex-col items-center w-full m-auto pt-10 h-screen bg-primary font-primary '>
+      <main className="flex flex-col items-center w-full m-auto pt-10 min-h-screen pb-20 bg-primary font-primary">
         <div className='flex justify-around w-4/5'>
           <button className={`text-tertiary font-bold text-xl cursor-pointer w-[200px] py-2 rounded-4xl ${opcionPrincipal === "Categorias"
             ? 'bg-white shadow-lg'

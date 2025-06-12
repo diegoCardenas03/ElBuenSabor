@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { Estado } from '../types/enums/Estado';
 
