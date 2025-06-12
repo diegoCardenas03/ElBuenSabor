@@ -9,22 +9,25 @@ import { useCategories } from '../hooks/useCategories';
 import { fetchProducts, fetchInsumosVendibles, setSearchTerm, setFilters } from '../hooks/redux/slices/ProductReducer';
 import { fetchRubrosProductos, fetchRubrosInsumos } from '../hooks/redux/slices/RubroReducer';
 import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado';
+import CarritoLateral from '../components/commons/CarritoLateral';
+import { abrirCarrito, cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { 
-    filteredProducts, 
+  const {
+    filteredProducts,
     loading: productsLoading,
     searchTerm,
     selectedCategories: rawSelectedCategories
   } = useAppSelector((state) => state.products);
 
   const { loading: rubrosLoading } = useAppSelector((state) => state.rubros);
+  const carritoAbierto = useAppSelector((state) => state.carritoUI.abierto);
 
   // Usar el hook personalizado para categorías
-  const { 
-    categories, 
-    selectedCategories, 
+  const {
+    categories,
+    selectedCategories,
     handleSelectCategory,
   } = useCategories();
 
@@ -52,6 +55,8 @@ export const MenuPage: React.FC = () => {
   // Función para añadir al carrito
   const handleAddToCart = () => {
     setModalOpen(false);
+    dispatch(abrirCarrito());
+
   };
 
   const loading = productsLoading || rubrosLoading;
@@ -65,46 +70,51 @@ export const MenuPage: React.FC = () => {
   }
 
   return (
-    <MenuLayout
-      onSearch={(term) => dispatch(setSearchTerm(term))}
-      onFiltersChange={(f) => dispatch(setFilters(f))}
-    >
-      <div className="flex flex-col items-center">
-        {/* Categorías */}
-        <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
-          Explorar categorías
-        </h3>
-        <Categories
-          categories={categories}
-          selectedCategories={selectedCategories}
-          onSelectCategory={handleSelectCategory}
-        />
-
-        {/* Productos */}
-        {rawSelectedCategories.length === 0 && !searchTerm && (
-          <h2 className="text-4xl font-tertiary text-center text-secondary mb-4">
-            Novedades Populares
-          </h2>
-        )}
-        {filteredProducts.length === 0 ? (
-          <p className="font-bowlby-one-sc text-center text-red-500 text-lg mt-4">
-            No se encontraron productos que coincidan con la búsqueda.
-          </p>
-        ) : (
-          <ProductCards products={filteredProducts} onCardClick={handleCardClick} />
-        )}
-
-        {/* Modal de producto */}
-        {selectedProduct && (
-          <ProductModal
-            product={selectedProduct}
-            isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            onAddToCart={handleAddToCart}
+    <>
+      {carritoAbierto && (
+        <CarritoLateral onClose={() => dispatch(cerrarCarrito())} />
+      )}
+      <MenuLayout
+        onSearch={(term) => dispatch(setSearchTerm(term))}
+        onFiltersChange={(f) => dispatch(setFilters(f))}
+      >
+        <div className="flex flex-col items-center">
+          {/* Categorías */}
+          <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
+            Explorar categorías
+          </h3>
+          <Categories
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onSelectCategory={handleSelectCategory}
           />
-        )}
-      </div>
-    </MenuLayout>
+
+          {/* Productos */}
+          {rawSelectedCategories.length === 0 && !searchTerm && (
+            <h2 className="text-4xl font-tertiary text-center text-[#9e1c1c] mb-4">
+              Novedades Populares
+            </h2>
+          )}
+          {filteredProducts.length === 0 ? (
+            <p className="font-bowlby-one-sc text-center text-red-500 text-lg mt-4">
+              No se encontraron productos que coincidan con la búsqueda.
+            </p>
+          ) : (
+            <ProductCards products={filteredProducts} onCardClick={handleCardClick} />
+          )}
+
+          {/* Modal de producto */}
+          {selectedProduct && (
+            <ProductModal
+              product={selectedProduct}
+              isOpen={modalOpen}
+              onClose={() => setModalOpen(false)}
+              onAddToCart={handleAddToCart}
+            />
+          )}
+        </div>
+      </MenuLayout>
+    </>
   );
 };
 

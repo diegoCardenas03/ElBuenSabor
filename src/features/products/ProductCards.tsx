@@ -1,5 +1,8 @@
 import React from 'react';
 import { ProductoUnificado, isInsumo } from '../../types/ProductoUnificado/ProductoUnificado';
+import { useAppDispatch } from '../../hooks/redux';
+import { agregarProducto } from '../../hooks/redux/slices/CarritoReducer';
+import { abrirCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 
 interface ProductCardsProps {
   products: ProductoUnificado[];
@@ -8,6 +11,7 @@ interface ProductCardsProps {
 }
 
 export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick, showBadges }) => {
+  const dispatch = useAppDispatch();
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-center">
       {products.map((product) => {
@@ -38,7 +42,9 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
               ${price.toFixed(2)}
             </p>
             {/* Botón para agregar al carrito */}
-            <button className="mt-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer">
+            <button 
+              className="mt-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer"
+              onClick={() => {dispatch(agregarProducto(product)); dispatch(abrirCarrito());}}>
               Añadir
             </button>
           </div>

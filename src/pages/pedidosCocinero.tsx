@@ -10,67 +10,6 @@ const PedidosCocinero: React.FC = () => {
     const [modalDetallePedido, setModalDetallePedido] = useState<Boolean>(false)
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState<any>(null);
 
-    // Simulación de datos
-    // useEffect(() => {
-    //     const pedidosSimulados: PedidoResponseDTO[] = [
-    //         {
-    //             id: 1, fecha: "10-03-2000", hora: "12:50hs", codigoOrden: "001", estado: Estado.PENDIENTE, horaEstimadaFin: "13:30", tipoEnvio: TipoEnvio.RETIRO_LOCAL, totalVenta: 300, totalCosto: 150, formaPago: FormaPago.EFECTIVO, detallePedido:
-    //                 [{
-    //                     producto: [{
-    //                         denominacion: "Pizza Musarela",
-    //                         descripcion: "descripcion",
-    //                         tiempoEstimadoPreparacion: 40,
-    //                         precioVenta: 300,
-    //                         urlImagen: "https://media.istockphoto.com/id/2170408203/es/foto/pizza-with-prosciutto-cotto-ham-and-mushrooms.jpg?s=1024x1024&w=is&k=20&c=c0KSm2vrbx9aYibYuicD1uXA-uHpXzUImhlRqD_3rXs=",
-    //                         activo: true,
-    //                         rubro: [{ denominacion: "queso", activo: true }],
-    //                         detalleProductos: [{
-    //                             cantidad: 2
-    //                         }]
-    //                     }], cantidad: 2
-    //                 }]
-    //         },
-    //         {
-    //             id: 2, fecha: "12-06-2000", hora: "13:40hs", codigoOrden: "002", estado: Estado.EN_PREPARACION, horaEstimadaFin: "14:00", tipoEnvio: TipoEnvio.DELIVERY, totalVenta: 400, totalCosto: 150, formaPago: FormaPago.MERCADO_PAGO, detallePedido:
-    //                 [{
-    //                     producto: [{
-    //                         denominacion: "Pizza 2",
-    //                         descripcion: "descripcion 2",
-    //                         tiempoEstimadoPreparacion: 20,
-    //                         precioVenta: 500,
-    //                         urlImagen: "https://media.istockphoto.com/id/2170408203/es/foto/pizza-with-prosciutto-cotto-ham-and-mushrooms.jpg?s=1024x1024&w=is&k=20&c=c0KSm2vrbx9aYibYuicD1uXA-uHpXzUImhlRqD_3rXs=",
-    //                         activo: true,
-    //                         rubro: [{ denominacion: "queso", activo: true }],
-    //                         detalleProductos: [{
-    //                             cantidad: 1
-    //                         }]
-    //                     }], cantidad: 1
-    //                 }]
-    //         },
-    //         {
-    //             id: 3, fecha: "01-10-2000", hora: "13:30hs", codigoOrden: "003", estado: Estado.PENDIENTE, horaEstimadaFin: "14:20", tipoEnvio: TipoEnvio.DELIVERY, totalVenta: 450, totalCosto: 150, formaPago: FormaPago.MERCADO_PAGO, detallePedido:
-    //                 [{
-    //                     producto: [{
-    //                         denominacion: "Pizza 3",
-    //                         descripcion: "descripcion 3",
-    //                         tiempoEstimadoPreparacion: 50,
-    //                         precioVenta: 350,
-    //                         urlImagen: "https://media.istockphoto.com/id/2170408203/es/foto/pizza-with-prosciutto-cotto-ham-and-mushrooms.jpg?s=1024x1024&w=is&k=20&c=c0KSm2vrbx9aYibYuicD1uXA-uHpXzUImhlRqD_3rXs=",
-    //                         activo: true,
-    //                         rubro: [{ denominacion: "queso", activo: true }],
-    //                         detalleProductos: [{
-    //                             cantidad: 3
-    //                         }]
-    //                     }], cantidad: 3
-    //                 }]
-    //         },
-    //     ];
-
-    //     setPedidos(pedidosSimulados);
-    //     setComandas(pedidosSimulados.filter(pedido => pedido.estado === Estado.PENDIENTE));
-    //     setEnPreparacion(pedidosSimulados.filter(pedido => pedido.estado === Estado.EN_PREPARACION));
-    // }, []);
-
     const cambiarEstadoPedido = (pedido: PedidoResponseDTO) => {
         let nuevoEstado: PedidoResponseDTO['estado'];
 

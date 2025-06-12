@@ -22,7 +22,7 @@ export const Categories: React.FC<CategoriesProps> = ({
             'px-4 py-2 rounded-full border-2 transition-colors font-medium cursor-pointer',
             selectedCategories.includes(cat.id) // Verificar por uniqueId
               ? 'bg-secondary text-white border-secondary shadow-lg'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-red-600 hover:text-red-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-secondary hover:text-secondary'
           )}
         >
           {cat.name}

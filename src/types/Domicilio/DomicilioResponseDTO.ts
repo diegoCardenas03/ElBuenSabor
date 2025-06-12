@@ -1,5 +1,5 @@
 export interface DomicilioResponseDTO {
-    id?: number;
+    id: number;
     calle: string;
     numero: number;
     localidad: string;

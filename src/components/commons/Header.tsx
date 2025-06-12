@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
 import { Navbar } from './Navbar';
 import logo from "../../assets/el_buen_sabor_logo.png";
 import CarritoLateral from './CarritoLateral';
 import { Link } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -21,9 +23,17 @@ export const Header: React.FC<HeaderProps> = ({
   backgroundColor = "none",
 }) => {
   const [navbarOpen, setNavbarOpen] = useState(false);
-  const [carritoAbierto, setCarritoAbierto] = useState(false);
+  const carrito = useAppSelector((state) => state.carrito.items);
+  const carritoAbierto = useAppSelector((state) => state.carritoUI.abierto);
+  const dispatch = useAppDispatch();
 
   const usuarioLogeado = true;
+
+  useEffect(() => {
+    if (carritoAbierto && carrito.length === 0) {
+      dispatch(cerrarCarrito());
+    }
+  }, [carrito, carritoAbierto, dispatch]);
 
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
@@ -63,27 +73,31 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Derecha - Usuario y carrito */}
       <div className="flex-shrink-0 flex items-center space-x-3 z-10">
         <span
-          className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${
-            whiteUserBar ? "text-white" : "text-black"
-          }`}
+          className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"
+            }`}
           onClick={handleUserClick}
           title={nombreUsuario}
         >
           {nombreUsuario}
         </span>
         <div
-          className={`h-5 border-l flex-shrink-0 ${
-            whiteUserBar ? "border-white" : "border-black"
-          }`}
+          className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"
+            }`}
         ></div>
         <FaShoppingCart
           className="flex-shrink-0 cursor-pointer"
           fill={whiteUserBar ? "white" : ""}
           color={whiteUserBar ? "white" : "black"}
-          onClick={() => setCarritoAbierto(true)}
+          onClick={() => dispatch(abrirCarrito())}
         />
-        {carritoAbierto && (
-          <CarritoLateral onClose={() => setCarritoAbierto(false)} />
+         {carritoAbierto && (
+          <div className="fixed inset-0 z-50">
+            <div
+              className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+              onClick={() => dispatch(cerrarCarrito())}
+            ></div>
+            <CarritoLateral onClose={() => dispatch(cerrarCarrito())} />
+          </div>
         )}
       </div>
 

@@ -199,7 +199,7 @@ const MisPedidos = () => {
 
   return (
     <>
-      <div className='w-full h-full bg-primary pb-10'>
+      <div className='w-full h-full bg-primary pb-10 pt-20'>
         <Header />
         <h1 className='font-tertiary text-center text-[30px] pt-10'>Mis Pedidos</h1>
         <div className='flex flex-col md:flex-row justify-center items-center mt-5 mb-5'>

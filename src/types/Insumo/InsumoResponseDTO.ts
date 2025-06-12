@@ -12,5 +12,5 @@ export interface InsumoResponseDTO {
     esParaElaborar: boolean;
     activo: boolean;
     unidadMedida: UnidadMedida;
-    rubro?: RubroInsumoResponseDTO;
+    rubro: RubroInsumoResponseDTO;
 }

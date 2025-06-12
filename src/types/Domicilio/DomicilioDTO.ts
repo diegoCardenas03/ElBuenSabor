@@ -1,7 +1,7 @@
 export interface DomicilioDTO {
-    id?: string;
+    id?: number;
     calle: string;
-    numero: string;
+    numero: number;
     localidad: string;
-    codigoPostal: string;
+    codigoPostal: number;
 }

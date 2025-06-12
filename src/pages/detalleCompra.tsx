@@ -6,58 +6,67 @@ import { Header } from '../components/commons/Header';
 import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { FormaPago } from '../types/enums/FormaPago';
-import { domicilio } from './misDirecciones';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { setComentario, setDireccion, setMetodoPago } from '../hooks/redux/slices/CarritoReducer';
+import { TipoEnvio } from '../types/enums/TipoEnvio';
+import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 
 const DetalleCompra = () => {
-    const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
-    const [mostrarDirecciones, setMostrarDirecciones] = useState<boolean>(false);
-    const [direccionState, setDireccionState] = useState({ seleccionada: '', temporal: '' });
-    const [agregarComentario, setAgregarComentario] = useState<boolean>(false);
-    const [comentarioState, setComentarioState] = useState({ actual: '', temporal: '' });
-    const [metodoPago, setMetodoPago] = useState<FormaPago>();
-    const location = useLocation();
-    const { direccion: direccionDesdeState, tipoEntrega, subTotal, envio, total } = location.state || {};
+    const dispatch = useAppDispatch();
+    const carrito = useAppSelector((state) => state.carrito.items);
+    const direcciones = useAppSelector((state) => state.domicilio.direcciones);
+    const tipoEntrega = useAppSelector((state) => state.carrito.tipoEntrega);
+    const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
+    const comentario = useAppSelector((state) => state.carrito.comentario);
+    const metodoPago = useAppSelector((state) => state.carrito.metodoPago);
+    const [direccionTemporal, setDireccionTemporal] = useState<DomicilioDTO | null>(direccionSeleccionada ?? null);
     const [tipoEntregaState, setTipoEntregaState] = useState<boolean>(tipoEntrega === 'DELIVERY' ? true : false);
+    const [comentarioState, setComentarioState] = useState({ actual: comentario || '', temporal: comentario || '' });
+    const [mostrarDirecciones, setMostrarDirecciones] = useState<boolean>(false);
+    const [agregarComentario, setAgregarComentario] = useState<boolean>(false);
+    const carritoAbierto = useAppSelector(state => state.carritoUI.abierto);
 
+    const location = useLocation();
+    const { subTotal, envio, total } = location.state || {};
 
     useEffect(() => {
-        const direcciones = domicilio();
-        setDirecciones(direcciones);
-    }, []);
-
-    useEffect(() => {
-        if (mostrarDirecciones) {
-            setDireccionState(prev => ({
-                ...prev,
-                temporal: prev.seleccionada || direccionDesdeState?.id || ''
-            }));
+        if (carritoAbierto) dispatch(cerrarCarrito());
+        if (tipoEntregaState) {
+            // Si es DELIVERY, selecciona Mercado Pago por defecto
+            dispatch(setMetodoPago(FormaPago.MERCADO_PAGO));
+        } else {
+            // Si es RETIRO EN TIENDA, selecciona Efectivo por defecto
+            dispatch(setMetodoPago(FormaPago.EFECTIVO));
         }
-    }, [mostrarDirecciones, direccionDesdeState]);
-
-    const formatearDireccion = (d?: DomicilioDTO) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
-    const tarifaServicio = 150; // Suponiendo una tarifa de servicio fija
+    }, [tipoEntregaState, dispatch, direcciones, carritoAbierto]);
 
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const formatearDireccion = (d?: DomicilioDTO | null) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
+    const tarifaServicio = 150;
 
-        if (name === 'direccion') {
-            setDireccionState(prev => ({ ...prev, temporal: value }));
-        } else if (name === 'comentario') {
-            setComentarioState(prev => ({ ...prev, temporal: value }));
+    const handleDireccionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const temporal = direcciones.find(dir => dir.id === parseInt(e.target.value));
+        if (temporal) {
+            setDireccionTemporal(temporal);
         }
     };
 
-    const handleSubmit = (name: 'direccion' | 'comentario') => {
-        if (name === 'direccion') {
-            setDireccionState(prev => ({ ...prev, seleccionada: prev.temporal }));
-            setMostrarDirecciones(false);
-        } else if (name === 'comentario') {
-            setComentarioState(prev => ({ ...prev, actual: prev.temporal }));
-            setAgregarComentario(false);
-        }
-    }
+    const handleComentarioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const { value } = e.target;
+        setComentarioState(prev => ({ ...prev, temporal: value }));
+    };
+    const handleDireccionSubmit = () => {
+        dispatch(setDireccion(direccionTemporal));
+        setMostrarDirecciones(false);
+    };
 
+    const handleComentarioSubmit = () => {
+        setComentarioState(prev => {
+            dispatch(setComentario(prev.temporal));
+            return { ...prev, actual: prev.temporal };
+        });
+        setAgregarComentario(false);
+    };
     return (
         <>
             <Header backgroundColor='bg-primary' />
@@ -72,8 +81,8 @@ const DetalleCompra = () => {
                                         <div className="flex items-center">
                                             <img src={imgDireccion} alt="Dirección" className="w-20 h-20 mr-4" />
                                             <p className="font-bold text-[16px]">
-                                                {formatearDireccion(direcciones.find(d => d.id === direccionState.seleccionada)!)
-                                                    || formatearDireccion(direccionDesdeState)
+                                                {formatearDireccion(direcciones.find(d => d.id === direccionSeleccionada?.id)!)
+                                                    || formatearDireccion(direccionSeleccionada)
                                                     || 'Seleccione una dirección'}
                                             </p>
                                         </div>
@@ -124,7 +133,7 @@ const DetalleCompra = () => {
 
                                     <div className="flex items-center justify-between">
                                         <p className="font-bold text-[16px] pl-2">En tienda</p>
-                                        <p className="text-gray-500 pr-10">{}</p>
+                                        <p className="text-gray-500 pr-10">{ }</p>
                                     </div>
                                 </div>
                             </div>
@@ -135,7 +144,7 @@ const DetalleCompra = () => {
                         <div className='pt-10'>
                             <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>MEDIOS DE PAGO</h1>
                             <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
-                                {!tipoEntregaState && (
+                                {tipoEntrega === TipoEnvio.RETIRO_LOCAL && (
                                     <div>
                                         <label className='flex items-center'>
                                             <input
@@ -143,7 +152,7 @@ const DetalleCompra = () => {
                                                 name='metodoPago'
                                                 value='efectivo'
                                                 checked={metodoPago === 'EFECTIVO'}
-                                                onChange={() => setMetodoPago(FormaPago.EFECTIVO)}
+                                                onChange={() => dispatch(setMetodoPago(FormaPago.EFECTIVO))}
                                                 className='accent-red-800 mr-3 cursor-pointer'
                                             />
                                             <p className='font-bold'>Efectivo</p>
@@ -160,7 +169,7 @@ const DetalleCompra = () => {
                                         name='metodoPago'
                                         value='mercadoPago'
                                         checked={metodoPago === 'MERCADO_PAGO'}
-                                        onChange={() => setMetodoPago(FormaPago.MERCADO_PAGO)}
+                                        onChange={() => dispatch(setMetodoPago(FormaPago.MERCADO_PAGO))}
                                         className='accent-red-800 mr-3 cursor-pointer'
                                     />
                                     <p className='font-bold'>Mercado Pago</p>
@@ -178,7 +187,7 @@ const DetalleCompra = () => {
                                     <p>Productos</p>
                                     <p>${subTotal}</p>
                                 </div>
-                                {tipoEntregaState && (
+                                {tipoEntrega === TipoEnvio.DELIVERY && (
                                     <div className="flex justify-between mb-3">
                                         <p>Envío</p>
                                         <p>${envio}</p>
@@ -209,10 +218,7 @@ const DetalleCompra = () => {
             {mostrarDirecciones && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative ">
-                        {/* <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionState({ ...direccionState, temporal: direccionState.seleccionada }); }}>
-                            ✕
-                        </button> */}
-                        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionState(prev => ({ ...prev, temporal: prev.seleccionada })); }}>
+                        <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionTemporal(direccionSeleccionada ?? null); }}>
                             ✕
                         </button>
 
@@ -225,9 +231,8 @@ const DetalleCompra = () => {
                                         type='radio'
                                         name='direccion'
                                         value={dir.id}
-                                        // checked={direccionState.temporal === dir.id || direccionDesdeState?.id === dir}
-                                        checked={direccionState.temporal === dir.id}
-                                        onChange={handleChange}
+                                        checked={direccionTemporal?.id === dir.id}
+                                        onChange={handleDireccionChange}
                                         className='accent-red-800 mr-3'
                                     />
                                     {formatearDireccion(dir)}
@@ -236,7 +241,7 @@ const DetalleCompra = () => {
                         </ul>
                         <div className="pt-8 flex justify-center">
                             <button className='bg-tertiary rounded-full px-5 py-1 hover:scale-102 transition-transform duration-200'
-                                onClick={() => handleSubmit('direccion')}>
+                                onClick={() => handleDireccionSubmit()}>
                                 Continuar
                             </button>
                         </div>
@@ -257,12 +262,12 @@ const DetalleCompra = () => {
                             className='bg-white w-full h-24 border-none rounded-lg p-4'
                             name='comentario'
                             value={comentarioState.temporal}
-                            onChange={handleChange}
+                            onChange={handleComentarioChange}
                             placeholder='Escribí tu comentario...'
                         />
                         <div className="pt-8 flex justify-center">
                             <button className='bg-tertiary rounded-full px-5 py-1 hover:scale-102 transition-transform duration-200 cursor-pointer'
-                                onClick={() => handleSubmit('comentario')}>
+                                onClick={() => handleComentarioSubmit()}>
                                 Continuar
                             </button>
                         </div>

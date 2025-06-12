@@ -4,31 +4,55 @@ import { FaPen, FaTrashAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { Header } from '../components/commons/Header';
 import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
-
-export const domicilio = (): DomicilioDTO[] => {
-    return [
-        { id: "1", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
-        { id: "2", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
-        { id: "3", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" },
-        { id: "4", calle: 'Av. San Martin', numero: "123", localidad: 'Ciudad', codigoPostal: "1000" },
-        { id: "5", calle: 'Calle Falsa', numero: "456", localidad: 'Godoy Cruz', codigoPostal: "2000" },
-        { id: "6", calle: 'Calle San Juan', numero: "436", localidad: 'Ciudad', codigoPostal: "3000" }
-    ];
-};
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { crearDireccion, editarDireccion, eliminarDireccion, fetchDirecciones } from '../hooks/redux/slices/DomicilioReducer';
 
 const MisDirecciones = () => {
-    const [direcciones, setDirecciones] = useState<DomicilioDTO[]>([]);
     const [mostrarModal, setMostrarModal] = useState<boolean>(false);
-    const [direccionNueva, setDireccionNueva] = useState({ calle: '', numero: '', localidad: '', codigoPostal: '' });
+    const [direccionNueva, setDireccionNueva] = useState({ calle: "", numero: 0, localidad: '', codigoPostal: 0 });
     const { calle, numero, localidad, codigoPostal } = direccionNueva;
     const [modoEditar, setModoEditar] = useState<boolean>(false);
     const [direccionEditando, setDireccionEditando] = useState<DomicilioDTO | null>(null);
+    const cerrarModal = () => {
+        setMostrarModal(false);
+        setModoEditar(false);
+        setDireccionEditando(null);
+        setDireccionNueva({ calle: "", numero: 0, localidad: '', codigoPostal: 0 });
+    }
 
+    const dispatch = useAppDispatch();
+    const { direcciones, cargando } = useAppSelector((state) => state.domicilio);
 
     useEffect(() => {
-        const direcciones = domicilio();
-        setDirecciones(direcciones);
+        dispatch(fetchDirecciones());
     }, []);
+
+    const handleEliminar = async (id: number) => {
+        const result = await dispatch(eliminarDireccion(id));
+        if (eliminarDireccion.fulfilled.match(result)) {
+            console.log("Dirección eliminada correctamente");
+        } else {
+            console.error("Error al eliminar dirección", result.payload);
+        }
+    };
+
+    const handleGuardar = async () => {
+        try {
+            if (modoEditar && direccionEditando?.id) {
+                const res = await dispatch(editarDireccion({ id: direccionEditando.id, data: direccionNueva }));
+                if (editarDireccion.fulfilled.match(res)) {
+                    cerrarModal();
+                }
+            } else {
+                const res = await dispatch(crearDireccion(direccionNueva));
+                if (crearDireccion.fulfilled.match(res)) {
+                    cerrarModal();
+                }
+            }
+        } catch (error) {
+            console.error("Error al guardar dirección", error);
+        }
+    };
 
     const formatearDireccion = (d: DomicilioDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
@@ -71,10 +95,7 @@ const MisDirecciones = () => {
                                     <FaPen stroke='2' width={20} height={20} className="relative left-[5px]" />
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        const nuevas = direcciones.filter(dirItem => dirItem.id !== d.id);
-                                        setDirecciones(nuevas);
-                                    }}
+                                    onClick={() => handleEliminar(d.id)}
                                     className="flex items-center cursor-pointer flex bg-primary px-4 py-2 rounded-full mt-2 hover:scale-102 transition-transform duration-200">
                                     Eliminar
                                     <FaTrashAlt stroke='2' width={20} height={20} className="relative left-[5px]" />
@@ -94,7 +115,7 @@ const MisDirecciones = () => {
                                         setMostrarModal(false);
                                         setModoEditar(false);
                                         setDireccionEditando(null);
-                                        setDireccionNueva({ calle: '', numero: '', localidad: '', codigoPostal: '' });
+                                        setDireccionNueva({ calle: "", numero: 0, localidad: "", codigoPostal: 0 });
                                     }}
                                 >
                                     ✕
@@ -114,7 +135,7 @@ const MisDirecciones = () => {
                                     className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Número"
                                     value={numero}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value })}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: parseInt(e.target.value) || 0 })}
                                 />
                                 <input
                                     type="text"
@@ -128,25 +149,12 @@ const MisDirecciones = () => {
                                     className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
                                     placeholder="Codigo Postal"
                                     value={codigoPostal}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value })}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: parseInt(e.target.value) || 0 })}
                                 />
                                 <div className="flex justify-center items-center space-x-4">
                                     <button
                                         className="cursor-pointer bg-tertiary px-5 py-2 rounded-full hover:scale-102 transition-transform duration-200"
-                                        onClick={() => {
-                                            if (modoEditar && direccionEditando) {
-                                                const nuevasDirecciones = direcciones.map(d => d.id === direccionEditando.id ? { ...direccionEditando, ...direccionNueva } : d);
-                                                setDirecciones(nuevasDirecciones);
-                                            } else {
-                                                const nuevaDireccion = { ...direccionNueva };
-                                                setDirecciones([...direcciones, nuevaDireccion]);
-                                            }
-                                            setMostrarModal(false);
-                                            setModoEditar(false);
-                                            setDireccionEditando(null);
-                                            setDireccionNueva({ calle: '', numero: '', localidad: '', codigoPostal: '' });
-                                        }}
-                                    >
+                                        onClick={handleGuardar}>
                                         Guardar
                                     </button>
                                 </div>

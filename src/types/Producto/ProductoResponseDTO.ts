@@ -10,6 +10,6 @@ export interface ProductoResponseDTO {
     precioCosto: number;
     urlImagen: string;
     activo: boolean;
-    rubro?: RubroProductoResponseDTO;
-    detalleProductos?: DetalleProductoResponseDTO[];
+    rubro: RubroProductoResponseDTO;
+    detalleProductos: DetalleProductoResponseDTO[];
 }
