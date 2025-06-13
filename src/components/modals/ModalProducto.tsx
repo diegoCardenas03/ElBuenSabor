@@ -138,7 +138,15 @@ export const ModalProducto = ({
             activo: Yup.boolean(),
             detalleProductos: Yup.array()
               .min(1, "Debe agregar al menos un insumo al producto")
-              .required("Debe agregar al menos un insumo al producto"),
+              .required("Debe agregar al menos un insumo al producto")
+              .of(
+                Yup.object().shape({
+                  insumoId: Yup.number().required(),
+                  cantidad: Yup.number()
+                    .min(0.01, "La cantidad debe ser mayor a 0")
+                    .required("La cantidad es obligatoria"),
+                })
+              ),
             descripcion: Yup.string().required("Campo requerido"),
           })}
           enableReinitialize
@@ -301,7 +309,8 @@ export const ModalProducto = ({
                         {insumos
                           .filter(
                             (insumoproducto) =>
-                              !values.detalleProductos.some((d) => d.insumoId === insumoproducto.id)
+                              !values.detalleProductos.some((d) => d.insumoId === insumoproducto.id) &&
+                              insumoproducto.esParaElaborar
                           )
                           .map((insumoproducto) => (
                             <option key={insumoproducto.id} value={insumoproducto.id}>
@@ -312,7 +321,8 @@ export const ModalProducto = ({
                       </select>
                       <input
                         type="number"
-                        min={1}
+                        min={0.01}
+                        step="any"
                         value={cantidad}
                         onChange={(e) => setCantidad(Number(e.target.value))}
                         className="form-control input-formulario"
@@ -366,7 +376,8 @@ export const ModalProducto = ({
                               {/* Input para editar cantidad */}
                               <input
                                 type="number"
-                                min={1}
+                                min={0.01}
+                                step="any"
                                 value={detalle.cantidad}
                                 onChange={(e) => {
                                   const nuevaCantidad = Number(e.target.value);
