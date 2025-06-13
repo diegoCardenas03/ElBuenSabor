@@ -28,7 +28,7 @@ const RoutesApp = () => {
         <Route path='/Success' element={<SuccessMP/>}/>
         <Route path='/Failure' element={<FailureMP/>}/>
         <Route path="/MiPerfil" element={<MiPerfilUsuarioPage />} />
-        <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
+        <Route path="/admin/PedidosCocinero" element={<PedidosCocinero />} />
         <Route path="/admin/Insumos" element={<ScreenInsumo />} />
         <Route path="/admin/productos" element={<ScreenProducto />} />
         <Route path='/admin/Configuracion' element={<Configuracion />} />

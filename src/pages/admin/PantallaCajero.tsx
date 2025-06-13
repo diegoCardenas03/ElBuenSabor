@@ -14,7 +14,6 @@ import  PedidoDetalleModal  from "../../components/modals/PedidoDetalleModal"
 
 const estadosTabs = [
   { label: "Solicitado", value: Estado.SOLICITADO },
-  { label: "Pendiente", value: Estado.PENDIENTE },
   { label: "En preparación", value: Estado.EN_PREPARACION },
   { label: "Terminado", value: Estado.TERMINADO },
   { label: "En camino", value: Estado.EN_CAMINO },
@@ -23,7 +22,7 @@ const estadosTabs = [
 ];
 
 export const PantallaCajero = () => {
-  const [estadoActual, setEstadoActual] = useState<Estado>(Estado.EN_PREPARACION);
+  const [estadoActual, setEstadoActual] = useState<Estado>(Estado.SOLICITADO);
   const [allPedidos, setAllPedidos] = useState<PedidoResponseDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -153,7 +152,7 @@ export const PantallaCajero = () => {
 return (
   <div className="bg-[#FFF4E0] h-screen overflow-y-auto">
     <AdminHeader />
-    <div className="p-4 bg-white shadow-md rounded-lg mb-4 flex justify-center items-center">
+    <div className="p-4 rounded-lg mb-4 flex justify-center items-center">
       <TabsPedidos
         estadoActual={estadoActual}
         setEstadoActual={setEstadoActual}
@@ -166,7 +165,7 @@ return (
         placeholder="Buscar por código..."
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="border rounded-lg px-4 py-2 w-full max-w-xs"
+        className="border border-gray-300 bg-white rounded-full px-4 py-2 w-full max-w-xs"
       />
     </div>
     {loading ? (
@@ -179,7 +178,7 @@ return (
         handleDelete={handleDelete}
         columns={ColumnsTablePedido}
         setOpenModal={setOpenModal}
-        getRowClassName={(row) => row.estado === Estado.PENDIENTE ? "pending-row" : ""}
+        getRowClassName={(row) => row.estado === Estado.SOLICITADO ? "pending-row" : ""}
       />
     )}
     {pedidoSeleccionado && (
