@@ -11,6 +11,7 @@ import ProdPopulares from "../components/prodPopulares";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 
+
 const items = [
   { id: 1, titulo: "Hamburguesas", imagen: burger1 },
   { id: 2, titulo: "Pizzas", imagen: pizzaCarrusel },
@@ -25,6 +26,7 @@ const Landing = () => {
   const [navbarWhite, setNavbarWhite] = useState(true);
   const redCircleRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     const updateSentinel = () => {

@@ -6,10 +6,12 @@ import rubroReducer from './slices/RubroReducer';
 import TablaReducer from "./slices/TableReducer"; // Importamos el reducer del slice TablaReducer
 import domicilioReducer from './slices/DomicilioReducer';
 import abrirCarritoReducer from './slices/AbrirCarritoReducer';
+import authReducer from './slices/AuthReducer'; 
 
 // Configuración de la tienda de Redux
 export const store = configureStore({
   reducer: {
+    auth: authReducer,
     carritoUI: abrirCarritoReducer,
     domicilio: domicilioReducer,
     carrito: carritoReducer,
