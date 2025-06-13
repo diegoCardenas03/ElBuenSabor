@@ -22,7 +22,7 @@ const RoutesApp = () => {
       <Routes>
         <Route path="/" element={<Landing />}/> 
         <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
-        {/* <Route path="/MisDirecciones" element={<MisDirecciones />} /> */}
+        <Route path="/MisDirecciones" element={<MisDirecciones />} /> 
         <Route path="/Menu" element={<Menu />} />
         <Route path='/MisPedidos' element={<MisPedidos />} />
         <Route path='/Success' element={<SuccessMP/>}/>
