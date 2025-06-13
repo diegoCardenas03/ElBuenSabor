@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDireccion, setTipoEntrega, vaciarCarrito } from '../../hooks/redux/slices/CarritoReducer';
 import { fetchDirecciones } from '../../hooks/redux/slices/DomicilioReducer';
 import { DomicilioResponseDTO } from '../../types/Domicilio/DomicilioResponseDTO';
+import Swal from 'sweetalert2';
 
 type Props = {
   onClose: () => void;
@@ -28,34 +29,62 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
   const formatearDireccion = (d: DomicilioResponseDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
-  const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cantidad, 0);
-  const envio = tipoEntrega == TipoEnvio.DELIVERY ? 200 : 0;
+  const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0);
+  const envio = tipoEntrega == TipoEnvio.DELIVERY ? 0 : 0;
   const total = subTotal + envio;
 
   const handleRealizarPedido = () => {
     if (tipoEntrega === null) {
-      alert("Elige donde quieres recibir el pedido")
-    } else {
-      dispatch(setTipoEntrega(tipoEntrega || null));
-      dispatch(setDireccion(direccionSeleccionada || null))
-      navigate('/DetalleCompra', {
-        state: {
-          subTotal,
-          envio,
-          total,
-        }
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Elige donde quieres recibir el pedido",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
       });
-      onClose();
+    } else {
+      if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "Selecciona una dirección",
+          showConfirmButton: false,
+          timer: 1000,
+          width: "20em"
+        });
+      } else {
+        dispatch(setTipoEntrega(tipoEntrega || null));
+        dispatch(setDireccion(direccionSeleccionada || null))
+        navigate('/DetalleCompra', {
+          state: {
+            subTotal,
+            envio,
+            total,
+          }
+        });
+        onClose();
+      }
     }
-  };
+  }
+
 
   const handleCancelarPedido = () => {
-    const confirmacion = window.confirm("¿Deseas cancelar el pedido?");
-    if (confirmacion) {
-      dispatch(vaciarCarrito());
-      navigate('/');
-      onClose();
-    }
+    Swal.fire({
+      title: "¿Deseas cancelar el pedido?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#FF9D3A",
+      cancelButtonColor: "#BD1E22",
+      confirmButtonText: "Aceptar",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(vaciarCarrito());
+        navigate('/');
+        onClose();
+      }
+    });
   }
 
   return (
@@ -72,7 +101,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
         }
         {!loading && carrito.length === 0 ? (
           <p className="text-gray-600">Tu carrito está vacío</p>
-        ) : (carrito.map(({ item, cantidad }) => {
+        ) : (carrito.map(({ item, cant }) => {
           const id = obtenerId(item);
           return (
             <div key={item.id} className="flex justify-between items-center mb-3">
@@ -85,17 +114,27 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                 <div className="flex flex-col">
                   <p className="font-semibold">{item.denominacion}</p>
                   <p className="text-sm text-gray-500">
-                    Subtotal: ${(item.precioVenta * cantidad).toFixed(2)}
+                    Subtotal: ${(item.precioVenta * cant).toFixed(2)}
                   </p>
                 </div>
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <button onClick={() => dispatch(cambiarCantidad({ id, cantidad: cantidad - 1 }))} className="px-2 py-1 rounded-full cursor-pointer">–</button>
-                  <span>{cantidad}</span>
+                  <button onClick={() => dispatch(cambiarCantidad({ id, cantidad: cant - 1 }))} className="px-2 py-1 rounded-full cursor-pointer">–</button>
+                  <span>{cant}</span>
                   <button onClick={() => dispatch(agregarProducto(item))} className="px-2 py-1 rounded-full cursor-pointer">+</button>
                 </div>
-                <button onClick={() => { dispatch(quitarProducto(id)); alert("producto eliminado"); }}
+                <button onClick={() => {
+                  dispatch(quitarProducto(id)); 
+                  Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Producto eliminado correctamente",
+                    showConfirmButton: false,
+                    timer: 1000,
+                    width: "20em"
+                  });
+                }}
                   className="cursor-pointer bg-secondary text-white px-3 py-1 rounded-full hover:scale-102 transition-transform duration-200">
                   Eliminar
                 </button>

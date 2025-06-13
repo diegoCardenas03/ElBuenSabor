@@ -2,6 +2,7 @@ import { ProductoUnificado, isInsumo } from '../../types/ProductoUnificado/Produ
 import { useAppDispatch } from '../../hooks/redux';
 import { agregarProducto } from '../../hooks/redux/slices/CarritoReducer';
 import { abrirCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
+import Swal from 'sweetalert2';
 
 interface ProductCardsProps {
   products: ProductoUnificado[];
@@ -13,9 +14,25 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
   const dispatch = useAppDispatch();
 
   const handleAgregar = (product: ProductoUnificado) => {
-    alert("producto agregado")
-    dispatch(agregarProducto(product));
-    dispatch(abrirCarrito());
+    if (dispatch(agregarProducto(product))) {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        title: "Producto agregado correctamente",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    } else {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "error",
+        title: "El producto no se pudo agregar al carrito",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    }
   };
 
   return (

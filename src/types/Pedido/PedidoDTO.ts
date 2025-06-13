@@ -1,5 +1,4 @@
 import { DetallePedidoDTO } from '../DetallePedido/DetallePedidoDTO';
-import { Estado } from '../enums/Estado';
 import { TipoEnvio } from '../enums/TipoEnvio';
 import { FormaPago } from '../enums/FormaPago';
 
@@ -7,7 +6,7 @@ export interface PedidoDTO {
     tipoEnvio: TipoEnvio;
     formaPago: FormaPago;
     clienteId: number;
-    domicilioId: number;
+    domicilioId?: number;
     comentario?: string;
-    detallePedido: DetallePedidoDTO[];
+    detallePedidos: DetallePedidoDTO[];
 }

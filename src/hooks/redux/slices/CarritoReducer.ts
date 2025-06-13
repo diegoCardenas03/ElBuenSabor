@@ -7,7 +7,7 @@ import { FormaPago } from '../../../types/enums/FormaPago';
 
 interface CarritoItem {
     item: ProductoUnificado;
-    cantidad: number;
+    cant: number;
 }
 
 type CarritoState = {
@@ -36,10 +36,10 @@ function loadCarritoState(): CarritoState {
     };
 }
 
-export const obtenerId = (item: ProductoUnificado): string => {
+export const obtenerId = (item: ProductoUnificado): number => {
     if (isInsumo(item))
-        return `insumo-${item.id}`;
-    return `producto-${item.id}`;
+        return item.id;
+    return item.id;
 };
 
 const carritoReducer = createSlice({
@@ -51,21 +51,21 @@ const carritoReducer = createSlice({
             const index = state.items.findIndex((i) => obtenerId(i.item) === id);
 
             if (index >= 0) {
-                state.items[index].cantidad += 1;
+                state.items[index].cant += 1;
             } else {
-                state.items.push({ item: action.payload, cantidad: 1 });
+                state.items.push({ item: action.payload, cant: 1 });
             }
         },
 
-        quitarProducto: (state, action: PayloadAction<string>) => {
+        quitarProducto: (state, action: PayloadAction<number>) => {
             state.items = state.items.filter((i) => obtenerId(i.item) !== action.payload);
         },
 
-        cambiarCantidad: (state, action: PayloadAction<{ id: string; cantidad: number }>) => {
+        cambiarCantidad: (state, action: PayloadAction<{ id: number; cantidad: number }>) => {
             const { id, cantidad } = action.payload;
             const item = state.items.find((i) => obtenerId(i.item) === id);
             if (item && cantidad > 0) {
-                item.cantidad = cantidad;
+                item.cant = cantidad;
             }
         },
 

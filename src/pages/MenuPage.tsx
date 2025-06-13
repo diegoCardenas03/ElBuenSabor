@@ -12,6 +12,7 @@ import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado'
 import CarritoLateral from '../components/commons/CarritoLateral';
 import { abrirCarrito, cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 import { agregarProducto } from '../hooks/redux/slices/CarritoReducer';
+import Swal from 'sweetalert2';
 
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -56,9 +57,25 @@ export const MenuPage: React.FC = () => {
   // Función para añadir al carrito
   const handleAddToCart = (product: ProductoUnificado) => {
     setModalOpen(false);
-    alert("producto agregado")
-    dispatch(agregarProducto(product));
-    dispatch(abrirCarrito());
+    if (dispatch(agregarProducto(product))) {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        title: "Producto agregado correctamente",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    } else {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "error",
+        title: "El producto no se pudo agregar al carrito",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    }
   };
 
   const loading = productsLoading || rubrosLoading;

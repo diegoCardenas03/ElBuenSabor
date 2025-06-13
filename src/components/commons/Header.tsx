@@ -6,6 +6,7 @@ import CarritoLateral from './CarritoLateral';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
+import Swal from 'sweetalert2';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -40,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50  ${backgroundColor}`}
+      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50 ${backgroundColor}`}
     >
       {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
@@ -88,9 +89,17 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex-shrink-0 cursor-pointer"
           fill={whiteUserBar ? "white" : ""}
           color={whiteUserBar ? "white" : "black"}
-          onClick={() => dispatch(abrirCarrito())}
+          onClick={() => carrito.length === 0 ? 
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "El carrito esta vacio",
+            showConfirmButton: false,
+            timer: 1000,
+            width: "20em"
+          }) : dispatch(abrirCarrito())}
         />
-         {carritoAbierto && (
+        {carritoAbierto && (
           <div className="fixed inset-0 z-50">
             <div
               className="absolute inset-0 bg-black/30 backdrop-blur-sm"

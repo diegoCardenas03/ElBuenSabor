@@ -1,6 +1,6 @@
 export interface DetallePedidoDTO {
-  id: number;
+  id?: number;
   cantidad: number;
-  productoId: number;
-  insumoId: number;
+  productoId?: number;
+  insumoId?: number;
 }

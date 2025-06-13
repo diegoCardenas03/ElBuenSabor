@@ -10,6 +10,8 @@ import { ScreenProducto } from '../pages/ScreenProducto';
 import MisPedidos from '../pages/MisPedidos';
 import MisDirecciones from '../pages/misDirecciones';
 import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
+import SuccessMP from '../pages/SuccessMP';
+import FailureMP from '../pages/FailureMP';
 
 const RoutesApp = () => {
   return (
@@ -21,6 +23,8 @@ const RoutesApp = () => {
         <Route path="/MisDirecciones" element={<MisDirecciones />} />
         <Route path="/Menu" element={<Menu />} />
         <Route path='/MisPedidos' element={<MisPedidos />} />
+        <Route path='/Success' element={<SuccessMP/>}/>
+        <Route path='/Failure' element={<FailureMP/>}/>
         <Route path="/MiPerfil" element={<MiPerfilUsuarioPage />} />
         <Route path="/PedidosCocinero" element={<PedidosCocinero />} />
         <Route path="/admin/Insumos" element={<ScreenInsumo />} />

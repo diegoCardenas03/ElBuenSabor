@@ -56,6 +56,7 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
   ];
 
   return (
+    
     <div className="bg-[#FFF4E0] min-h-screen relative overflow-hidden pt-20">
       {/* Imágenes decorativas de fondo */}
       <img
@@ -76,7 +77,6 @@ export const MenuLayout: React.FC<MenuLayoutProps> = ({ children, onSearch, onFi
 
       <div className="relative z-10 py-3 px-2 sm:px-5">
         <Header />
-
         {/* Título */}
         <h2 className="font-tertiary text-center text-3xl sm:text-4xl text-black mb-8 pt-6">MENÚ</h2>
 

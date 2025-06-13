@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Header } from '../components/commons/Header'
-import { MisPedidosService } from '../services/MisPedidosService';
+import { PedidosService } from '../services/PedidosService';
 import { useAppDispatch } from '../hooks/redux';
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { MdRemoveRedEye, MdOutlineFileDownload } from "react-icons/md";
@@ -26,10 +26,10 @@ const MisPedidos = () => {
   const [openModal, setOpenModal] = useState<Boolean>(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
   const [modalFilters, setModalFilters] = useState<Boolean>(false);
-  const [filtros, setFiltros] = useState<FiltroState>({tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "",});
-  const [filtroSeleccionado, setFiltroSeleccionado] = useState<FiltroState>({tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "",});
-  const resetFiltros = () => {setFiltros({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "" }); setFiltroSeleccionado({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "" });};
-  const misPedidosService = new MisPedidosService();
+  const [filtros, setFiltros] = useState<FiltroState>({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "", });
+  const [filtroSeleccionado, setFiltroSeleccionado] = useState<FiltroState>({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "", });
+  const resetFiltros = () => { setFiltros({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "" }); setFiltroSeleccionado({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "" }); };
+  const misPedidosService = new PedidosService();
   const dispatch = useAppDispatch();
 
   const ColumnsTablePedido = [
@@ -96,16 +96,14 @@ const MisPedidos = () => {
   ];
 
   const mostrarSoloNumero = (codigo: string) => {
-  const partes = codigo.split("-");
-  return partes[partes.length - 1];
-};
+    const partes = codigo.split("-");
+    return partes[partes.length - 1];
+  };
 
   const getEstadoTexto = (estado: Estado) => {
     switch (estado) {
       case Estado.SOLICITADO:
         return "Solicitado";
-      case Estado.PENDIENTE:
-        return "Pendiente";
       case Estado.EN_PREPARACION:
         return "En preparación";
       case Estado.EN_CAMINO:
@@ -199,8 +197,8 @@ const MisPedidos = () => {
 
   return (
     <>
+      <Header />
       <div className='w-full h-full bg-primary pb-10 pt-20'>
-        <Header />
         <h1 className='font-tertiary text-center text-[30px] pt-10'>Mis Pedidos</h1>
         <div className='flex flex-col md:flex-row justify-center items-center mt-5 mb-5'>
           <div className='flex items-center mt-4 mb-2 lg:pl-5 sm:w-[60%] lg:w-[70%] gap-10'>
@@ -257,11 +255,10 @@ const MisPedidos = () => {
           <TableGeneric<PedidoResponseDTO>
             columns={ColumnsTablePedido}
             setOpenModal={setOpenModal}
-            handleDelete={() => {}}
+            handleDelete={() => { }}
             getRowClassName={(pedido: PedidoResponseDTO) => {
               const estadosEnCurso = [
                 Estado.SOLICITADO,
-                Estado.PENDIENTE,
                 Estado.EN_PREPARACION,
                 Estado.EN_CAMINO,
               ];
