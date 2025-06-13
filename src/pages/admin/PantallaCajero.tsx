@@ -44,7 +44,7 @@ export const PantallaCajero = () => {
       ),
     },
     {
-      label: "Tiempo Estimado",
+      label: "Hora estimada finalización",
       key: "horaEstimadaFin",
       render: (pedido: PedidoResponseDTO) => pedido.horaEstimadaFin || "Sin dato",
     },
