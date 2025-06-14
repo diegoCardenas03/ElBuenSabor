@@ -3,8 +3,7 @@ import  SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { PedidoResponseDTO } from "../types/Pedido/PedidoResponseDTO";
 
-const WS_URL = "http://localhost:8080/ws-pedidos"; // Cambia si tu backend está en otra URL
-
+const WS_URL = "http://localhost:8080/ws-pedidos"; 
 type Callback = (pedido: PedidoResponseDTO) => void;
 
 export function usePedidosSocket(onPedidoActualizado: Callback) {
