@@ -11,6 +11,7 @@ import { TabsPedidos } from "../../components/TabsPedidos";
 import { AiOutlinePlus, AiOutlineEye } from "react-icons/ai";
 import { Estado } from "../../types/enums/Estado";
 import  PedidoDetalleModal  from "../../components/modals/PedidoDetalleModal"
+import { usePedidosSocket } from "../../hooks/usePedidoSocket";
 
 const estadosTabs = [
   { label: "Solicitado", value: Estado.SOLICITADO },
@@ -148,6 +149,9 @@ export const PantallaCajero = () => {
     );
   dispatch(setDataTable(pedidosFiltrados));
 }, [allPedidos, estadoActual, search, dispatch]);
+usePedidosSocket(() => {
+  getPedidos(); // Refresca toda la lista cuando llega un cambio
+});
 
 return (
   <div className="bg-[#FFF4E0] h-screen overflow-y-auto">
