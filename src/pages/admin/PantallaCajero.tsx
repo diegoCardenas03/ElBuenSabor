@@ -151,7 +151,7 @@ export const PantallaCajero = () => {
 
 return (
   <div className="bg-[#FFF4E0] h-screen overflow-y-auto">
-    <AdminHeader />
+    <AdminHeader text = "Pedidos"/>
     <div className="p-4 rounded-lg mb-4 flex justify-center items-center">
       <TabsPedidos
         estadoActual={estadoActual}
