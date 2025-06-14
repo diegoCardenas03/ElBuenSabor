@@ -9,9 +9,10 @@ import { Loader } from '../commons/Loader';
 
 interface ModalLoginProps {
   onClose?: () => void; // Para cerrar el modal desde el componente padre
+  onSwitchToRegister?: () => void;
 }
 
-const ModalLogin: React.FC<ModalLoginProps> = ({ onClose }) => {
+const ModalLogin: React.FC<ModalLoginProps> = ({ onClose, onSwitchToRegister }) => {
   const [VerContrasenia, setVerContrasenia] = useState<boolean>(false);
 
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
@@ -104,12 +105,12 @@ const ModalLogin: React.FC<ModalLoginProps> = ({ onClose }) => {
             className="flex items-center justify-center gap-3 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 w-full max-w-xs rounded-md shadow-md transition-colors">
             <img src={iconGoogle} alt="Google" className="w-5 h-5 object-contain" style={{ minWidth: '20px' }} />
             <span className="whitespace-nowrap">
-              {isGoogleLoading || authStatus === 'checking' ? <Loader/> : 'Continuar con Google'}
+              {isGoogleLoading || authStatus === 'checking' ? <Loader /> : 'Continuar con Google'}
             </span>
           </button>
         </div>
 
-        <p className='mt-4 text-secondary text-xs text-center cursor-pointer hover:underline'>¿No tenés cuenta? Registrate</p>
+        <p className='mt-4 text-secondary text-xs text-center cursor-pointer hover:underline' onClick={onSwitchToRegister} >¿No tenés cuenta? Registrate</p>
       </section>
     </>
   )

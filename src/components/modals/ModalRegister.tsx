@@ -9,10 +9,11 @@ import { Loader } from "../commons/Loader";
 
 interface ModalRegisterProps {
   onClose?: () => void; // Para cerrar el modal desde el componente padre
+  onSwitchToLogin?: () => void; // ✅ NUEVA PROP
 }
 
 
-const ModalRegister: React.FC<ModalRegisterProps> = ({onClose}) => {
+const ModalRegister: React.FC<ModalRegisterProps> = ({onClose, onSwitchToLogin}) => {
 
   const [VerContrasenia, setVerContrasenia] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
@@ -107,7 +108,7 @@ const ModalRegister: React.FC<ModalRegisterProps> = ({onClose}) => {
             {isGoogleLoading || authStatus === 'checking' ? <Loader/> : 'Log In with Google'}
           </button>
         </div>
-        <p className='mt-4 text-secondary text-xs text-center cursor-pointer pb-5'>¿Ya tenés cuenta? Iniciá sesión</p>
+        <p onClick={onSwitchToLogin} className='mt-4 text-secondary text-xs text-center cursor-pointer pb-5'>¿Ya tenés cuenta? Iniciá sesión</p>
       </section>
     </>
   )

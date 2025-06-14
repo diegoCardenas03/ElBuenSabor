@@ -7,6 +7,7 @@ import { store } from './hooks/redux/store'
 import { BrowserRouter } from 'react-router-dom'
 import { Auth0ProviderApp } from './auth/Auth0ProviderApp'
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
@@ -17,4 +18,5 @@ createRoot(document.getElementById('root')!).render(
       </BrowserRouter>
     </Provider>
   </StrictMode>
+  
 )

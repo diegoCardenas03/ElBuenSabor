@@ -77,12 +77,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Ingresar
             </button>
-            <button
-              className="bg-transparent border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-white px-6 py-2 rounded-full font-semibold cursor-pointer transition-colors"
-              onClick={abrirRegister}
-            >
-              Registrarse
-            </button>
           </div>
         </div>
 
