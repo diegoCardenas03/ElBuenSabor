@@ -7,10 +7,10 @@ import { useAppDispatch } from "../../hooks/redux";
 import { setDataTable } from "../../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { PedidoService } from "../../services/PedidoService";
-import { TabsPedidos } from "../../components/TabsPedidos"; 
+import { TabsPedidos } from "../../components/TabsPedidos";
 import { AiOutlinePlus, AiOutlineEye } from "react-icons/ai";
 import { Estado } from "../../types/enums/Estado";
-import  PedidoDetalleModal  from "../../components/modals/PedidoDetalleModal"
+import PedidoDetalleModal from "../../components/modals/PedidoDetalleModal"
 import { usePedidosSocket } from "../../hooks/usePedidoSocket";
 
 const estadosTabs = [
@@ -49,21 +49,21 @@ export const PantallaCajero = () => {
       key: "horaEstimadaFin",
       render: (pedido: PedidoResponseDTO) => pedido.horaEstimadaFin || "Sin dato",
     },
-{
-  label: "Agregar tiempo",
-  key: "agregarTiempo",
-  render: (pedido: PedidoResponseDTO) =>
-    pedido.estado === Estado.ENTREGADO || pedido.estado === Estado.CANCELADO ? (
-      null
-    ) : (
-      <div className="flex justify-center items-center">
-        <AiOutlinePlus
-          className="text-red-600 text-xl cursor-pointer hover:scale-110 transition"
-          onClick={() => agregarTiempo(pedido)}
-        />
-      </div>
-    ),
-},
+    {
+      label: "Agregar tiempo",
+      key: "agregarTiempo",
+      render: (pedido: PedidoResponseDTO) =>
+        pedido.estado === Estado.ENTREGADO || pedido.estado === Estado.CANCELADO ? (
+          null
+        ) : (
+          <div className="flex justify-center items-center">
+            <AiOutlinePlus
+              className="text-red-600 text-xl cursor-pointer hover:scale-110 transition"
+              onClick={() => agregarTiempo(pedido)}
+            />
+          </div>
+        ),
+    },
     {
       label: "Detalle",
       key: "detalle",
@@ -120,7 +120,7 @@ export const PantallaCajero = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          
+
           await fetch(`http://localhost:8080/api/pedidos/agregar-min/${pedido.id}?minutos=5`, {
             method: "PUT",
           });
@@ -142,56 +142,56 @@ export const PantallaCajero = () => {
   }, []);
 
   useEffect(() => {
-  const pedidosFiltrados = allPedidos
-    .filter(pedido => pedido.estado?.trim().toUpperCase() === estadoActual)
-    .filter(pedido =>
-      pedido.codigo.toLowerCase().includes(search.toLowerCase())
-    );
-  dispatch(setDataTable(pedidosFiltrados));
-}, [allPedidos, estadoActual, search, dispatch]);
-usePedidosSocket(() => {
-  getPedidos(); // Refresca toda la lista cuando llega un cambio
-});
+    const pedidosFiltrados = allPedidos
+      .filter(pedido => pedido.estado?.trim().toUpperCase() === estadoActual)
+      .filter(pedido =>
+        pedido.codigo.toLowerCase().includes(search.toLowerCase())
+      );
+    dispatch(setDataTable(pedidosFiltrados));
+  }, [allPedidos, estadoActual, search, dispatch]);
+  usePedidosSocket(() => {
+    getPedidos(); // Refresca toda la lista cuando llega un cambio
+  });
 
-return (
-  <div className="bg-[#FFF4E0] h-screen overflow-y-auto">
-    <AdminHeader />
-    <div className="p-4 rounded-lg mb-4 flex justify-center items-center">
-      <TabsPedidos
-        estadoActual={estadoActual}
-        setEstadoActual={setEstadoActual}
-        estadosTabs={estadosTabs}
-      />
-    </div>
-    <div className="flex justify-center mb-4">
-      <input
-        type="text"
-        placeholder="Buscar por código..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="border border-gray-300 bg-white rounded-full px-4 py-2 w-full max-w-xs"
-      />
-    </div>
-    {loading ? (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress color="secondary" />
-        <h2>Cargando...</h2>
+  return (
+    <div className="bg-[#FFF4E0] h-screen overflow-y-auto">
+      <AdminHeader />
+      <div className="p-4 rounded-lg mb-4 flex justify-center items-center">
+        <TabsPedidos
+          estadoActual={estadoActual}
+          setEstadoActual={setEstadoActual}
+          estadosTabs={estadosTabs}
+        />
       </div>
-    ) : (
-      <TableGeneric<PedidoResponseDTO>
-        handleDelete={handleDelete}
-        columns={ColumnsTablePedido}
-        setOpenModal={setOpenModal}
-        getRowClassName={(row) => row.estado === Estado.SOLICITADO ? "pending-row" : ""}
-      />
-    )}
-    {pedidoSeleccionado && (
-      <PedidoDetalleModal
-        pedido={pedidoSeleccionado}
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-      />
-    )}
-  </div>
-);
+      <div className="flex justify-center mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por código..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border border-gray-300 bg-white rounded-full px-4 py-2 w-full max-w-xs"
+        />
+      </div>
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
+          <CircularProgress color="secondary" />
+          <h2>Cargando...</h2>
+        </div>
+      ) : (
+        <TableGeneric<PedidoResponseDTO>
+          handleDelete={handleDelete}
+          columns={ColumnsTablePedido}
+          setOpenModal={setOpenModal}
+          getRowClassName={(row) => row.estado === Estado.SOLICITADO ? "pending-row" : ""}
+        />
+      )}
+      {pedidoSeleccionado && (
+        <PedidoDetalleModal
+          pedido={pedidoSeleccionado}
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+        />
+      )}
+    </div>
+  );
 };

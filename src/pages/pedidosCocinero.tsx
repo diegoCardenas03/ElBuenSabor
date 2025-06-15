@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { Estado } from '../types/enums/Estado';
+import { usePedidosSocket } from "../hooks/usePedidoSocket";
 
 
 const PedidosCocinero: React.FC = () => {
@@ -10,6 +11,7 @@ const PedidosCocinero: React.FC = () => {
     const [modalDetallePedido, setModalDetallePedido] = useState<Boolean>(false)
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
 
+    // CAMBIEN ESTO PARA QUE LLAME AL SERVICE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const obtenerPedidos = async () => {
         try {
             const res = await fetch("http://localhost:8080/api/pedidos");
@@ -25,6 +27,10 @@ const PedidosCocinero: React.FC = () => {
     useEffect(() => {
         obtenerPedidos();
     }, []);
+
+    usePedidosSocket(() => {
+        obtenerPedidos(); // Se llama automáticamente cuando llega un evento desde el WebSocket
+    });
 
     const mostrarNumeroPedido = (codigo: string) => {
         const partes = codigo.split("-");
@@ -129,24 +135,24 @@ const PedidosCocinero: React.FC = () => {
                             ✕
                         </button>
                         <h2 className="text-secondary font-primary font-bold pb-8 text-[20px] flex justify-center items-center">Orden N° {mostrarNumeroPedido(pedidoSeleccionado.codigo)}</h2>
-                        
-                            <p><b>Hora:</b> {pedidoSeleccionado.hora}</p>
-                            <p><b>Estado:</b> {pedidoSeleccionado.estado}</p>
-                            <div className="max-h-[50vh] overflow-y-auto">
-                                {pedidoSeleccionado.detallePedidos.map((detalle, idx) => (
+
+                        <p><b>Hora:</b> {pedidoSeleccionado.hora}</p>
+                        <p><b>Estado:</b> {pedidoSeleccionado.estado}</p>
+                        <div className="max-h-[50vh] overflow-y-auto">
+                            {pedidoSeleccionado.detallePedidos.map((detalle, idx) => (
                                 <React.Fragment key={idx}>
-                                        {detalle.producto && (
-                                            <div className="mt-2 p-2 bg-white rounded">
-                                                <p><b>Cantidad:</b> {detalle.cantidad}</p>
-                                                <p><b>Producto:</b> {detalle.producto.denominacion}</p>
-                                            </div>
-                                        )}
-                                        {detalle.insumo && detalle.insumo.esParaElaborar == false && (
-                                            <div className="mt-2 p-2 bg-white rounded">
-                                                <p><b>Cantidad:</b> {detalle.cantidad}</p>
-                                                <p><b>Insumo:</b> {detalle.insumo.denominacion}</p>
-                                            </div>
-                                        )}
+                                    {detalle.producto && (
+                                        <div className="mt-2 p-2 bg-white rounded">
+                                            <p><b>Cantidad:</b> {detalle.cantidad}</p>
+                                            <p><b>Producto:</b> {detalle.producto.denominacion}</p>
+                                        </div>
+                                    )}
+                                    {detalle.insumo && detalle.insumo.esParaElaborar == false && (
+                                        <div className="mt-2 p-2 bg-white rounded">
+                                            <p><b>Cantidad:</b> {detalle.cantidad}</p>
+                                            <p><b>Insumo:</b> {detalle.insumo.denominacion}</p>
+                                        </div>
+                                    )}
                                 </React.Fragment>
                             ))}
                         </div>
