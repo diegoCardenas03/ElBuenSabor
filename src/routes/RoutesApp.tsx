@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import { Header } from '../components/Header';  
 import DetalleCompra from '../pages/detalleCompra';
-// import MisDirecciones from '../pages/misDirecciones';
 import Landing from "../pages/Landing"
 import Menu from '../pages/MenuPage';
 import MiPerfilUsuarioPage from '../pages/MiPerfilUsuarioPage';
@@ -14,6 +12,7 @@ import MisDirecciones from '../pages/misDirecciones';
 import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
+import Delivery from '../pages/admin/Delivery';
 
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 const RoutesApp = () => {
@@ -35,6 +34,7 @@ const RoutesApp = () => {
         <Route path='/admin/Configuracion' element={<Configuracion />} />
         <Route path="/admin/PantallaCajero" element={<PantallaCajero />} />
         
+        <Route path='/admin/Delivery' element={<Delivery />} />
       </Routes>
     </BrowserRouter>
   );

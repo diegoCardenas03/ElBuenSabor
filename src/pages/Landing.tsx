@@ -86,7 +86,7 @@ const Landing = () => {
               El Buen <br /> Sabor
             </h1>
             <Link to="/menu">
-              <button className="bg-white md:bg-[#FFF4E0] text-black px-8 py-2 font-primary rounded-full font-semibold shadow hover:scale-105 transition text-base md:text-[14px] md:ml-20 lg:text-lg">
+              <button className="bg-whit cursor-pointer md:bg-[#FFF4E0] text-black px-8 py-2 font-primary rounded-full font-semibold shadow hover:scale-105 transition text-base md:text-[14px] md:ml-20 lg:text-lg">
                 Ver el menú completo
               </button>
             </Link>

@@ -31,6 +31,7 @@ const menuPorRol: Record<Rol, { path: string; label: string }[]> = {
     { path: '/admin/clientes', label: 'Clientes' },
     { path: '/admin/estadistica', label: 'Estadísticas' },
     { path: '/admin/configuracion', label: 'Configuración' },
+    { path: '/admin/delivery', label: 'Delivery' },
   ],
   [Rol.COCINERO]: [
     { path: '/admin/perfil', label: 'Mi Perfil' },
