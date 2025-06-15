@@ -15,7 +15,7 @@ export const useAuthHandler = () => {
       
       // 1. Obtener rol de Cliente
       const roleResponse = await interceptorApiClient.get(
-        "/api/admin/roles/getRoleByName?name=Cliente"
+        "/api/admin/roles/nombre/Cliente"
       );
 
       // 2. Crear usuario en BD
