@@ -106,6 +106,7 @@ const Empleados = () => {
                 <button
                     className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
                     onClick={() => {
+                        setModoEditar(true);
                         setEmpleadoEditando({
                             id: empleado.id,
                             nombreCompleto: empleado.nombreCompleto,
@@ -122,8 +123,7 @@ const Empleados = () => {
                                 codigoPostal: empleado.domicilio.codigoPostal,
                             }
                         });
-                        setMostrarModal(true);
-                        setModoEditar(true);
+                        
                         setMostrarModal(true);
                     }}
                 >
