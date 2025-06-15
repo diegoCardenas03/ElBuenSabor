@@ -1,8 +1,6 @@
 import pizza from "../assets/img/pizza-landing.png";
 import CardLanding from "../components/CardLanding";
-import pizzaCarrusel from "../assets/img/pizzaCarrusel.png";
-import burger1 from "../assets/img/burger1.png";
-import PapasCheddar from "../assets/img/PapasCheddar.png";
+
 import PizzanuestroMenu from "../assets/img/pizzanuestromenu.png";
 import ProductosPopularesImg from "../assets/img/imagen-productos-populares.png";
 import { Header } from "../components/commons/Header";
@@ -10,18 +8,18 @@ import { Footer } from "../components/commons/Footer";
 import ProdPopulares from "../components/prodPopulares";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-
-const items = [
-  { id: 1, titulo: "Hamburguesas", imagen: burger1 },
-  { id: 2, titulo: "Pizzas", imagen: pizzaCarrusel },
-  { id: 3, titulo: "Lomos", imagen: pizzaCarrusel },
-  { id: 4, titulo: "Panchos", imagen: pizzaCarrusel },
-  { id: 5, titulo: "Papas Fritas", imagen: PapasCheddar },
-  { id: 6, titulo: "Bebidas", imagen: pizzaCarrusel },
-  { id: 7, titulo: "Postres", imagen: pizzaCarrusel },
-];
+import { useCategories } from "../hooks/useCategories";
 
 const Landing = () => {
+  const { categories } = useCategories();
+
+  // Adaptá las categorías al formato que espera CardLanding
+  const items = categories.map((cat, idx) => ({
+    id: idx,
+    titulo: cat.name,
+    imagen: "", // Si tenés imágenes, agregalas aquí
+  }));
+
   const [navbarWhite, setNavbarWhite] = useState(true);
   const redCircleRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);

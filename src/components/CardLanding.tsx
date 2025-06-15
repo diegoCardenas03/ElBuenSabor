@@ -58,11 +58,7 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
                     : "bg-white"
                 }`}
               >
-                <img
-                  src={item.imagen}
-                  alt={item.titulo}
-                  className="w-20 h-20 object-contain mb-2"
-                />
+
                 <p className="font-semibold">{item.titulo}</p>
               </div>
             );
