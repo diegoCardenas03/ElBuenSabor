@@ -13,6 +13,7 @@ import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
+import {Estadistica} from '../pages/admin/Estadistica';
 
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 const RoutesApp = () => {
@@ -35,6 +36,7 @@ const RoutesApp = () => {
         <Route path="/admin/PantallaCajero" element={<PantallaCajero />} />
         
         <Route path='/admin/Delivery' element={<Delivery />} />
+        <Route path='/admin/Estadistica' element={<Estadistica />} />
       </Routes>
     </BrowserRouter>
   );
