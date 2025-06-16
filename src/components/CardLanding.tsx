@@ -53,33 +53,36 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
 
         <div className="flex gap-2 md:gap-4 overflow-hidden">
           {visibleItems.map((item, idx) => {
-            const isMiddle = idx === Math.floor(visibleItems.length / 2);
-            return (
-              <Link
-                key={item.id}
-                to="/menu"
-                className={
-                  `w-28 h-32 md:w-44 md:h-48 shadow-lg rounded-2xl flex flex-col items-center justify-center shrink-0
-                  px-2 md:px-4 transition-transform duration-300 border-2 cursor-pointer
-                  ${isMiddle
-                    ? "scale-110 bg-[#D32F2F] text-white border-[#FF9D3A] z-10"
-                    : "bg-white text-[#D32F2F] border-[#D32F2F] opacity-80 hover:opacity-100"
-                  }
-                  hover:shadow-xl`
-                }
-                style={{
-                  boxShadow: isMiddle
-                    ? "0 8px 32px 0 rgba(211,47,47,0.3)"
-                    : "0 2px 8px 0 rgba(211,47,47,0.12)",
-                  textDecoration: "none"
-                }}
-              >
-                <p className="font-tertiary text-lg md:text-xl uppercase text-center tracking-wider select-none">
-                  {item.titulo}
-                </p>
-              </Link>
-            );
-          })}
+  const isMiddle = idx === Math.floor(visibleItems.length / 2);
+  return (
+    <Link
+      key={item.id}
+      to="/menu"
+      className={
+        `w-28 h-32 md:w-44 md:h-48 shadow-lg rounded-2xl flex flex-col items-center justify-center shrink-0
+        px-2 md:px-4 transition-transform duration-300 border-2 cursor-pointer
+        ${isMiddle
+          ? "scale-110 bg-[#D32F2F] text-white border-[#FF9D3A] z-10"
+          : "bg-white text-[#D32F2F] border-[#D32F2F] opacity-80 hover:opacity-100"
+        }
+        hover:shadow-xl`
+      }
+      style={{
+        boxShadow: isMiddle
+          ? "0 8px 32px 0 rgba(211,47,47,0.3)"
+          : "0 2px 8px 0 rgba(211,47,47,0.12)",
+        textDecoration: "none"
+      }}
+    >
+      <p className={`font-tertiary 
+        ${isMiddle ? "font-bold" : "font-normal"} 
+        text-xs md:text-base 
+        uppercase text-center tracking-wider select-none leading-tight break-words`}>
+        {item.titulo}
+      </p>
+    </Link>
+  );
+})}
         </div>
 
         <button
