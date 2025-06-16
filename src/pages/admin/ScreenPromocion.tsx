@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { PromocionResponseDTO } from "../../types/Promocion/PromocionResponseDTO";     
 import { TableGeneric } from "../../components/TableGeneric";
 import { CircularProgress } from "@mui/material";
@@ -34,11 +34,31 @@ export const ScreenPromocion = () => {
     { label: "Fecha Desde", key: "fechaDesde" },
     { label: "Fecha Hasta", key: "fechaHasta" },
     { label: "Descuento (%)", key: "descuento" },
+     {
+      label: "Total",
+      key: "total",
+      render: (promo: PromocionResponseDTO) => (
+        <span>
+          ${promo.total.toLocaleString("es-AR")}
+        </span>
+      ),
+
+    },
+    {
+      label: "Total Costo",
+      key: "totalCosto",
+      render: (promo: PromocionResponseDTO) => (
+        <span>
+          ${promo.totalCosto.toLocaleString("es-AR")}
+        </span>
+      ),
+    },
     {
       label: "Acciones",
       key: "acciones",
       // Aquí puedes agregar botones para editar/eliminar si lo deseas
     },
+   
   ];
 
   // Función para manejar el borrado de una promoción
