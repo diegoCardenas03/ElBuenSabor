@@ -10,7 +10,7 @@ import { fetchProducts, fetchInsumosVendibles, setSearchTerm, setFilters } from 
 import { fetchRubrosProductos, fetchRubrosInsumos } from '../hooks/redux/slices/RubroReducer';
 import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado';
 import CarritoLateral from '../components/commons/CarritoLateral';
-import { abrirCarrito, cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
+import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 import { agregarProducto } from '../hooks/redux/slices/CarritoReducer';
 import Swal from 'sweetalert2';
 
