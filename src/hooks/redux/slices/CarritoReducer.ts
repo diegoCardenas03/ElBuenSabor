@@ -3,10 +3,13 @@ import { ProductoUnificado, isProducto, isInsumo } from '../../../types/Producto
 import { TipoEnvio } from '../../../types/enums/TipoEnvio';
 import { DomicilioDTO } from '../../../types/Domicilio/DomicilioDTO';
 import { FormaPago } from '../../../types/enums/FormaPago';
+import { PromocionResponseDTO } from '../../../types/Promocion/PromocionResponseDTO';
 
+
+type CarritoItemType = ProductoUnificado | PromocionResponseDTO;
 
 interface CarritoItem {
-    item: ProductoUnificado;
+    item: CarritoItemType;
     cant: number;
 }
 
@@ -36,9 +39,8 @@ function loadCarritoState(): CarritoState {
     };
 }
 
-export const obtenerId = (item: ProductoUnificado): number => {
-    if (isInsumo(item))
-        return item.id;
+// Cambiá las funciones de identificación si es necesario:
+export const obtenerId = (item: CarritoItemType): number => {
     return item.id;
 };
 

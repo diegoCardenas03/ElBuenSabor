@@ -7,5 +7,7 @@ export interface PromocionResponseDTO {
     fechaDesde: string;      // LocalDate como string
     fechaHasta: string;      // LocalDate como string
     descuento: number;       // Double como number
+    total: number;
+   totalCosto: number; 
     detallePromociones: DetallePromocionResponseDTO[];
 }

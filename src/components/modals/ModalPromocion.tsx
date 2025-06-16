@@ -20,7 +20,8 @@ import { FaTimes } from "react-icons/fa";
 import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
 import Swal from "sweetalert2";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
-const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
+const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env
+  .VITE_API_CLOUDINARY_UPLOAD_PRESET;
 
 interface IModalPromocion {
   getPromociones: () => void;
@@ -64,13 +65,13 @@ export const ModalPromocion = ({
     elementActive && "denominacion" in elementActive
       ? (elementActive as PromocionDTO)
       : {
-        denominacion: "",
-        urlImagen: "",
-        fechaDesde: "",
-        fechaHasta: "",
-        descuento: 0,
-        detallePromociones: [],
-      };
+          denominacion: "",
+          urlImagen: "",
+          fechaDesde: "",
+          fechaHasta: "",
+          descuento: 0,
+          detallePromociones: [],
+        };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -82,7 +83,10 @@ export const ModalPromocion = ({
   return (
     <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
-        <button onClick={handleClose} className="absolute top-7 right-4 text-gray-500 hover:text-red-600">
+        <button
+          onClick={handleClose}
+          className="absolute top-7 right-4 text-gray-500 hover:text-red-600"
+        >
           <FaTimes className="text-secondary h-6 w-6 cursor-pointer" />
         </button>
         <p
@@ -105,21 +109,24 @@ export const ModalPromocion = ({
             denominacion: Yup.string().required("Campo requerido"),
             fechaDesde: Yup.string().required("Campo requerido"),
             fechaHasta: Yup.string().required("Campo requerido"),
-            descuento: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
+            descuento: Yup.number()
+              .min(0, "Debe ser positivo")
+              .required("Campo requerido"),
             detallePromociones: Yup.array()
-              .min(1, "Debe agregar al menos un producto o insumo")
+              .when([], {
+                is: () => !elementActive,
+                then: (schema) =>
+                  schema.min(1, "Debe agregar al menos un producto o insumo"),
+                otherwise: (schema) => schema,
+              })
               .of(
                 Yup.object().shape({
                   productoId: Yup.number(),
                   insumoId: Yup.number(),
-                  cantidad: Yup.number().min(0.01, "La cantidad debe ser mayor a 0").required(),
-                }).test(
-                  "solo-uno",
-                  "Debe seleccionar solo producto o insumo, no ambos ni ninguno",
-                  (value) =>
-                    (!!value.productoId && !value.insumoId) ||
-                    (!value.productoId && !!value.insumoId)
-                )
+                  cantidad: Yup.number()
+                    .min(0.01, "La cantidad debe ser mayor a 0")
+                    .required(),
+                })
               ),
           })}
           enableReinitialize
@@ -129,7 +136,10 @@ export const ModalPromocion = ({
               if (selectedImage) {
                 const formData = new FormData();
                 formData.append("file", selectedImage);
-                formData.append("upload_preset", `${API_CLOUDINARY_UPLOAD_PRESET}`);
+                formData.append(
+                  "upload_preset",
+                  `${API_CLOUDINARY_UPLOAD_PRESET}`
+                );
                 const res = await fetch(`${API_CLOUDINARY_URL}`, {
                   method: "POST",
                   body: formData,
@@ -138,17 +148,19 @@ export const ModalPromocion = ({
                 imageUrl = data.secure_url;
               }
 
-              const detallePromociones = values.detallePromociones.map((detalle: any) => ({
-                productoId:
-                  detalle.productoId && detalle.productoId !== 0
-                    ? detalle.productoId
-                    : null,
-                insumoId:
-                  detalle.insumoId && detalle.insumoId !== 0
-                    ? detalle.insumoId
-                    : null,
-                cantidad: detalle.cantidad,
-              }));
+              const detallePromociones = values.detallePromociones.map(
+                (detalle: any) => ({
+                  productoId:
+                    detalle.productoId && detalle.productoId !== 0
+                      ? detalle.productoId
+                      : null,
+                  insumoId:
+                    detalle.insumoId && detalle.insumoId !== 0
+                      ? detalle.insumoId
+                      : null,
+                  cantidad: detalle.cantidad,
+                })
+              );
 
               const payload = {
                 ...values,
@@ -228,10 +240,17 @@ export const ModalPromocion = ({
                     <label style={{ fontWeight: "bold", fontSize: "1em" }}>
                       Agregar Productos/Insumos a la Promoción
                     </label>
-                    <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
                       <select
                         value={productoId}
-                        onChange={e => setProductoId(Number(e.target.value))}
+                        onChange={(e) => setProductoId(Number(e.target.value))}
                         disabled={!!insumoId}
                         className="form-control input-formulario"
                         style={{ width: "15em" }}
@@ -245,24 +264,25 @@ export const ModalPromocion = ({
                       </select>
                       <select
                         value={insumoId}
-                        onChange={e => setInsumoId(Number(e.target.value))}
-                        disabled={!!productoId}
+                        onChange={(e) => setInsumoId(Number(e.target.value))}
                         className="form-control input-formulario"
                         style={{ width: "15em" }}
                       >
                         <option value={0}>Seleccione un insumo</option>
-                        {insumos.map((insumo) => (
-                          <option key={insumo.id} value={insumo.id}>
-                            {insumo.denominacion}
-                          </option>
-                        ))}
+                        {insumos
+                          .filter((insumo) => !insumo.esParaElaborar) 
+                          .map((insumo) => (
+                            <option key={insumo.id} value={insumo.id}>
+                              {insumo.denominacion}
+                            </option>
+                          ))}
                       </select>
                       <input
                         type="number"
-                        min={0.01}
-                        step="any"
+                        min={1}
+                        step={1}
                         value={cantidad}
-                        onChange={e => setCantidad(Number(e.target.value))}
+                        onChange={(e) => setCantidad(Number(e.target.value))}
                         className="form-control input-formulario"
                         style={{ width: "5em" }}
                         placeholder="Cantidad"
@@ -273,11 +293,13 @@ export const ModalPromocion = ({
                         onClick={() => {
                           // Solo uno de los dos debe estar seleccionado
                           if (
-                            ((productoId && !insumoId) || (!productoId && insumoId)) &&
+                            ((productoId && !insumoId) ||
+                              (!productoId && insumoId)) &&
                             cantidad > 0 &&
                             !values.detallePromociones.some(
                               (d: DetallePromocionDTO) =>
-                                d.productoId === productoId && d.insumoId === insumoId
+                                d.productoId === productoId &&
+                                d.insumoId === insumoId
                             )
                           ) {
                             setFieldValue("detallePromociones", [
@@ -301,36 +323,52 @@ export const ModalPromocion = ({
                     {/* Lista de productos/insumos agregados */}
                     <ul style={{ marginTop: "10px" }}>
                       {values.detallePromociones.map(
-                        (detalle: DetallePromocionDTO, idx: number) => {
-                          const producto = productos.find(
-                            (p) => p.id === detalle.productoId
-                          );
-                          const insumo = insumos.find(
-                            (i) => i.id === detalle.insumoId
-                          );
+                        (detalle: any, idx: number) => {
+                          // Si viene el objeto completo desde el backend
+                          const producto =
+                            detalle.producto ||
+                            (detalle.productoId &&
+                              productos.find(
+                                (p) => p.id === detalle.productoId
+                              ));
+                          const insumo =
+                            detalle.insumo ||
+                            (detalle.insumoId &&
+                              insumos.find((i) => i.id === detalle.insumoId));
+
                           return (
                             <li
-                              key={`${detalle.productoId}-${detalle.insumoId}-${idx}`}
-                              style={{ display: "flex", alignItems: "center", gap: "1em" }}
+                              key={
+                                detalle.id ??
+                                `${detalle.productoId}-${detalle.insumoId}-${idx}`
+                              }
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "1em",
+                              }}
                             >
                               <span>
                                 {producto
                                   ? `Producto: ${producto.denominacion}`
                                   : insumo
-                                    ? `Insumo: ${insumo.denominacion}`
-                                    : "Item"}
+                                  ? `Insumo: ${insumo.denominacion}`
+                                  : "Item"}
                               </span>
                               <input
                                 type="number"
-                                min={0.01}
-                                step="any"
+                                min={1}
+                                step={1}
                                 value={detalle.cantidad}
-                                onChange={e => {
+                                onChange={(e) => {
                                   const nuevaCantidad = Number(e.target.value);
                                   setFieldValue(
                                     "detallePromociones",
-                                    values.detallePromociones.map((d, i) =>
-                                      i === idx ? { ...d, cantidad: nuevaCantidad } : d
+                                    values.detallePromociones.map(
+                                      (d: any, i: number) =>
+                                        i === idx
+                                          ? { ...d, cantidad: nuevaCantidad }
+                                          : d
                                     )
                                   );
                                 }}
@@ -359,8 +397,17 @@ export const ModalPromocion = ({
                   </div>
 
                   {/* Imagen de la promoción */}
-                  <label style={{ fontWeight: "bold" }}>Imagen de la promoción:</label>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px" }}>
+                  <label style={{ fontWeight: "bold" }}>
+                    Imagen de la promoción:
+                  </label>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
                     <div
                       className="image-upload-area"
                       style={{
@@ -379,12 +426,17 @@ export const ModalPromocion = ({
                       onMouseEnter={() => setIsHovering(true)}
                       onMouseLeave={() => setIsHovering(false)}
                     >
-                      {(previewUrl || values.urlImagen) ? (
+                      {previewUrl || values.urlImagen ? (
                         <>
                           <img
                             src={previewUrl || values.urlImagen}
                             alt="Vista previa"
-                            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "10px" }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "10px",
+                            }}
                           />
                           <div
                             style={{
@@ -412,7 +464,11 @@ export const ModalPromocion = ({
                         <img
                           src={AddImageIcon}
                           alt="Agregar imagen"
-                          style={{ width: "100px", height: "100px", objectFit: "contain" }}
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            objectFit: "contain",
+                          }}
                         />
                       )}
                     </div>
@@ -421,7 +477,7 @@ export const ModalPromocion = ({
                       accept="image/*"
                       style={{ display: "none" }}
                       ref={fileInputRef}
-                      onChange={e => {
+                      onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           setSelectedImage(file);
@@ -430,8 +486,10 @@ export const ModalPromocion = ({
                         }
                       }}
                     />
-                    {(!previewUrl && !values.urlImagen) && (
-                      <div className="error" style={{ textAlign: "center" }}>Debe seleccionar una imagen</div>
+                    {!previewUrl && !values.urlImagen && (
+                      <div className="error" style={{ textAlign: "center" }}>
+                        Debe seleccionar una imagen
+                      </div>
                     )}
                   </div>
                 </div>

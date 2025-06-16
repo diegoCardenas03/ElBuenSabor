@@ -104,7 +104,7 @@ const Landing = () => {
         <div className="flex flex-col items-center justify-center mt-0 md:mt-10 mb-10 p-6 md:p-20">
           <div className="flex items-center justify-center gap-6 relative mb-12 flex-wrap">
             <h2 className="font-tertiary text-5xl md:text-7xl text-center leading-tight">
-              PRODUCTOS<br />POPULARES
+              PROMOCIONES<br />POPULARES
             </h2>
             <img
               src={ProductosPopularesImg}
