@@ -9,15 +9,25 @@ import ProdPopulares from "../components/prodPopulares";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useCategories } from "../hooks/useCategories";
+import { useAppDispatch } from "../hooks/redux";
+import { fetchProducts, fetchInsumosVendibles } from "../hooks/redux/slices/ProductReducer";
+import { fetchRubrosProductos, fetchRubrosInsumos } from "../hooks/redux/slices/RubroReducer";
 
 const Landing = () => {
-  const { categories } = useCategories();
+  const dispatch = useAppDispatch();
 
-  // Adaptá las categorías al formato que espera CardLanding
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchInsumosVendibles());
+    dispatch(fetchRubrosProductos());
+    dispatch(fetchRubrosInsumos());
+  }, [dispatch]);
+  const { categories } = useCategories();
+  console.log('categorias', categories)
+
   const items = categories.map((cat, idx) => ({
     id: idx,
     titulo: cat.name,
-    imagen: "", // Si tenés imágenes, agregalas aquí
   }));
 
   const [navbarWhite, setNavbarWhite] = useState(true);
