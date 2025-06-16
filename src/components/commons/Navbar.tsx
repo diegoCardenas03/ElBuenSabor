@@ -11,6 +11,8 @@ interface NavbarProps {
   onClose: () => void;
   usuarioLogeado: boolean;
   nombreUsuario: string;
+  fotoUsuario?: string | null;
+  emailUsuario?: string | null;
   whiteUserBar?: boolean;
 }
 
@@ -31,6 +33,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   usuarioLogeado,
   nombreUsuario,
   whiteUserBar = false,
+  fotoUsuario,
+  emailUsuario
 }) => {
   const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
   const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
@@ -120,10 +124,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           <FaTimes stroke='2' color={whiteUserBar ? "white" : "black"} onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar" />
         </div>
         <div className="p-4 pt-0 flex align-top justify-between">
-          <img src={usuarioImg} alt="Usuario" className="w-12 h-12 rounded-full mx-auto" />
+           {/* ✅ CAMBIO: Usar foto real del usuario */}
+          <img 
+            src={fotoUsuario || usuarioImg} 
+            alt="Usuario" 
+            className="w-12 h-12 rounded-full mx-auto object-cover" 
+          />
           <div className="text-start mt-2 flex flex-col gap-1">
             <p className={`font-tertiary text-tertiary text-sm ${whiteUserBar ? "text-white" : "text-black"}`}>{nombreUsuario}</p>
-            <p className={`text-xs ${whiteUserBar ? "text-white" : "text-quaternary"}`}>tengo3prop@gmail.com</p>
+              {/* ✅ CAMBIO: Usar email real del usuario */}
+            <p className={`text-xs ${whiteUserBar ? "text-white" : "text-quaternary"}`}>
+              {emailUsuario || "Sin email"}
+            </p>
           </div>
         </div>
         <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />

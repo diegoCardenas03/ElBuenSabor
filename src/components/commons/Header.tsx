@@ -34,13 +34,17 @@ export const Header: React.FC<HeaderProps> = ({
   const { authStatus } = useAuthHandler();
 
   // ✅ NUEVO: Determinar estado del usuario dinámicamente
-  const usuarioLogeado = isAuthenticated && authStatus === 'completed';
+const usuarioLogeado = isAuthenticated && authStatus === 'completed';
   const nombreUsuario = usuarioLogeado
-    ? (user?.name || user?.nickname || user?.email || "Usuario")
+    ? (user?.name || user?.nickname || user?.given_name || "Usuario")
     : "Invitado";
 
   // ✅ CORREGIDO: Considerar AMBOS estados de loading
   const isAppLoading = isLoading || (isAuthenticated && authStatus !== 'completed');
+
+    // ✅ NUEVO: Foto de perfil del usuario
+  const fotoUsuario = user?.picture || null;
+  const emailUsuario = user?.email || null;
 
   useEffect(() => {
     console.log('🔍 Header - isAppLoading cambió:', isAppLoading, { isLoading, authStatus });
@@ -172,11 +176,13 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
 
-      <Navbar
+     <Navbar
         open={navbarOpen}
         onClose={handleCloseNavbar}
         usuarioLogeado={usuarioLogeado}
         nombreUsuario={nombreUsuario}
+        fotoUsuario={fotoUsuario}
+        emailUsuario={emailUsuario}
         whiteUserBar={navbarOpen ? true : whiteUserBar}
       />
     </header>

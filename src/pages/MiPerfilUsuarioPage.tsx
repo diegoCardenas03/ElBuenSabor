@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MiPerfilUsuarioLayout } from "../layouts/MiPerfilUsuarioLayout";
 import usuarioImg from "../assets/img/usuarioLogeado.jpg";
 import { FaEye, FaEyeSlash, FaPen } from "react-icons/fa";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type PerfilForm = {
   nombre: string;
@@ -15,21 +16,37 @@ export const MiPerfilUsuarioPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
-  const { register, handleSubmit, watch, formState: { errors, isDirty } } = useForm<PerfilForm>({
+  // ✅ CAMBIO: Obtener datos del usuario desde Auth0
+  const { user, isAuthenticated } = useAuth0();
+
+  const { register, handleSubmit, watch, formState: { errors, isDirty }, setValue } = useForm<PerfilForm>({
     defaultValues: {
-      nombre: "nOOO La Politzia noOooo",
-      telefono: "+5492614360505",
-      password: "queso",
-      repeatPassword: "queso",
+      nombre: "",
+      telefono: "",
+      password: "",
+      repeatPassword: "",
     }
   });
 
-  const email = "tengo3prop@gmail.com";
+   // ✅ CAMBIO: Usar datos reales del usuario
+  const nombreUsuario = user?.name || user?.nickname || user?.given_name || "Usuario";
+  const emailUsuario = user?.email || "Sin email";
+  const fotoUsuario = user?.picture || usuarioImg;
+  const telefonoUsuario = user?.phone_number || "";
+
+  // ✅ NUEVO: Cargar datos del usuario al montar el componente
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setValue("nombre", nombreUsuario);
+      setValue("telefono", telefonoUsuario);
+    }
+  }, [isAuthenticated, user, setValue, nombreUsuario, telefonoUsuario]);
 
   const onSubmit = (data: PerfilForm) => {
-    // Aquí tu lógica de guardado
-    console.log(data);
+    console.log("Datos del perfil a guardar:", data);
+    // Aquí implementarías la lógica para actualizar el perfil
   };
+
 
   return (
     <MiPerfilUsuarioLayout>
@@ -38,7 +55,12 @@ export const MiPerfilUsuarioPage = () => {
           Historial Pedidos
         </button>
         <div className="flex-shrink-0 flex flex-col items-center w-full md:w-auto pt-8">
-          <img src={usuarioImg} alt="Usuario" className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mb-2" />
+         {/* ✅ CAMBIO: Usar foto real del usuario */}
+          <img 
+            src={fotoUsuario} 
+            alt="Usuario" 
+            className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mb-2" 
+          />
         </div>
         <form className="flex-1 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col gap-2 mt-2 md:mt-0 pt-8 mx-auto" onSubmit={handleSubmit(onSubmit)} >
           <label className="font-semibold text-base mb-1">Nombre
@@ -66,7 +88,7 @@ export const MiPerfilUsuarioPage = () => {
             <div className="flex items-center">
               <input
                 className="w-full border-b border-black font-normal outline-none py-1 cursor-not-allowed"
-                value={email}
+                value={emailUsuario}
                 type="email"
                 disabled
                 readOnly
