@@ -1,8 +1,8 @@
-import { Rol } from "../enums/Rol";
+import { RolResponseDTO } from "../Rol/RolResponseDTO";
 
 export interface UsuarioResponseDTO {
     id?: number;
     email: string;
     auth0Id: string;
-    rol: Rol;
+    roles: RolResponseDTO[];
 }

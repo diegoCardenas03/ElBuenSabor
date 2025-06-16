@@ -40,6 +40,7 @@ const Clientes = () => {
         {
             label: "Rol",
             key: "rol",
+            render: (cliente: ClienteResponseDTO) => cliente.usuario.roles.map(r => r.nombre).join(', ')
         },
         {
             label: "Activo",
@@ -95,7 +96,7 @@ const Clientes = () => {
                 activo: c.activo,
                 usuario: c.usuario,
                 email: c.usuario.email,
-                rol: c.usuario.rol,
+                rol: c.usuario.roles,
                 detalleDomicilios: c.detalleDomicilios,
             }));
             const clientesFiltrados = filtrarClientes(clientesDTO);

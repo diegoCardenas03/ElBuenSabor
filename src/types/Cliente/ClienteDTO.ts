@@ -1,8 +1,7 @@
 import { UsuarioDTO } from "../Usuario/UsuarioDTO";
 
 export interface ClienteDTO {
-    id?: number;
-    nombreCompleto: string;
-    telefono: string;
-    usuario: UsuarioDTO;
+    nombreCompleto: string
+    telefono?: string // Opcional para registro social
+    usuario: UsuarioDTO
 }
