@@ -64,13 +64,13 @@ export const ModalPromocion = ({
     elementActive && "denominacion" in elementActive
       ? (elementActive as PromocionDTO)
       : {
-          denominacion: "",
-          urlImagen: "",
-          fechaDesde: "",
-          fechaHasta: "",
-          descuento: 0,
-          detallePromociones: [],
-        };
+        denominacion: "",
+        urlImagen: "",
+        fechaDesde: "",
+        fechaHasta: "",
+        descuento: 0,
+        detallePromociones: [],
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -139,8 +139,14 @@ export const ModalPromocion = ({
               }
 
               const detallePromociones = values.detallePromociones.map((detalle: any) => ({
-                productoId: detalle.productoId ?? detalle.producto?.id ?? 0,
-                insumoId: detalle.insumoId ?? detalle.insumo?.id ?? 0,
+                productoId:
+                  detalle.productoId && detalle.productoId !== 0
+                    ? detalle.productoId
+                    : null,
+                insumoId:
+                  detalle.insumoId && detalle.insumoId !== 0
+                    ? detalle.insumoId
+                    : null,
                 cantidad: detalle.cantidad,
               }));
 
@@ -311,8 +317,8 @@ export const ModalPromocion = ({
                                 {producto
                                   ? `Producto: ${producto.denominacion}`
                                   : insumo
-                                  ? `Insumo: ${insumo.denominacion}`
-                                  : "Item"}
+                                    ? `Insumo: ${insumo.denominacion}`
+                                    : "Item"}
                               </span>
                               <input
                                 type="number"
