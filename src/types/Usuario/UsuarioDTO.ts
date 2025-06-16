@@ -1,7 +1,7 @@
-import { Rol } from "../enums/Rol";
-
 export interface UsuarioDTO {
     email: string;
-    contraseña: string;
-    rol: Rol;
+    contrasenia?: string;
+    connection?: string;
+    auth0Id?: string;
+    roles: string[];
 }
