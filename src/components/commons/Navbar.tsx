@@ -33,7 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   whiteUserBar = false,
 }) => {
   const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
-
   const [abrirModalRegister, setAbrirModalRegister] = useState<boolean>(false);
   const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
 
@@ -60,7 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const cerrarModal = () => {
     setAbrirModalLogin(false);
   };
-
 
   // Si no está logeado, muestra solo el botón de login
   if (!usuarioLogeado) {
@@ -130,7 +128,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           ))}
         </div>
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
-          <div className={`flex items-center gap-2 w-50 m-auto mb-4 ${whiteUserBar ? "text-white" : "text-black"}`}>
+          <div 
+            className={`flex items-center gap-2 w-50 m-auto mb-4 ${whiteUserBar ? "text-white" : "text-black"}`}
+            onClick={handleLogout}
+            tabIndex={0}
+            role="button"
+            aria-label="Cerrar Sesión"
+          >
             <FaSignOutAlt className="w-6 h-6" color={whiteUserBar ? "white" : "black"} />
             <p className={whiteUserBar ? "text-white" : "text-quaternary"}>Cerrar Sesion</p>
           </div>
