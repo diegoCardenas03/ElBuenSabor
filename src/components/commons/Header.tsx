@@ -39,6 +39,25 @@ export const Header: React.FC<HeaderProps> = ({
     ? (user?.name || user?.nickname || user?.email || "Usuario")
     : "Invitado";
 
+  // ✅ CORREGIDO: Considerar AMBOS estados de loading
+  const isAppLoading = isLoading || (isAuthenticated && authStatus !== 'completed');
+
+  useEffect(() => {
+    console.log('🔍 Header - isAppLoading cambió:', isAppLoading, { isLoading, authStatus });
+    if (isAppLoading) {
+      console.log('🔴 Mostrando cargando...');
+    } else {
+      console.log('🟢 Ocultando cargando...');
+    }
+  }, [isAppLoading, isLoading, authStatus]);
+
+
+  useEffect(() => {
+    if (isAppLoading) {
+      setNavbarOpen(false);
+    }
+  }, [isAppLoading]);
+
   useEffect(() => {
     if (carritoAbierto && carrito.length === 0) {
       dispatch(cerrarCarrito());
@@ -48,8 +67,8 @@ export const Header: React.FC<HeaderProps> = ({
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
 
-  // ✅ NUEVO: Mostrar loading mientras se procesa la autenticación
-  if (isLoading || authStatus === 'checking') {
+  // ✅ CORREGIDO: Usar la variable combinada de loading
+  if (isAppLoading) {
     return (
       <header className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50 ${backgroundColor}`}>
         <div className="flex-shrink-0 flex items-center z-10">
@@ -77,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className="flex-shrink-0 flex items-center space-x-3 z-10">
           <span className={`font-secondary text-base ${whiteUserBar ? "text-white" : "text-black"}`}>
-            Cargando... {/* ✅ NUEVO: Mostrar estado de carga */}
+            Cargando...
           </span>
         </div>
       </header>
@@ -121,9 +140,9 @@ export const Header: React.FC<HeaderProps> = ({
         <span
           className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
           onClick={handleUserClick}
-          title={nombreUsuario} 
+          title={nombreUsuario}
         >
-          {nombreUsuario} 
+          {nombreUsuario}
         </span>
         <div
           className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"}`}
@@ -156,8 +175,8 @@ export const Header: React.FC<HeaderProps> = ({
       <Navbar
         open={navbarOpen}
         onClose={handleCloseNavbar}
-        usuarioLogeado={usuarioLogeado} 
-        nombreUsuario={nombreUsuario} 
+        usuarioLogeado={usuarioLogeado}
+        nombreUsuario={nombreUsuario}
         whiteUserBar={navbarOpen ? true : whiteUserBar}
       />
     </header>

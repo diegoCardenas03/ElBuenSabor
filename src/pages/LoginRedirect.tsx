@@ -30,10 +30,8 @@ export const LoginRedirect = () => {
                     dispatch(setRol(null));
 
                     const response = await interceptorApiClient.post(
-                        "/api/admin/users/getUserById",
-                        {
-                            auth0Id: sub,
-                        }
+                        "/api/clientes/",
+                        { auth0Id: user.sub }
                     );
 
                     // Si no existe, reviso firstLogin

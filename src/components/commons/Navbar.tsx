@@ -33,7 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   whiteUserBar = false,
 }) => {
   const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
-  const [abrirModalRegister, setAbrirModalRegister] = useState<boolean>(false);
   const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
 
   const { logout } = useAuth0();
@@ -60,6 +59,17 @@ export const Navbar: React.FC<NavbarProps> = ({
     setAbrirModalLogin(false);
   };
 
+  // ✅ AGREGAR: Funciones para cambiar entre modales
+  const cambiarARegister = () => {
+    console.log('Cambiando a registro desde navbar');
+    setTipoModal('register');
+  };
+
+  const cambiarALogin = () => {
+    console.log('Cambiando a login desde navbar');
+    setTipoModal('login');
+  };
+
   // Si no está logeado, muestra solo el botón de login
   if (!usuarioLogeado) {
     return (
@@ -75,17 +85,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Ingresar
             </button>
+            {/* ✅ AGREGAR: Botón de registro */}
           </div>
         </div>
 
-         {/* Modal dinámico */}
+        {/* ✅ CORREGIR: Modal dinámico con funciones de cambio */}
         {abrirModalLogin && (
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
             <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
               {tipoModal === 'login' ? (
-                <ModalLogin onClose={cerrarModal} />
+                <ModalLogin 
+                  onClose={cerrarModal} 
+                  onSwitchToRegister={cambiarARegister} // ✅ AGREGAR
+                />
               ) : (
-                <ModalRegister onClose={cerrarModal} />
+                <ModalRegister 
+                  onClose={cerrarModal} 
+                  onSwitchToLogin={cambiarALogin} // ✅ AGREGAR
+                />
               )}
               <FaTimes stroke='4' onClick={cerrarModal} className="w-6 h-6 absolute top-4 right-4 cursor-pointer"/>
             </div>
@@ -140,15 +157,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
       </div>
-      {/* Modal Login */}
-      {abrirModalLogin && (
-        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
-          <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg">
-            <ModalLogin />
-            <FaTimes stroke='2' onClick={() => setAbrirModalLogin(false)} className="absolute top-4 right-4 cursor-pointer" />
-          </div>
-        </div>
-      )}
     </>
   );
 };
