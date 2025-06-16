@@ -16,6 +16,7 @@ export const ScreenPromocion = () => {
   const promocionService = new PromocionService();
   const dispatch = useAppDispatch();
 
+
   // Columnas de la tabla de promociones
   const ColumnsTablePromocion = [
     {
@@ -55,6 +56,7 @@ export const ScreenPromocion = () => {
       if (result.isConfirmed) {
         promocionService.delete(id).then(() => {
           getPromociones();
+          
         });
       }
     });
@@ -65,6 +67,7 @@ export const ScreenPromocion = () => {
     setLoading(true);
     await promocionService.getAll().then((promosData) => {
       dispatch(setDataTable(promosData));
+      console.log(promosData);
       setLoading(false);
     });
   };
@@ -72,7 +75,6 @@ export const ScreenPromocion = () => {
   useEffect(() => {
     getPromociones();
   }, []);
-
   return (
     <>
       <AdminHeader text="Promociones" />

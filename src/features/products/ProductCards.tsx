@@ -56,7 +56,7 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
         // Detectar si es promoción
         const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
         const price = isPromo
-          ? (product as any).precioPromocional || 0 // Ajustá según tu DTO
+          ? (product as PromocionResponseDTO).total
           : isInsumo(product)
             ? product.precioVenta
             : (product.precioVenta || 0);
@@ -68,20 +68,18 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
             : `producto-${product.id}`;
 
         return (
-          
           <div
             key={uniqueKey}
             className="relative bg-white p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-57 w-42 cursor-pointer"
           >
-                            {isPromo && (
-                  <span className="absolute mt-1 top-0 bg-[#BD1E22] text-white px-2 py-1 rounded-full text-xs font-bold z-10">
-                    ¡Promoción!
-                  </span>
-                )}
+            {isPromo && (
+              <span className="absolute mt-1 top-0 bg-[#BD1E22] text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+                ¡Promoción!
+              </span>
+            )}
 
             <div className='mt-4 flex flex-col items-center w-full' onClick={() => onCardClick && onCardClick(product)}>
               <div className="relative w-full flex justify-center items-center mb-3">
-
                 <img
                   src={imageUrl}
                   alt={product.denominacion}
