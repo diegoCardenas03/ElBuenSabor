@@ -3,6 +3,7 @@ import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { Estado } from '../types/enums/Estado';
 import { TablePagination } from '@mui/material';
 import { AdminHeader } from '../components/admin/AdminHeader';
+import { PedidosService } from '../services/PedidosService';
 
 
 const PedidosCocinero: React.FC = () => {
@@ -11,36 +12,36 @@ const PedidosCocinero: React.FC = () => {
     const [comandas, setComandas] = useState<PedidoResponseDTO[]>([]);
     const [modalDetallePedido, setModalDetallePedido] = useState<Boolean>(false)
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
-const [pageComandas, setPageComandas] = useState(0);
-const [rowsPerPageComandas, setRowsPerPageComandas] = useState(10);
-const [pagePreparacion, setPagePreparacion] = useState(0);
-const [rowsPerPagePreparacion, setRowsPerPagePreparacion] = useState(10);
+    const [pageComandas, setPageComandas] = useState(0);
+    const [rowsPerPageComandas, setRowsPerPageComandas] = useState(10);
+    const [pagePreparacion, setPagePreparacion] = useState(0);
+    const [rowsPerPagePreparacion, setRowsPerPagePreparacion] = useState(10);
+    const pedidosService = new PedidosService();
 
-const handleChangePageComandas = (_: unknown, newPage: number) => {
-    setPageComandas(newPage);
-};
-const handleChangeRowsPerPageComandas = (
-    event: React.ChangeEvent<HTMLInputElement>
-) => {
-    setRowsPerPageComandas(+event.target.value);
-    setPageComandas(0);
-};
+    const handleChangePageComandas = (_: unknown, newPage: number) => {
+        setPageComandas(newPage);
+    };
+    const handleChangeRowsPerPageComandas = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setRowsPerPageComandas(+event.target.value);
+        setPageComandas(0);
+    };
 
-// Funciones para En Preparacion
-const handleChangePagePreparacion = (_: unknown, newPage: number) => {
-    setPagePreparacion(newPage);
-};
-const handleChangeRowsPerPagePreparacion = (
-    event: React.ChangeEvent<HTMLInputElement>
-) => {
-    setRowsPerPagePreparacion(+event.target.value);
-    setPagePreparacion(0);
-};
+    // Funciones para En Preparacion
+    const handleChangePagePreparacion = (_: unknown, newPage: number) => {
+        setPagePreparacion(newPage);
+    };
+    const handleChangeRowsPerPagePreparacion = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setRowsPerPagePreparacion(+event.target.value);
+        setPagePreparacion(0);
+    };
 
     const obtenerPedidos = async () => {
         try {
-            const res = await fetch("http://localhost:8080/api/pedidos");
-            const data = await res.json();
+            const data = await pedidosService.getAll();
             setPedidos(data);
             setComandas(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.SOLICITADO));
             setEnPreparacion(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.EN_PREPARACION));
@@ -58,31 +59,48 @@ const handleChangeRowsPerPagePreparacion = (
         return partes[partes.length - 1];
     };
 
-    const cambiarEstadoPedido = (pedido: PedidoResponseDTO) => {
-        let nuevoEstado: PedidoResponseDTO['estado'];
+    const cambiarEstadoPedido = async (pedido: PedidoResponseDTO) => {
+        try {
+            let nuevoEstado = pedido.estado;
+            if (pedido.estado === Estado.SOLICITADO) {
+                nuevoEstado = Estado.EN_PREPARACION;
+            } else if (pedido.estado === Estado.EN_PREPARACION) {
+                nuevoEstado = Estado.TERMINADO;
+            } else {
+                return;
+            }
 
-        if (pedido.estado === Estado.SOLICITADO) {
-            nuevoEstado = Estado.EN_PREPARACION
-        } else if (pedido.estado === Estado.EN_PREPARACION) {
-            nuevoEstado = Estado.TERMINADO
-        } else return;
+            const response = await fetch(
+                `http://localhost:8080/api/pedidos/actualizar-estado/${pedido.id}?estado=${nuevoEstado}`,
+                { method: 'PUT' }
+            );
 
-        const pedidoActualizado: PedidoResponseDTO = { ...pedido, estado: nuevoEstado };
+            if (!response.ok) {
+                throw new Error('Error al actualizar el estado');
+            }
 
-        setComandas(prev => prev.filter(p => p.id !== pedido.id));
-        setEnPreparacion(prev => prev.filter(p => p.id !== pedido.id));
+            obtenerPedidos();
+            setPedidoSeleccionado(null);
+            setModalDetallePedido(false);
 
-        if (nuevoEstado === Estado.EN_PREPARACION) {
-            setEnPreparacion(prev => [...prev, pedidoActualizado]);
+
+        } catch (error) {
+            console.error(error);
         }
 
-        setPedidoSeleccionado(null);
-        setModalDetallePedido(false);
+        // const pedidoActualizado: PedidoResponseDTO = { ...pedido, estado: nuevoEstado };
+
+        // setComandas(prev => prev.filter(p => p.id !== pedido.id));
+        // setEnPreparacion(prev => prev.filter(p => p.id !== pedido.id));
+
+        // if (nuevoEstado === Estado.EN_PREPARACION) {
+        //     setEnPreparacion(prev => [...prev, pedidoActualizado]);
+        // }
     };
 
     return (
         <>
-            <AdminHeader text = "Pedidos"/>
+            <AdminHeader text="Pedidos" />
             <div className='bg-primary h-screen flex items-center justify-around'>
                 <div className='bg-white w-[40%] h-[80vh] rounded-2xl shadow-md flex flex-col '>
                     <div className='flex flex-col items-center justify-center mt-5 mb-3'>
@@ -98,25 +116,25 @@ const handleChangeRowsPerPagePreparacion = (
                         ) : (
                             <div className='flex flex-col items-center'>
                                 {comandas
-                                .slice(pageComandas * rowsPerPageComandas, pageComandas * rowsPerPageComandas + rowsPerPageComandas)
-                                .map((pedidos, index) => (
-                                    <div key={pedidos.id} >
-                                        <button
-                                            className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
-                                            onClick={() => {
-                                                setPedidoSeleccionado(pedidos);
-                                                setModalDetallePedido(true);
-                                            }}>
-                                            <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
-                                            <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
-                                        </button>
-                                    </div>
+                                    .slice(pageComandas * rowsPerPageComandas, pageComandas * rowsPerPageComandas + rowsPerPageComandas)
+                                    .map((pedidos, index) => (
+                                        <div key={pedidos.id} >
+                                            <button
+                                                className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
+                                                onClick={() => {
+                                                    setPedidoSeleccionado(pedidos);
+                                                    setModalDetallePedido(true);
+                                                }}>
+                                                <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
+                                                <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
+                                            </button>
+                                        </div>
 
-                                ))}
+                                    ))}
                             </div>
-                        )} 
+                        )}
                     </div>
-                   <TablePagination
+                    <TablePagination
                         rowsPerPageOptions={[10, 25, 100]}
                         component="div"
                         count={comandas.length}
@@ -140,20 +158,20 @@ const handleChangeRowsPerPagePreparacion = (
                         ) : (
                             <div className='flex flex-col items-center'>
                                 {enPreparacion
-                                .slice(pagePreparacion * rowsPerPagePreparacion, pagePreparacion * rowsPerPagePreparacion + rowsPerPagePreparacion)
-                                .map((pedidos, index) => (
-                                    <div key={pedidos.id} >
-                                        <button
-                                            className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
-                                            onClick={() => {
-                                                setPedidoSeleccionado(pedidos);
-                                                setModalDetallePedido(true);
-                                            }}>
-                                            <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
-                                            <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
-                                        </button>
-                                    </div>
-                                ))}
+                                    .slice(pagePreparacion * rowsPerPagePreparacion, pagePreparacion * rowsPerPagePreparacion + rowsPerPagePreparacion)
+                                    .map((pedidos, index) => (
+                                        <div key={pedidos.id} >
+                                            <button
+                                                className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
+                                                onClick={() => {
+                                                    setPedidoSeleccionado(pedidos);
+                                                    setModalDetallePedido(true);
+                                                }}>
+                                                <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
+                                                <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
+                                            </button>
+                                        </div>
+                                    ))}
                             </div>
                         )}
                     </div>

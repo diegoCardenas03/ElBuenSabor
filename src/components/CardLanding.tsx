@@ -59,7 +59,7 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
       key={item.id}
       to="/menu"
       className={
-        `w-28 h-32 md:w-44 md:h-48 shadow-lg rounded-2xl flex flex-col items-center justify-center shrink-0
+        `w-28 h-32 md:w-44 md:h-40 shadow-lg rounded-2xl flex flex-col items-center justify-center shrink-0
         px-2 md:px-4 transition-transform duration-300 border-2 cursor-pointer
         ${isMiddle
           ? "scale-110 bg-[#D32F2F] text-white border-[#FF9D3A] z-10"
