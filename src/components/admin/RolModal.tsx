@@ -21,11 +21,13 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
   const [nuevoPermiso, setNuevoPermiso] = useState("");
   const [nombre, setNombre] = useState(rolName ?? "");
   const [oculto, setOculto] = useState(initialOculto);
+  const [nombreError, setNombreError] = useState(false);
 
   useEffect(() => {
     setPermisos(initialPermisos);
     setNombre(rolName ?? "");
     setOculto(initialOculto);
+    setNombreError(false);
   }, [initialPermisos, rolName, initialOculto, open]);
 
   if (!open) return null;
@@ -42,6 +44,10 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
   };
 
   const handleSave = () => {
+    if (!nombre.trim()) {
+      setNombreError(true);
+      return;
+    }
     onSave({ nombre, permisos, oculto });
     onClose();
   };
@@ -51,7 +57,7 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
       <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl"
+          className="absolute top-3 right-3 text-gray-400 hover:text-secondary text-2xl"
         >
           ×
         </button>
@@ -66,10 +72,18 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
             id="nombreRol"
             type="text"
             value={nombre}
-            onChange={e => setNombre(e.target.value)}
-            className="border rounded px-2 py-1 w-full mb-2"
+            onChange={e => {
+              setNombre(e.target.value);
+              if (e.target.value.trim()) setNombreError(false);
+            }}
+            className={`border rounded px-2 py-1 w-full mb-2 ${nombreError ? 'border-red-500' : ''}`}
             placeholder="Nombre del rol"
           />
+          {nombreError && (
+            <span className="text-red-600 text-sm mb-2 block">
+              El nombre no puede estar vacío.
+            </span>
+          )}
           <label className="flex items-center gap-2 mb-4">
             <input
               type="checkbox"
@@ -86,7 +100,7 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
                   <span>{permiso}</span>
                   <button
                     onClick={() => handleRemovePermiso(permiso)}
-                    className="text-red-500 hover:text-red-700 px-2 py-1"
+                    className="text-secondary hover:text-secondary px-2 py-1"
                   >
                     Quitar
                   </button>
@@ -108,7 +122,7 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
                 }}
               />
               <button
-                className="bg-[#BD1E22] text-white rounded px-4 py-1 font-bold"
+                className="bg-secondary text-white rounded px-4 py-1 font-bold"
                 onClick={handleAddPermiso}
                 type="button"
               >
@@ -125,8 +139,9 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
             Cancelar
           </button>
           <button
-            className="px-4 py-2 rounded bg-[#BD1E22] text-white hover:bg-[#a3181d]"
+            className="px-4 py-2 rounded bg-secondary text-white hover:bg-[#bd1e23ce]"
             onClick={handleSave}
+            disabled={!nombre.trim()}
           >
             Guardar
           </button>

@@ -33,7 +33,6 @@ const RoutesApp = () => {
         <Route path="/admin/Productos" element={<ScreenProducto />} />
         <Route path='/admin/Configuracion' element={<Configuracion />} />
         <Route path="/admin/PantallaCajero" element={<PantallaCajero />} />
-        
         <Route path='/admin/Delivery' element={<Delivery />} />
       </Routes>
     </BrowserRouter>
