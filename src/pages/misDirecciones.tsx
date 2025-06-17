@@ -7,7 +7,6 @@ import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { crearDireccion, editarDireccion, eliminarDireccion, fetchDirecciones } from '../hooks/redux/slices/DomicilioReducer';
 import { DomicilioResponseDTO } from '../types/Domicilio/DomicilioResponseDTO';
-import { useEventCallback } from '@mui/material';
 
 const MisDirecciones = () => {
     const [mostrarModal, setMostrarModal] = useState<boolean>(false);

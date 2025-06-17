@@ -3,10 +3,13 @@ import { useAppDispatch, useAppSelector } from './redux';
 import { toggleCategory } from './redux/slices/ProductReducer';
 
 export const useCategories = () => {
+    
     const dispatch = useAppDispatch();
     const { selectedCategories, rubrosConInsumosVendibles } = useAppSelector((state) => state.products);
     const { rubros, rubrosInsumos } = useAppSelector((state) => state.rubros);
-
+ console.log('rubros:', rubros);
+    console.log('rubrosInsumos:', rubrosInsumos);
+    console.log('rubrosConInsumosVendibles:', rubrosConInsumosVendibles)
     // Crear categorías únicas para mostrar (sin duplicados por nombre)
     const categories = useMemo(() => {
         const categoryMap = new Map();

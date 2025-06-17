@@ -114,7 +114,7 @@ const Roles = () => {
           <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
         </form>
         <button
-          className='bg-[#BD1E22] text-white py-2 rounded-2xl cursor-pointer px-10 shadow-md ml-4'
+          className='bg-secondary text-white py-2 rounded-2xl cursor-pointer px-10 shadow-md ml-4'
           onClick={() => handleAbrirModal()}
           type="button"
         >
@@ -161,7 +161,7 @@ const Roles = () => {
               <div className="flex items-center justify-between min-h-[56px]">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`text-lg font-semibold cursor-pointer py-4 ${expandedRole === rol.id ? "text-[#BD1E22]" : ""}`}
+                    className={`text-lg font-semibold cursor-pointer py-4 ${expandedRole === rol.id ? "text-secondary" : ""}`}
                     onClick={() => setExpandedRole(expandedRole === rol.id ? null : rol.id)}
                   >
                     {rol.name}
@@ -170,7 +170,7 @@ const Roles = () => {
                 </div>
                 <div className="flex items-center gap-5">
                   <button
-                    className="p-1 text-[#BD1E22] hover:bg-gray-100 rounded-full"
+                    className="p-1 text-secondary hover:bg-gray-100 rounded-full"
                     onClick={() => handleAbrirModal(rol)}
                   >
                     <FaPen size={18} />
@@ -196,7 +196,7 @@ const Roles = () => {
                     </ul>
                   )}
                   <button
-                    className="text-[#BD1E22] text-sm ml-4 font-bold hover:underline"
+                    className="text-secondary text-sm ml-4 font-bold hover:underline"
                     onClick={() => handleAbrirModal(rol)}
                   >
                     + Agregar permiso

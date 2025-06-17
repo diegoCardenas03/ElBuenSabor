@@ -15,6 +15,7 @@ import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
 import {Estadistica} from '../pages/admin/Estadistica';
 
+import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 const RoutesApp = () => {
   return (
@@ -34,6 +35,7 @@ const RoutesApp = () => {
         <Route path="/admin/Productos" element={<ScreenProducto />} />
         <Route path='/admin/Configuracion' element={<Configuracion />} />
         <Route path="/admin/PantallaCajero" element={<PantallaCajero />} />
+        <Route path="/admin/Promociones" element={<ScreenPromocion />} />
         
         <Route path='/admin/Delivery' element={<Delivery />} />
         <Route path='/admin/Estadistica' element={<Estadistica />} />
