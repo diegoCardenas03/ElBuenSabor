@@ -58,7 +58,7 @@ interceptorApiClient.interceptors.response.use(
     // ✅ VERIFICAR: Si debe mostrar el alert
     if (!shouldShowErrorAlert(error)) {
       // Solo retornar el error sin mostrar alert
-      return Promise.reject(createHTTPError(status!, serverMessage));
+      return Promise.reject(error);
     }
 
     // Si es error 500 genérico

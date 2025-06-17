@@ -41,6 +41,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const { logout } = useAuth0();
 
+  // ✅ AGREGAR: Función para manejar clics en enlaces
+  const handleLinkClick = () => {
+    onClose(); // Cerrar el navbar antes de navegar
+  };
+
   const handleLogout = () => {
     logout({
       logoutParams: {
@@ -80,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <>
         <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex justify-end">
-            <FaTimes stroke='2' color={whiteUserBar ? "white" : "black"} onClick={onClose} className="w-7 h-7 cursor-pointer mr-4"/>
+            <FaTimes stroke='2' color={whiteUserBar ? "white" : "black"} onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" />
           </div>
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <button
@@ -98,17 +103,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
             <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
               {tipoModal === 'login' ? (
-                <ModalLogin 
-                  onClose={cerrarModal} 
+                <ModalLogin
+                  onClose={cerrarModal}
                   onSwitchToRegister={cambiarARegister} // ✅ AGREGAR
                 />
               ) : (
-                <ModalRegister 
-                  onClose={cerrarModal} 
+                <ModalRegister
+                  onClose={cerrarModal}
                   onSwitchToLogin={cambiarALogin} // ✅ AGREGAR
                 />
               )}
-              <FaTimes stroke='4' onClick={cerrarModal} className="w-6 h-6 absolute top-4 right-4 cursor-pointer"/>
+              <FaTimes stroke='4' onClick={cerrarModal} className="w-6 h-6 absolute top-4 right-4 cursor-pointer" />
             </div>
           </div>
         )}
@@ -123,17 +128,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex justify-end">
           <FaTimes stroke='2' color={whiteUserBar ? "white" : "black"} onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar" />
         </div>
-        <div className="p-4 pt-0 flex align-top justify-between">
-           {/* ✅ CAMBIO: Usar foto real del usuario */}
-          <img 
-            src={fotoUsuario || usuarioImg} 
-            alt="Usuario" 
-            className="w-12 h-12 rounded-full mx-auto object-cover" 
+        <div className="p-4 pt-0 flex flex-row items-center gap-3">
+          <img
+            src={fotoUsuario || usuarioImg}
+            alt="Usuario"
+            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
           />
-          <div className="text-start mt-2 flex flex-col gap-1">
-            <p className={`font-tertiary text-tertiary text-sm ${whiteUserBar ? "text-white" : "text-black"}`}>{nombreUsuario}</p>
-              {/* ✅ CAMBIO: Usar email real del usuario */}
-            <p className={`text-xs ${whiteUserBar ? "text-white" : "text-quaternary"}`}>
+          <div className="flex flex-col min-w-0">
+            <p className={`font-tertiary text-tertiary text-sm ${whiteUserBar ? "text-white" : "text-black"} truncate max-w-[120px]`}>
+              {nombreUsuario}
+            </p>
+            <p className={`text-xs ${whiteUserBar ? "text-white" : "text-quaternary"} truncate max-w-[120px]`}>
               {emailUsuario || "Sin email"}
             </p>
           </div>
@@ -141,7 +146,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />
         <div className="p-4 ml-4 cursor-pointer">
           {navbarLinks.map((link, index) => (
-            <Link to={link.to} key={index} className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}>
+            <Link
+              to={link.to}
+              key={index}
+              className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
+              onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
+            >
               {link.icon}
               <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
             </Link>
@@ -150,14 +160,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
           {navbarLinks2.map((link, index) => (
-            <Link to={link.to} key={index} className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}>
+            <Link
+              to={link.to}
+              key={index}
+              className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
+              onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
+            >
               {link.icon}
               <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
             </Link>
           ))}
         </div>
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
-          <div 
+          <div
             className={`flex items-center gap-2 w-50 m-auto mb-4 ${whiteUserBar ? "text-white" : "text-black"}`}
             onClick={handleLogout}
             tabIndex={0}

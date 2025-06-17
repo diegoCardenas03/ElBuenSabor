@@ -30,30 +30,32 @@ export const Header: React.FC<HeaderProps> = ({
   const dispatch = useAppDispatch();
 
   // ✅ NUEVO: Auth0 integration
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth0();
   const { authStatus } = useAuthHandler();
 
+  // --- OPTIMIZACIÓN: Leer datos de sessionStorage si existen ---
+  const sessionCompleted = sessionStorage.getItem('auth_completed') === 'true';
+  const sessionRole = sessionStorage.getItem('user_role');
+  const sessionToken = sessionStorage.getItem('auth_token');
+  const sessionName = sessionStorage.getItem('user_name'); // <-- NUEVO
+  const sessionEmail = sessionStorage.getItem('user_email');
+  const sessionPicture = sessionStorage.getItem('user_picture');
+  const hasSessionData = sessionCompleted && sessionRole && sessionToken;
+
   // ✅ NUEVO: Determinar estado del usuario dinámicamente
-const usuarioLogeado = isAuthenticated && authStatus === 'completed';
+  const usuarioLogeado =
+    !!((isAuthenticated && authStatus === 'completed') || hasSessionData);
+
   const nombreUsuario = usuarioLogeado
-    ? (user?.name || user?.nickname || user?.given_name || "Usuario")
-    : "Invitado";
+  ? (sessionName || "Usuario")
+  : "Invitado";
+  const emailUsuario = sessionEmail || "Sin email";
+  const fotoUsuario = sessionPicture || "nada";
 
-  // ✅ CORREGIDO: Considerar AMBOS estados de loading
-  const isAppLoading = isLoading || (isAuthenticated && authStatus !== 'completed');
-
-    // ✅ NUEVO: Foto de perfil del usuario
-  const fotoUsuario = user?.picture || null;
-  const emailUsuario = user?.email || null;
-
-  useEffect(() => {
-    console.log('🔍 Header - isAppLoading cambió:', isAppLoading, { isLoading, authStatus });
-    if (isAppLoading) {
-      console.log('🔴 Mostrando cargando...');
-    } else {
-      console.log('🟢 Ocultando cargando...');
-    }
-  }, [isAppLoading, isLoading, authStatus]);
+  // Mostrar loading SOLO si no hay datos en sessionStorage y Auth0 está cargando
+  const isAppLoading =
+    (!hasSessionData && isLoading) ||
+    (isAuthenticated && authStatus === 'checking');
 
 
   useEffect(() => {
@@ -176,7 +178,7 @@ const usuarioLogeado = isAuthenticated && authStatus === 'completed';
         )}
       </div>
 
-     <Navbar
+      <Navbar
         open={navbarOpen}
         onClose={handleCloseNavbar}
         usuarioLogeado={usuarioLogeado}
