@@ -11,8 +11,6 @@ export const getEstadoTexto = (estado: Estado) => {
   switch (estado) {
     case Estado.SOLICITADO:
       return "Solicitado";
-    case Estado.PENDIENTE:
-      return "Pendiente";
     case Estado.EN_PREPARACION:
       return "En preparación";
     case Estado.EN_CAMINO:
