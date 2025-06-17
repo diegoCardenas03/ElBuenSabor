@@ -278,7 +278,7 @@ const DetalleCompra = () => {
                             <div>
                                 <div className="flex justify-between mb-3">
                                     <p>Productos</p>
-                                    <p>${subTotal}</p>
+                                    <p>${subTotal} </p>
                                 </div>
                                 {tipoEntrega === TipoEnvio.DELIVERY && (
                                     <div className="flex justify-between mb-3">
