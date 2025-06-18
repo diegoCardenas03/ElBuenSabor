@@ -1,8 +1,16 @@
 import { AdminHeader } from "../../components/admin/AdminHeader";
 import { useState } from "react";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
-const Estadistica = () => {
 
+const comidasEjemplo = [
+  "Pizza Margarita",
+  "Empanadas de Carne",
+  "Hamburguesa Completa",
+  "Milanesa Napolitana",
+  "Ensalada César"
+];
+
+const Estadistica = () => {
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
 
@@ -36,32 +44,32 @@ const Estadistica = () => {
         </div>
 
         <div className="flex items-center py-2 rounded-lg w-full px-20 ">
-
           {/* COMIDAS MAS PEDIDAS */}
-
           <div className="flex flex-col items-center w-4/10 bg-white px-2 py-3 shadow-lg rounded-2xl">
             <h4 className="text-secondary font-black text-md">Top 5</h4>
-            <span className="text-secondary font-black text-md mb-2">Comidas mas Pedidos</span>
+            <span className="text-secondary font-black text-md mb-2">Comidas más Pedidas</span>
             <ol className="w-full flex flex-col gap-2 list-decimal list-inside marker:text-tertiary">
-              <li className="border border-tertiary pl-3">Pizza Margarita</li>
-              <li className="border border-tertiary pl-3">Pizza Margarita</li>
-              <li className="border border-tertiary pl-3">Pizza Margarita</li>
-              <li className="border border-tertiary pl-3">Pizza Margarita</li>
-              <li className="border border-tertiary pl-3">Pizza Margarita</li>
+              {comidasEjemplo.map((comida, idx) => (
+                <li key={idx} className="border border-tertiary pl-3">
+                  {comida}
+                </li>
+              ))}
             </ol>
-
-            <button className="cursor-pointer font-semibold bg-tertiary mt-5 rounded-2xl px-4 py-1 ">Ver mas</button>
+            <button className="cursor-pointer font-semibold bg-tertiary mt-5 rounded-2xl px-4 py-1 ">Ver más</button>
           </div>
-
           <div className="flex w-3/5 bg-white">
-
+            {/* Aquí puedes agregar otros datos estadísticos */}
+            <div className="flex flex-col items-center w-full">
+              <div className="flex items-center justify-between">
+                <div></div>
+                <div></div>
+              </div>
+            </div>
           </div>
-
-
-
         </div>
       </main>
     </>
   );
-}
+};
+
 export { Estadistica };
