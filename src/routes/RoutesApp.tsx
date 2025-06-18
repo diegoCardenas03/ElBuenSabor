@@ -31,7 +31,7 @@ const RoutesApp = () => {
       <Route
         path="/DetalleCompra"
         element={
-          <ProtectedRoute allowedRoles={['Cliente']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <DetalleCompra />
           </ProtectedRoute>
         }
@@ -39,7 +39,7 @@ const RoutesApp = () => {
       <Route
         path="/MisDirecciones"
         element={
-          <ProtectedRoute allowedRoles={['Cliente']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <MisDirecciones />
           </ProtectedRoute>
         }
@@ -47,7 +47,7 @@ const RoutesApp = () => {
       <Route
         path='/MisPedidos'
         element={
-          <ProtectedRoute allowedRoles={['Cliente']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <MisPedidos />
           </ProtectedRoute>
         }
@@ -55,7 +55,7 @@ const RoutesApp = () => {
       <Route
         path='/Success'
         element={
-          <ProtectedRoute allowedRoles={['Cliente']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <SuccessMP />
           </ProtectedRoute>
         }
@@ -63,7 +63,7 @@ const RoutesApp = () => {
       <Route
         path='/Failure'
         element={
-          <ProtectedRoute allowedRoles={['Cliente']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <FailureMP />
           </ProtectedRoute>
         }
@@ -71,7 +71,7 @@ const RoutesApp = () => {
       <Route
         path="/MiPerfil"
         element={
-          <ProtectedRoute allowedRoles={['Cliente']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <MiPerfilUsuarioPage />
           </ProtectedRoute>
         }
