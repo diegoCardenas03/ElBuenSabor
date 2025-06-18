@@ -14,7 +14,7 @@ import { FormaPago } from '../types/enums/FormaPago';
 import { FaSearch } from "react-icons/fa";
 
 type FiltroState = {
-  tipoEnvio: "" | "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
+  tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
   fechaDesde: string;
   fechaHasta: string;
   searchTerm: string;
@@ -26,9 +26,9 @@ const MisPedidos = () => {
   const [openModal, setOpenModal] = useState<Boolean>(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
   const [modalFilters, setModalFilters] = useState<Boolean>(false);
-  const [filtros, setFiltros] = useState<FiltroState>({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "", });
-  const [filtroSeleccionado, setFiltroSeleccionado] = useState<FiltroState>({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "", });
-  const resetFiltros = () => { setFiltros({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "" }); setFiltroSeleccionado({ tipoEnvio: "", fechaDesde: "", fechaHasta: "", searchTerm: "" }); };
+  const [filtros, setFiltros] = useState<FiltroState>({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "", });
+  const [filtroSeleccionado, setFiltroSeleccionado] = useState<FiltroState>({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "", });
+  const resetFiltros = () => { setFiltros({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "" }); setFiltroSeleccionado({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "" }); };
   const misPedidosService = new PedidosService();
   const dispatch = useAppDispatch();
 
@@ -232,7 +232,7 @@ const MisPedidos = () => {
             </div>
           </div>
           <div className='flex justify-left items-left md:justify-center w-[60%] md:w-[20%] mt-3'>
-            <span className="inline-block w-4 h-4 bg-green-300/70 rounded mr-2"></span>
+            <span className="inline-block w-4 h-4 bg-[#49D56E]/30 rounded mr-2"></span>
             <p>Pedidos en curso</p>
           </div>
         </div>
@@ -262,7 +262,7 @@ const MisPedidos = () => {
                 Estado.EN_PREPARACION,
                 Estado.EN_CAMINO,
               ];
-              return estadosEnCurso.includes(pedido.estado) ? 'bg-green-300/70' : '';
+              return estadosEnCurso.includes(pedido.estado) ? 'bg-[#49D56E]/30' : '';
             }}
           />
         )}

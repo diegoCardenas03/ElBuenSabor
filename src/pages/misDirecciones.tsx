@@ -73,7 +73,7 @@ const MisDirecciones = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 justify-center place-items-center sm:px-5 lg:px-25">
                     {direcciones.map((d: DomicilioResponseDTO) => (
-                        <div className="shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px]" key={d.id}>
+                        <div className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px]" key={d.id}>
                             <div className='flex text-primary '>
                                 <FaMapMarkerAlt stroke='2' className='relative top-[3px] w-5 h-5 mt-2' />
                                 <h2 className="text-primary text-xl font-semibold pt-1 pb-3 pl-1">{formatearDireccion(d)}</h2>
@@ -92,13 +92,13 @@ const MisDirecciones = () => {
                                         setModoEditar(true);
                                         setMostrarModal(true);
                                     }}
-                                    className="flex items-center cursor-pointer flex bg-primary px-4 py-2 rounded-full mt-2 hover:scale-102 transition-transform duration-200">
+                                    className="flex items-center cursor-pointer bg-primary px-4 py-2 rounded-full mt-2 hover:scale-102 transition-transform duration-200">
                                     Editar
                                     <FaPen stroke='2' width={20} height={20} className="relative left-[5px]" />
                                 </button>
                                 <button
                                     onClick={() => handleEliminar(d.id)}
-                                    className="flex items-center cursor-pointer flex bg-primary px-4 py-2 rounded-full mt-2 hover:scale-102 transition-transform duration-200">
+                                    className="flex items-center cursor-pointer bg-primary px-4 py-2 rounded-full mt-2 hover:scale-102 transition-transform duration-200">
                                     Eliminar
                                     <FaTrashAlt stroke='2' width={20} height={20} className="relative left-[5px]" />
                                 </button>
@@ -107,63 +107,63 @@ const MisDirecciones = () => {
                     ))}
                 </div>
 
-                <div>
-                    {mostrarModal && (
-                        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                            <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative flex flex-col justify-center items-center">
+
+                {mostrarModal && (
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                        <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative flex flex-col justify-center items-center">
+                            <button
+                                className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+                                onClick={() => {
+                                    setMostrarModal(false);
+                                    setModoEditar(false);
+                                    setDireccionEditando(null);
+                                    setDireccionNueva({ calle: "", numero: 0, localidad: "", codigoPostal: 0 });
+                                }}
+                            >
+                                ✕
+                            </button>
+                            <h2 className="items-center text-secondary font-primary font-bold pb-4 text-[20px]">
+                                {modoEditar ? 'Editar dirección' : 'Agregar nueva dirección'}
+                            </h2>
+                            <input
+                                type="text"
+                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
+                                placeholder="Calle"
+                                value={calle}
+                                onChange={(e) => setDireccionNueva({ ...direccionNueva, calle: e.target.value })}
+                            />
+                            <input
+                                type="number"
+                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
+                                placeholder="Número"
+                                value={numero === 0 ? "" : numero}
+                                onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value === "" ? 0 : parseInt(e.target.value, 10), })}
+                            />
+                            <input
+                                type="text"
+                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
+                                placeholder="Localidad"
+                                value={localidad}
+                                onChange={(e) => setDireccionNueva({ ...direccionNueva, localidad: e.target.value })}
+                            />
+                            <input
+                                type="number"
+                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
+                                placeholder="Codigo Postal"
+                                value={codigoPostal === 0 ? "" : codigoPostal}
+                                onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value === "" ? 0 : parseInt(e.target.value, 10), })}
+                            />
+                            <div className="flex justify-center items-center space-x-4">
                                 <button
-                                    className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-                                    onClick={() => {
-                                        setMostrarModal(false);
-                                        setModoEditar(false);
-                                        setDireccionEditando(null);
-                                        setDireccionNueva({ calle: "", numero: 0, localidad: "", codigoPostal: 0 });
-                                    }}
-                                >
-                                    ✕
+                                    className="cursor-pointer bg-tertiary px-5 py-2 rounded-full hover:scale-102 transition-transform duration-200"
+                                    onClick={handleGuardar}>
+                                    Guardar
                                 </button>
-                                <h2 className="items-center text-secondary font-primary font-bold pb-4 text-[20px]">
-                                    {modoEditar ? 'Editar dirección' : 'Agregar nueva dirección'}
-                                </h2>
-                                <input
-                                    type="text"
-                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                    placeholder="Calle"
-                                    value={calle}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, calle: e.target.value })}
-                                />
-                                <input
-                                    type="number"
-                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                    placeholder="Número"
-                                    value={numero === 0 ? "" : numero}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value === "" ? 0 : parseInt(e.target.value, 10),})}
-                                />
-                                <input
-                                    type="text"
-                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                    placeholder="Localidad"
-                                    value={localidad}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, localidad: e.target.value })}
-                                />
-                                <input
-                                    type="number"
-                                    className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                    placeholder="Codigo Postal"
-                                    value={codigoPostal === 0 ? "" : codigoPostal}
-                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value === "" ? 0 : parseInt(e.target.value, 10),})}
-                                />
-                                <div className="flex justify-center items-center space-x-4">
-                                    <button
-                                        className="cursor-pointer bg-tertiary px-5 py-2 rounded-full hover:scale-102 transition-transform duration-200"
-                                        onClick={handleGuardar}>
-                                        Guardar
-                                    </button>
-                                </div>
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
 
                 <div className="flex justify-center items-center pt-10">
                     <img src={Pizza} alt="pizza" className="w-[35%] h-[35%]" />

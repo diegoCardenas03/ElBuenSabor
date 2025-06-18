@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { InsumoService } from "../services/InsumoService";
 import { InsumoResponseDTO } from "../types/Insumo/InsumoResponseDTO";
 import { TableGeneric } from "../components/TableGeneric";
-import {  CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { ModalInsumo } from "../components/modals/ModalInsumo";
 import { useAppDispatch } from "../hooks/redux";
 import { setDataTable } from "../hooks/redux/slices/TableReducer";
@@ -18,80 +18,80 @@ export const ScreenInsumo = () => {
 
   const insumoService = new InsumoService();
   const dispatch = useAppDispatch();
-  
+
 
   // Columnas de la tabla de insumos
-const ColumnsTableInsumo = [
-  // {
-  //   label: "ID",
-  //   key: "id",
-  //   render: (insumo: RubroInsumoResponseDTO) => insumo.id?.toString() ?? "0",
-  // },
-  {
-    label: "Denominación",
-    key: "denominacion",
-  },
-  {
-    label: "Precio Costo",
-    key: "precioCosto",
-  },
-  {
-    label: "Precio Venta",
-    key: "precioVenta",
-    render: (insumo: InsumoResponseDTO) => insumo.precioVenta ? insumo.precioVenta : "Sin precio venta",
-  },
-  {
-    label: "Stock Actual",
-    key: "stockActual",
-  },
-  {
-    label: "Stock Mínimo",
-    key: "stockMinimo",
-  },
-  {
-    label: "Unidad de Medida",
-    key: "unidadMedida",
-    render: (insumo: InsumoResponseDTO) => insumo.unidadMedida.toString(),
-  },
-  {
-    label: "Para Elaborar",
-    key: "esParaElaborar",
-    render: (insumo: InsumoResponseDTO) => (insumo.esParaElaborar ? "Sí" : "No"),
-  },
-{
-  label: "Activo",
-  key: "activo",
-  render: (insumo: InsumoResponseDTO) => (
-    <Switch
-      checked={insumo.activo}
-      onChange={async () => {
-        try {
-          await insumoService.updateEstado(insumo.id)
-          getInsumos(); // Actualizás la tabla
-        } catch (error) {
-                      Swal.fire(
-                        error instanceof Error ? error.message : String(error),
-                        "No se pudo actualizar el estado",
-                        "error"
-                      );
-                    }
-      }}
-      color="primary"
-    />
-  ),
-},
+  const ColumnsTableInsumo = [
+    // {
+    //   label: "ID",
+    //   key: "id",
+    //   render: (insumo: RubroInsumoResponseDTO) => insumo.id?.toString() ?? "0",
+    // },
+    {
+      label: "Denominación",
+      key: "denominacion",
+    },
+    {
+      label: "Precio Costo",
+      key: "precioCosto",
+    },
+    {
+      label: "Precio Venta",
+      key: "precioVenta",
+      render: (insumo: InsumoResponseDTO) => insumo.precioVenta ? insumo.precioVenta : "Sin precio venta",
+    },
+    {
+      label: "Stock Actual",
+      key: "stockActual",
+    },
+    {
+      label: "Stock Mínimo",
+      key: "stockMinimo",
+    },
+    {
+      label: "Unidad de Medida",
+      key: "unidadMedida",
+      render: (insumo: InsumoResponseDTO) => insumo.unidadMedida.toString(),
+    },
+    {
+      label: "Para Elaborar",
+      key: "esParaElaborar",
+      render: (insumo: InsumoResponseDTO) => (insumo.esParaElaborar ? "Sí" : "No"),
+    },
+    {
+      label: "Activo",
+      key: "activo",
+      render: (insumo: InsumoResponseDTO) => (
+        <Switch
+          checked={insumo.activo}
+          onChange={async () => {
+            try {
+              await insumoService.updateEstado(insumo.id)
+              getInsumos(); // Actualizás la tabla
+            } catch (error) {
+              Swal.fire(
+                error instanceof Error ? error.message : String(error),
+                "No se pudo actualizar el estado",
+                "error"
+              );
+            }
+          }}
+          color="primary"
+        />
+      ),
+    },
 
-{
-  label: "Rubro",
-  key: "rubro",
-  render: (insumo: InsumoResponseDTO) => insumo.rubro?.denominacion ?? "Sin rubro"
-},
+    {
+      label: "Rubro",
+      key: "rubro",
+      render: (insumo: InsumoResponseDTO) => insumo.rubro?.denominacion ?? "Sin rubro"
+    },
 
-  {
-    label: "Acciones",
-    key: "acciones",
-  },
-];
+    {
+      label: "Acciones",
+      key: "acciones",
+    },
+  ];
 
   // Función para manejar el borrado de una persona
   const handleDelete = async (id: number) => {
@@ -110,7 +110,7 @@ const ColumnsTableInsumo = [
         // Eliminar la persona si se confirma
         insumoService.delete(id).then(() => {
           getInsumos();
-           
+
         });
       }
     });
@@ -131,7 +131,7 @@ const ColumnsTableInsumo = [
 
   return (
     <>
-    <AdminHeader text = "Insumos"/>
+      <AdminHeader text="Insumos" />
       <div className=" bg-[#FFF4E0] h-screen">
         <div
           style={{
@@ -142,15 +142,15 @@ const ColumnsTableInsumo = [
 
           }}
         >
-        
+
           {/* Botón para abrir el modal de agregar insumos */}
           <button className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 
           font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
-          style={{ borderRadius: '9999px' }}
+            style={{ borderRadius: '9999px' }}
             onClick={() => {
               setOpenModal(true);
             }}
-            // variant="contained"
+          // variant="contained"
           >
             + Crear insumo
           </button>
@@ -178,7 +178,7 @@ const ColumnsTableInsumo = [
             columns={ColumnsTableInsumo}
             setOpenModal={setOpenModal}
             getRowClassName={(insumo) =>
-            insumo.stockActual < insumo.stockMinimo ? "bg-red-100 text-red-900 font-semibold" : ""}
+              insumo.stockActual < insumo.stockMinimo ? "bg-red-100 text-red-900 font-semibold" : ""}
           />
         )}
       </div>

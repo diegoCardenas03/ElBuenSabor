@@ -56,7 +56,7 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
         // Detectar si es promoción
         const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
         const price = isPromo
-          ? (product as PromocionResponseDTO).total
+          ? (product as PromocionResponseDTO).precioVenta
           : isInsumo(product)
             ? product.precioVenta
             : (product.precioVenta || 0);
