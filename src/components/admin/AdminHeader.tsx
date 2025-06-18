@@ -2,18 +2,18 @@ import { useState } from "react";
 import { FaArrowLeft, FaBars, FaTimes, FaSignOutAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import usuarioImg from '../../assets/img/usuarioLogeado.jpg';
-// import { Rol } from "../../types/enums/Rol";
+import { Rol } from "../../types/enums/Rol";
 
 interface AdminHeaderProps {
   showBackButton?: boolean;
   text?: string;
   nombreUsuario?: string;
-  // rol?: Rol;
+  rol?: Rol;
   onBackClick?: () => void;
 }
 
 // Mapeo de nombres amigables para los roles
-/*const nombreRol: Record<Rol, string> = {
+const nombreRol: Record<Rol, string> = {
   [Rol.ADMIN]: 'Administrador',
   [Rol.COCINERO]: 'Cocinero',
   [Rol.DELIVERY]: 'Delivery',
@@ -48,17 +48,17 @@ const menuPorRol: Record<Rol, { path: string; label: string }[]> = {
     { path: '/admin/entregas', label: 'Entregas' }
   ],
   [Rol.CLIENTE]: []
-};*/
+};
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({
   showBackButton = false,
   text = "Configuración",
   onBackClick,
-  nombreUsuario = "San Martín",
-  // rol = Rol.ADMIN
+  nombreUsuario = sessionStorage.getItem('user_name'),
+  rol = Rol.ADMIN
 }) => {
   const [navbarOpen, setNavbarOpen] = useState<boolean>(false);
-
+  const userImagen = sessionStorage.getItem('user_picture');
   const toggleNavbar = () => {
     setNavbarOpen(prev => !prev);
   };
@@ -78,23 +78,23 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             </div>
 
             <div className="px-6 flex flex-col items-center gap-3">
-              <img src={usuarioImg} alt="Usuario" className="w-16 h-16 rounded-full border-2 border-white object-cover" />
+              <img src={userImagen!} alt="Usuario" className="w-16 h-16 rounded-full border-2 border-white object-cover" />
               <div className="text-center">
                 <p className="font-medium text-white">{nombreUsuario}</p>
-                {/* <p className="text-sm text-gray-300 mt-1">{nombreRol[rol]}</p> */}
+                <p className="text-sm text-gray-300 mt-1">{nombreRol[rol]}</p>
               </div>
             </div>
 
             <hr className="border-white/20 my-4 mx-6" />
 
             {/* Menú de navegación */}
-            {/* <nav className="flex-1 overflow-y-auto px-4">
+            <nav className="flex-1 overflow-y-auto px-4">
               <div className="space-y-2">
                 {menuPorRol[rol]?.map((item, index) => (
                   <Link key={index} to={item.path} className="block w-full px-4 py-3 text-white text-center hover:bg-white/10 rounded-lg transition-colors duration-200"onClick={toggleNavbar}>{item.label}</Link>
                 ))}
               </div>
-            </nav> */}
+            </nav>
 
             <div className="p-4 border-t border-white/10">
               <button onClick={handleLogout}className="flex items-center justify-center gap-2 w-full px-4 py-2 text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"><FaSignOutAlt /><span>Cerrar sesión</span></button>

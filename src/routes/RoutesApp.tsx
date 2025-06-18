@@ -17,6 +17,7 @@ import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 import { CallbackPage } from '../pages/CallBackPage';
 import { LoginRedirect } from '../pages/LoginWithRedirect';
+import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 
 const RoutesApp = () => {
   return (
@@ -131,6 +132,14 @@ const RoutesApp = () => {
         element={
           <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin']}>
             <ScreenPromocion />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/MiPerfil"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+            <MiPerfilEmpleadoPage />
           </ProtectedRoute>
         }
       />
