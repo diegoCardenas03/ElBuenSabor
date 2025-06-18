@@ -63,6 +63,13 @@ export const PantallaCajero = () => {
       </div>
     ),
 },
+{
+  label:"Total venta",
+  key: "totalVenta",
+  render: (pedido: PedidoResponseDTO) => `$${pedido.totalVenta.toFixed(2)}`,
+
+
+},
     {
       label: "Detalle",
       key: "detalle",

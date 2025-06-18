@@ -12,7 +12,7 @@ const Configuracion = () => {
     return setOpcionPrincipal(opcion);
   }
 
-  
+
 
   return (
     <>

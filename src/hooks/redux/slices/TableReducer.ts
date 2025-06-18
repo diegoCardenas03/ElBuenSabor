@@ -4,9 +4,10 @@ import { ProductoDTO } from "../../../types/Producto/ProductoDTO";
 import { PedidoResponseDTO } from "../../../types/Pedido/PedidoResponseDTO";
 import { ClienteResponseDTO } from "../../../types/Cliente/ClienteResponseDTO";
 import { EmpleadoResponseDTO } from "../../../types/Empleado/EmpleadoResponseDTO";
+import { PromocionResponseDTO } from "../../../types/Promocion/PromocionResponseDTO";
 
 // El tipo de dato puede ser insumo o producto (o ambos)
-type TableElement = InsumoResponseDTO | ProductoDTO |  PedidoResponseDTO | ClienteResponseDTO | EmpleadoResponseDTO;
+type TableElement = InsumoResponseDTO | ProductoDTO |  PedidoResponseDTO | PromocionResponseDTO | ClienteResponseDTO | EmpleadoResponseDTO;
 
 interface IInitialState {
   dataTable: TableElement[]; // Datos de la tabla (pueden ser insumos o productos)

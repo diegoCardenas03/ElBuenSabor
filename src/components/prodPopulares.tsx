@@ -1,12 +1,10 @@
+import { usePromocionesPopulares } from "../hooks/usePromocionesPopulares"
 import { ProductCards } from "../features/products/ProductCards";
-import { products } from "../utils/products/productsData.ts"; // Cambiado a "products"
 
-const ProdPopulares = () => {
-    return (
-        <div className="flex flex-col items-center justify-center mt-10 mb-10">
-            <ProductCards showBadges products={products.slice(0, 4)} /> {/* Cambiado a "products" */}
-        </div>
-    );
+const PromocionesPopulares = () => {
+  const promociones = usePromocionesPopulares();
+
+  return <ProductCards products={promociones} />;
 };
 
-export default ProdPopulares;
+export default PromocionesPopulares;
