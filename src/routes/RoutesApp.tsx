@@ -12,6 +12,8 @@ import MisPedidos from '../pages/MisPedidos';
 import MisDirecciones from '../pages/misDirecciones';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
+import Delivery from '../pages/admin/Delivery';
+import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 import { CallbackPage } from '../pages/CallBackPage';
 import { LoginRedirect } from '../pages/LoginWithRedirect';
@@ -116,7 +118,47 @@ const RoutesApp = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/Delivery"
+        element={
+          <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin']}>
+            <Delivery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Promociones"
+        element={
+          <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin']}>
+            <ScreenPromocion />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
+
+    /*  
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />}/> 
+        <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
+        <Route path="/MisDirecciones" element={<MisDirecciones />} /> 
+        <Route path="/Menu" element={<Menu />} />
+        <Route path='/MisPedidos' element={<MisPedidos />} />
+        <Route path='/Success' element={<SuccessMP/>}/>
+        <Route path='/Failure' element={<FailureMP/>}/>
+        <Route path="/MiPerfil" element={<MiPerfilUsuarioPage />} />
+        <Route path='/admin/MiPerfil' element={<MiPerfilEmpleadoPage/>}/>
+        <Route path="/admin/PedidosCocinero" element={<PedidosCocinero />} />
+        <Route path="/admin/Insumos" element={<ScreenInsumo />} />
+        <Route path="/admin/Productos" element={<ScreenProducto />} />
+        <Route path='/admin/Configuracion' element={<Configuracion />} />
+        <Route path="/admin/PantallaCajero" element={<PantallaCajero />} />
+        <Route path="/admin/Promociones" element={<ScreenPromocion />} />
+        
+        <Route path='/admin/Delivery' element={<Delivery />} />
+      </Routes>
+    </BrowserRouter>
+    */
   );
 };
 

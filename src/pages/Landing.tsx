@@ -1,8 +1,6 @@
 import pizza from "../assets/img/pizza-landing.png";
 import CardLanding from "../components/CardLanding";
-import pizzaCarrusel from "../assets/img/pizzaCarrusel.png";
-import burger1 from "../assets/img/burger1.png";
-import PapasCheddar from "../assets/img/PapasCheddar.png";
+
 import PizzanuestroMenu from "../assets/img/pizzanuestromenu.png";
 import ProductosPopularesImg from "../assets/img/imagen-productos-populares.png";
 import { Header } from "../components/commons/Header";
@@ -10,19 +8,28 @@ import { Footer } from "../components/commons/Footer";
 import ProdPopulares from "../components/prodPopulares";
 import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-
-
-const items = [
-  { id: 1, titulo: "Hamburguesas", imagen: burger1 },
-  { id: 2, titulo: "Pizzas", imagen: pizzaCarrusel },
-  { id: 3, titulo: "Lomos", imagen: pizzaCarrusel },
-  { id: 4, titulo: "Panchos", imagen: pizzaCarrusel },
-  { id: 5, titulo: "Papas Fritas", imagen: PapasCheddar },
-  { id: 6, titulo: "Bebidas", imagen: pizzaCarrusel },
-  { id: 7, titulo: "Postres", imagen: pizzaCarrusel },
-];
+import { useCategories } from "../hooks/useCategories";
+import { useAppDispatch } from "../hooks/redux";
+import { fetchProducts, fetchInsumosVendibles } from "../hooks/redux/slices/ProductReducer";
+import { fetchRubrosProductos, fetchRubrosInsumos } from "../hooks/redux/slices/RubroReducer";
 
 const Landing = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchInsumosVendibles());
+    dispatch(fetchRubrosProductos());
+    dispatch(fetchRubrosInsumos());
+  }, [dispatch]);
+  const { categories } = useCategories();
+  console.log('categorias', categories)
+
+  const items = categories.map((cat, idx) => ({
+    id: idx,
+    titulo: cat.name,
+  }));
+
   const [navbarWhite, setNavbarWhite] = useState(true);
   const redCircleRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -88,7 +95,7 @@ const Landing = () => {
               El Buen <br /> Sabor
             </h1>
             <Link to="/menu">
-              <button className="bg-white md:bg-[#FFF4E0] text-black px-8 py-2 font-primary rounded-full font-semibold shadow hover:scale-105 transition text-base md:text-[14px] md:ml-20 lg:text-lg">
+              <button className="bg-whit cursor-pointer md:bg-[#FFF4E0] text-black px-8 py-2 font-primary rounded-full font-semibold shadow hover:scale-105 transition text-base md:text-[14px] md:ml-20 lg:text-lg">
                 Ver el menú completo
               </button>
             </Link>
@@ -98,7 +105,7 @@ const Landing = () => {
         <div className="flex flex-col items-center justify-center mt-0 md:mt-10 mb-10 p-6 md:p-20">
           <div className="flex items-center justify-center gap-6 relative mb-12 flex-wrap">
             <h2 className="font-tertiary text-5xl md:text-7xl text-center leading-tight">
-              PRODUCTOS<br />POPULARES
+              PROMOCIONES<br />POPULARES
             </h2>
             <img
               src={ProductosPopularesImg}

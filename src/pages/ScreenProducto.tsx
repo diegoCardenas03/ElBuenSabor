@@ -159,7 +159,7 @@ export const ScreenProducto = () => {
 
   return (
     <>
-      <AdminHeader />
+      <AdminHeader text = "Productos"/>
       <div className="bg-[#FFF4E0] h-screen" >
         <div
           style={{

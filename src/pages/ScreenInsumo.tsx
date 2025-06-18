@@ -131,7 +131,7 @@ const ColumnsTableInsumo = [
 
   return (
     <>
-    <AdminHeader />
+    <AdminHeader text = "Insumos"/>
       <div className=" bg-[#FFF4E0] h-screen">
         <div
           style={{

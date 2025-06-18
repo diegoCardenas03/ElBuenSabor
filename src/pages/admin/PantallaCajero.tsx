@@ -6,11 +6,11 @@ import { PedidoResponseDTO } from "../../types/Pedido/PedidoResponseDTO";
 import { useAppDispatch } from "../../hooks/redux";
 import { setDataTable } from "../../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
-import { PedidoService } from "../../services/PedidoService";
 import { TabsPedidos } from "../../components/TabsPedidos"; 
 import { AiOutlinePlus, AiOutlineEye } from "react-icons/ai";
 import { Estado } from "../../types/enums/Estado";
 import  PedidoDetalleModal  from "../../components/modals/PedidoDetalleModal"
+import { PedidosService } from "../../services/PedidosService";
 
 const estadosTabs = [
   { label: "Solicitado", value: Estado.SOLICITADO },
@@ -29,7 +29,7 @@ export const PantallaCajero = () => {
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
   const [search, setSearch] = useState("");
 
-  const pedidoService = new PedidoService();
+  const pedidoService = new PedidosService();
   const dispatch = useAppDispatch();
 
   const ColumnsTablePedido = [
@@ -62,6 +62,13 @@ export const PantallaCajero = () => {
         />
       </div>
     ),
+},
+{
+  label:"Total venta",
+  key: "totalVenta",
+  render: (pedido: PedidoResponseDTO) => `$${pedido.totalVenta.toFixed(2)}`,
+
+
 },
     {
       label: "Detalle",
@@ -151,7 +158,7 @@ export const PantallaCajero = () => {
 
 return (
   <div className="bg-[#FFF4E0] h-screen overflow-y-auto">
-    <AdminHeader />
+    <AdminHeader text = "Pedidos"/>
     <div className="p-4 rounded-lg mb-4 flex justify-center items-center">
       <TabsPedidos
         estadoActual={estadoActual}

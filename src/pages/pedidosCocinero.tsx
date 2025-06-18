@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { Estado } from '../types/enums/Estado';
+import { TablePagination } from '@mui/material';
+import { AdminHeader } from '../components/admin/AdminHeader';
+import { PedidosService } from '../services/PedidosService';
 
 
 const PedidosCocinero: React.FC = () => {
@@ -9,11 +12,36 @@ const PedidosCocinero: React.FC = () => {
     const [comandas, setComandas] = useState<PedidoResponseDTO[]>([]);
     const [modalDetallePedido, setModalDetallePedido] = useState<Boolean>(false)
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
+    const [pageComandas, setPageComandas] = useState(0);
+    const [rowsPerPageComandas, setRowsPerPageComandas] = useState(10);
+    const [pagePreparacion, setPagePreparacion] = useState(0);
+    const [rowsPerPagePreparacion, setRowsPerPagePreparacion] = useState(10);
+    const pedidosService = new PedidosService();
+
+    const handleChangePageComandas = (_: unknown, newPage: number) => {
+        setPageComandas(newPage);
+    };
+    const handleChangeRowsPerPageComandas = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setRowsPerPageComandas(+event.target.value);
+        setPageComandas(0);
+    };
+
+    // Funciones para En Preparacion
+    const handleChangePagePreparacion = (_: unknown, newPage: number) => {
+        setPagePreparacion(newPage);
+    };
+    const handleChangeRowsPerPagePreparacion = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setRowsPerPagePreparacion(+event.target.value);
+        setPagePreparacion(0);
+    };
 
     const obtenerPedidos = async () => {
         try {
-            const res = await fetch("http://localhost:8080/api/pedidos");
-            const data = await res.json();
+            const data = await pedidosService.getAll();
             setPedidos(data);
             setComandas(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.SOLICITADO));
             setEnPreparacion(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.EN_PREPARACION));
@@ -31,35 +59,50 @@ const PedidosCocinero: React.FC = () => {
         return partes[partes.length - 1];
     };
 
-    const cambiarEstadoPedido = (pedido: PedidoResponseDTO) => {
-        let nuevoEstado: PedidoResponseDTO['estado'];
+    const cambiarEstadoPedido = async (pedido: PedidoResponseDTO) => {
+        try {
+            let nuevoEstado = pedido.estado;
+            if (pedido.estado === Estado.SOLICITADO) {
+                nuevoEstado = Estado.EN_PREPARACION;
+            } else if (pedido.estado === Estado.EN_PREPARACION) {
+                nuevoEstado = Estado.TERMINADO;
+            } else {
+                return;
+            }
 
-        if (pedido.estado === Estado.SOLICITADO) {
-            nuevoEstado = Estado.EN_PREPARACION
-        } else if (pedido.estado === Estado.EN_PREPARACION) {
-            nuevoEstado = Estado.TERMINADO
-        } else return;
+            const response = await fetch(
+                `http://localhost:8080/api/pedidos/actualizar-estado/${pedido.id}?estado=${nuevoEstado}`,
+                { method: 'PUT' }
+            );
 
-        const pedidoActualizado: PedidoResponseDTO = { ...pedido, estado: nuevoEstado };
+            if (!response.ok) {
+                throw new Error('Error al actualizar el estado');
+            }
 
-        setComandas(prev => prev.filter(p => p.id !== pedido.id));
-        setEnPreparacion(prev => prev.filter(p => p.id !== pedido.id));
+            obtenerPedidos();
+            setPedidoSeleccionado(null);
+            setModalDetallePedido(false);
 
-        if (nuevoEstado === Estado.EN_PREPARACION) {
-            setEnPreparacion(prev => [...prev, pedidoActualizado]);
+
+        } catch (error) {
+            console.error(error);
         }
 
-        setPedidoSeleccionado(null);
-        setModalDetallePedido(false);
+        // const pedidoActualizado: PedidoResponseDTO = { ...pedido, estado: nuevoEstado };
+
+        // setComandas(prev => prev.filter(p => p.id !== pedido.id));
+        // setEnPreparacion(prev => prev.filter(p => p.id !== pedido.id));
+
+        // if (nuevoEstado === Estado.EN_PREPARACION) {
+        //     setEnPreparacion(prev => [...prev, pedidoActualizado]);
+        // }
     };
 
     return (
         <>
-            <div className='bg-secondary h-[15vh] flex items-center justify-center'>
-                <p className='text-primary text-[40px] font-tertiary'>Pedidos</p>
-            </div>
+            <AdminHeader text="Pedidos" />
             <div className='bg-primary h-screen flex items-center justify-around'>
-                <div className='bg-white w-[40%] max-h-[80vh] h-[80vh] rounded-2xl shadow-md flex flex-col '>
+                <div className='bg-white w-[40%] h-[80vh] rounded-2xl shadow-md flex flex-col '>
                     <div className='flex flex-col items-center justify-center mt-5 mb-3'>
                         <h2 className='text-tertiary font-tertiary text-[25px] mb-4'>Comandas</h2>
                         <div className='flex items-center justify-between w-full px-4 mb-2'>
@@ -67,30 +110,41 @@ const PedidosCocinero: React.FC = () => {
                             <h3 className='font-primary pr-13'>Hora</h3>
                         </div>
                     </div>
-                    <div className='flex flex-col justify-center overflow-y-auto'>
+                    <div className='flex-1 justify-center overflow-auto'>
                         {comandas.length === 0 ? (
                             <p className='text-primary font-tertiary text-[20px] text-center'>No hay comandas</p>
                         ) : (
                             <div className='flex flex-col items-center'>
-                                {comandas.map((pedidos, index) => (
-                                    <div key={pedidos.id} >
-                                        <button
-                                            className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
-                                            onClick={() => {
-                                                setPedidoSeleccionado(pedidos);
-                                                setModalDetallePedido(true);
-                                            }}>
-                                            <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
-                                            <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
-                                        </button>
-                                    </div>
+                                {comandas
+                                    .slice(pageComandas * rowsPerPageComandas, pageComandas * rowsPerPageComandas + rowsPerPageComandas)
+                                    .map((pedidos, index) => (
+                                        <div key={pedidos.id} >
+                                            <button
+                                                className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
+                                                onClick={() => {
+                                                    setPedidoSeleccionado(pedidos);
+                                                    setModalDetallePedido(true);
+                                                }}>
+                                                <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
+                                                <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
+                                            </button>
+                                        </div>
 
-                                ))}
+                                    ))}
                             </div>
                         )}
                     </div>
+                    <TablePagination
+                        rowsPerPageOptions={[10, 25, 100]}
+                        component="div"
+                        count={comandas.length}
+                        rowsPerPage={rowsPerPageComandas}
+                        page={pageComandas}
+                        onPageChange={handleChangePageComandas}
+                        onRowsPerPageChange={handleChangeRowsPerPageComandas}
+                    />
                 </div>
-                <div className='bg-white w-[40%] max-h-[80vh] h-[80vh] rounded-2xl shadow-md flex flex-col'>
+                <div className='bg-white w-[40%] h-[80vh] rounded-2xl shadow-md flex flex-col'>
                     <div className='flex flex-col items-center justify-center mt-5 mb-3'>
                         <h2 className='text-tertiary font-tertiary text-[25px] mb-4'>En preparacion</h2>
                         <div className='flex items-center justify-between w-full px-4 mb-2'>
@@ -98,27 +152,38 @@ const PedidosCocinero: React.FC = () => {
                             <h3 className='font-primary pr-13'>Hora</h3>
                         </div>
                     </div>
-                    <div className='flex flex-col items-center justify-center overflow-y-auto'>
+                    <div className='flex-1 items-center justify-center overflow-auto'>
                         {enPreparacion.length === 0 ? (
                             <p className='text-primary font-tertiary text-[20px] text-center'>No hay pedidos en preparacion</p>
                         ) : (
                             <div className='flex flex-col items-center'>
-                                {enPreparacion.map((pedidos, index) => (
-                                    <div key={pedidos.id} >
-                                        <button
-                                            className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
-                                            onClick={() => {
-                                                setPedidoSeleccionado(pedidos);
-                                                setModalDetallePedido(true);
-                                            }}>
-                                            <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
-                                            <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
-                                        </button>
-                                    </div>
-                                ))}
+                                {enPreparacion
+                                    .slice(pagePreparacion * rowsPerPagePreparacion, pagePreparacion * rowsPerPagePreparacion + rowsPerPagePreparacion)
+                                    .map((pedidos, index) => (
+                                        <div key={pedidos.id} >
+                                            <button
+                                                className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
+                                                onClick={() => {
+                                                    setPedidoSeleccionado(pedidos);
+                                                    setModalDetallePedido(true);
+                                                }}>
+                                                <p className='text-black font-primary text-[20px]'>{mostrarNumeroPedido(pedidos.codigo)}</p>
+                                                <p className='text-black font-primary text-[20px]'>{pedidos.hora}</p>
+                                            </button>
+                                        </div>
+                                    ))}
                             </div>
                         )}
                     </div>
+                    <TablePagination
+                        rowsPerPageOptions={[10, 25, 100]}
+                        component="div"
+                        count={enPreparacion.length}
+                        rowsPerPage={rowsPerPagePreparacion}
+                        page={pagePreparacion}
+                        onPageChange={handleChangePagePreparacion}
+                        onRowsPerPageChange={handleChangeRowsPerPagePreparacion}
+                    />
                 </div>
             </div>
 
@@ -129,24 +194,24 @@ const PedidosCocinero: React.FC = () => {
                             ✕
                         </button>
                         <h2 className="text-secondary font-primary font-bold pb-8 text-[20px] flex justify-center items-center">Orden N° {mostrarNumeroPedido(pedidoSeleccionado.codigo)}</h2>
-                        
-                            <p><b>Hora:</b> {pedidoSeleccionado.hora}</p>
-                            <p><b>Estado:</b> {pedidoSeleccionado.estado}</p>
-                            <div className="max-h-[50vh] overflow-y-auto">
-                                {pedidoSeleccionado.detallePedidos.map((detalle, idx) => (
+
+                        <p><b>Hora:</b> {pedidoSeleccionado.hora}</p>
+                        <p><b>Estado:</b> {pedidoSeleccionado.estado}</p>
+                        <div className="max-h-[50vh] overflow-y-auto">
+                            {pedidoSeleccionado.detallePedidos.map((detalle, idx) => (
                                 <React.Fragment key={idx}>
-                                        {detalle.producto && (
-                                            <div className="mt-2 p-2 bg-white rounded">
-                                                <p><b>Cantidad:</b> {detalle.cantidad}</p>
-                                                <p><b>Producto:</b> {detalle.producto.denominacion}</p>
-                                            </div>
-                                        )}
-                                        {detalle.insumo && detalle.insumo.esParaElaborar == false && (
-                                            <div className="mt-2 p-2 bg-white rounded">
-                                                <p><b>Cantidad:</b> {detalle.cantidad}</p>
-                                                <p><b>Insumo:</b> {detalle.insumo.denominacion}</p>
-                                            </div>
-                                        )}
+                                    {detalle.producto && (
+                                        <div className="mt-2 p-2 bg-white rounded">
+                                            <p><b>Cantidad:</b> {detalle.cantidad}</p>
+                                            <p><b>Producto:</b> {detalle.producto.denominacion}</p>
+                                        </div>
+                                    )}
+                                    {detalle.insumo && detalle.insumo.esParaElaborar == false && (
+                                        <div className="mt-2 p-2 bg-white rounded">
+                                            <p><b>Cantidad:</b> {detalle.cantidad}</p>
+                                            <p><b>Insumo:</b> {detalle.insumo.denominacion}</p>
+                                        </div>
+                                    )}
                                 </React.Fragment>
                             ))}
                         </div>
