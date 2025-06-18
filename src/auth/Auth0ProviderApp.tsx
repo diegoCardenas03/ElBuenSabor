@@ -14,13 +14,13 @@ type Props = {
 export const Auth0ProviderApp: FC<Props> = ({ children }) => {
   const navigate = useNavigate();
   const onRedirectCallback = (appState: AppState | undefined) => {
-    navigate(appState?.returnTo || "/");
+    navigate("/login-redirect");
   };
 
   if (!(VITE_AUTH0_DOMAIN && VITE_AUTH0_CLIENT_ID)) {
     return null;
   }
-  
+
   return (
     <Auth0Provider
       domain={VITE_AUTH0_DOMAIN}
@@ -28,11 +28,11 @@ export const Auth0ProviderApp: FC<Props> = ({ children }) => {
       authorizationParams={{
         audience: VITE_AUTH0_AUDIENCE,
         // Cambiamos redirect_uri por el origin actual
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/callback`,
       }}
       onRedirectCallback={onRedirectCallback}
     >
-      {children} 
+      {children}
     </Auth0Provider>
   );
 };

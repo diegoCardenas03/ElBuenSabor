@@ -41,6 +41,7 @@ const clearSession = () => {
     sessionStorage.removeItem('auth_completed');
     sessionStorage.removeItem('user_id_db');
     sessionStorage.removeItem('user_telefono');
+    sessionStorage.removeItem('user_needs_extra_data');
     console.log("[useAuthHandler] clearSession ejecutado");
   } catch (e) {
     console.error("[useAuthHandler] Error limpiando sessionStorage", e);
@@ -82,7 +83,131 @@ export const useAuthHandler = () => {
     }
   }, [isAuthenticated, isLoading, user, dispatch]);
 
-  // CREAR USUARIO (debug)
+  // ✅ NUEVA FUNCIÓN: Completar datos de sessionStorage después del modal
+  const completeSessionData = useCallback(async (clienteData: any) => {
+    try {
+      console.log("[useAuthHandler] Completando datos de sessionStorage:", clienteData);
+
+      saveToSession('user_name', getFirstName(clienteData.nombreCompleto) || "Usuario");
+      saveToSession('user_telefono', clienteData.telefono || "");
+      saveToSession('user_needs_extra_data', 'false');
+      saveToSession('auth_completed', 'true');
+
+      console.log("[useAuthHandler] Datos de sessionStorage completados");
+    } catch (error) {
+      console.error("[useAuthHandler] Error completando sessionStorage:", error);
+    }
+  }, []);
+
+  // ✅ LOGIN TRADICIONAL
+  const loginTraditional = useCallback(async (email: string, password: string) => {
+    try {
+      setAuthStatus('checking');
+      console.log("[useAuthHandler] Iniciando login tradicional para:", email);
+
+      const loginResponse = await interceptorApiClient.post('/api/clientes/login', {
+        email,
+        password
+      });
+
+      const { token, cliente } = loginResponse.data;
+      console.log("[useAuthHandler] Login exitoso:", cliente);
+
+      dispatch(setToken(token));
+      dispatch(setRol("Cliente"));
+
+      // Guardar datos en sessionStorage
+      saveToSession('auth_token', token);
+      saveToSession('user_role', 'Cliente');
+      saveToSession('user_name', getFirstName(cliente.nombreCompleto) || "Usuario");
+      saveToSession('user_email', cliente.usuario?.email || email);
+      saveToSession('user_picture', "");
+      saveToSession('user_id_db', cliente.id || "");
+      saveToSession('user_telefono', cliente.telefono || "");
+      saveToSession('auth_completed', 'true');
+      saveToSession('user_needs_extra_data', 'false');
+
+      setAuthStatus('completed');
+      console.log("[useAuthHandler] Login tradicional completado");
+
+      return { success: true, data: cliente };
+    } catch (error: any) {
+      setAuthStatus('completed');
+      console.error("[useAuthHandler] Error en login tradicional:", error?.response?.data || error);
+      throw error;
+    }
+  }, [dispatch]);
+
+  // ✅ REGISTRO TRADICIONAL
+  const registerTraditional = useCallback(async (userData: {
+    email: string;
+    nombreCompleto: string;
+    telefono: string;
+    password: string;
+  }) => {
+    try {
+      setAuthStatus('creating-user');
+      console.log("[useAuthHandler] Iniciando registro tradicional para:", userData.email);
+
+      const roleResponse = await interceptorApiClient.get('/api/admin/roles');
+      const clienteRole = roleResponse.data.find((role: any) => role.nombre === 'Cliente');
+
+      if (!clienteRole?.auth0RolId) {
+        throw new Error('Rol Cliente no encontrado');
+      }
+
+      const usuarioDTO: UsuarioDTO = {
+        email: userData.email,
+        nombreCompleto: userData.nombreCompleto,
+        contrasenia: userData.password,
+        connection: "Username-Password-Authentication",
+        roles: [clienteRole.auth0RolId]
+      };
+
+      const clienteDTO: ClienteDTO = {
+        nombreCompleto: userData.nombreCompleto,
+        telefono: userData.telefono,
+        usuario: usuarioDTO
+      };
+
+      console.log("[useAuthHandler] Creando usuario tradicional:", clienteDTO);
+
+      const createResponse = await interceptorApiClient.post("/api/clientes/save", clienteDTO);
+
+      // Login automático después del registro
+      const loginResponse = await interceptorApiClient.post('/api/clientes/login', {
+        email: userData.email,
+        password: userData.password
+      });
+
+      const { token, cliente } = loginResponse.data;
+
+      dispatch(setToken(token));
+      dispatch(setRol("Cliente"));
+
+      // Guardar datos completos en sessionStorage
+      saveToSession('auth_token', token);
+      saveToSession('user_role', 'Cliente');
+      saveToSession('user_name', getFirstName(cliente.nombreCompleto) || "Usuario");
+      saveToSession('user_email', cliente.usuario?.email || userData.email);
+      saveToSession('user_picture', "");
+      saveToSession('user_id_db', cliente.id || "");
+      saveToSession('user_telefono', cliente.telefono || "");
+      saveToSession('auth_completed', 'true');
+      saveToSession('user_needs_extra_data', 'false');
+
+      setAuthStatus('completed');
+      console.log("[useAuthHandler] Registro tradicional completado");
+
+      return { success: true, data: cliente };
+    } catch (error: any) {
+      setAuthStatus('completed');
+      console.error("[useAuthHandler] Error en registro tradicional:", error?.response?.data || error);
+      throw error;
+    }
+  }, [dispatch]);
+
+  // ✅ CREAR USUARIO (para Auth0 social)
   const createUser = useCallback(async (userData: {
     email?: string;
     nombreCompleto?: string;
@@ -141,13 +266,26 @@ export const useAuthHandler = () => {
 
       dispatch(setToken(token));
       dispatch(setRol("Cliente"));
+
+      // ✅ CAMBIO PRINCIPAL: Solo guardar datos esenciales, marcar que necesita datos extra
       saveToSession('auth_token', token);
       saveToSession('user_role', 'Cliente');
-      saveToSession('auth_completed', 'true');
-      saveToSession('user_name', getFirstName(user?.name) || user?.nickname || user?.given_name || "Usuario");
-      saveToSession('user_email', user?.email || "");
+      saveToSession('user_id_db', createResponse.data.id || "");
+      saveToSession('user_email', userData.email || user?.email || "");
       saveToSession('user_picture', user?.picture || "");
-      saveToSession('user_telefono', createResponse.data.telefono || "");
+
+      // ✅ CONDICIONAL: Si es nuevo usuario de Google y no tiene teléfono, marcar para datos extra
+      if (userData.isGoogleUser && (!createResponse.data.telefono || createResponse.data.telefono === "")) {
+        saveToSession('user_needs_extra_data', 'true');
+        // No guardar user_name ni auth_completed aún
+        console.log("[useAuthHandler] Usuario nuevo de Google, requiere datos adicionales");
+      } else {
+        // Usuario tradicional o ya tiene datos completos
+        saveToSession('user_name', getFirstName(createResponse.data.nombreCompleto) || "Usuario");
+        saveToSession('user_telefono', createResponse.data.telefono || "");
+        saveToSession('auth_completed', 'true');
+        saveToSession('user_needs_extra_data', 'false');
+      }
 
       setAuthStatus('completed');
       processedUserRef.current = userData.auth0Id || null;
@@ -160,50 +298,7 @@ export const useAuthHandler = () => {
     }
   }, [dispatch, getAccessTokenSilently, user]);
 
-  // LOGIN TRADICIONAL (debug)
-  const loginTraditional = useCallback(async (email: string, password: string) => {
-    try {
-      console.log("[useAuthHandler] loginTraditional llamado con:", email);
-      const loginResponse = await interceptorApiClient.post('/api/clientes/login', {
-        email, password
-      });
-
-      const { token, cliente } = loginResponse.data;
-
-      dispatch(setToken(token));
-      dispatch(setRol('Cliente'));
-      saveToSession('auth_token', token);
-      saveToSession('user_role', 'Cliente');
-      saveToSession('auth_completed', 'true');
-      saveToSession('user_name', getFirstName(user?.name) || user?.nickname || user?.given_name || "Usuario");
-      saveToSession('user_email', user?.email || "");
-      saveToSession('user_picture', user?.picture || "");
-      saveToSession('user_telefono', cliente.telefono || "");
-
-      return { success: true, cliente };
-    } catch (error: any) {
-      console.error("[useAuthHandler] Error en loginTraditional:", error?.response?.data || error);
-      throw error;
-    }
-  }, [dispatch, user]);
-
-  // REGISTRO TRADICIONAL (debug)
-  const registerTraditional = useCallback(async (userData: {
-    nombreCompleto: string;
-    telefono: string;
-    email: string;
-    password: string;
-  }) => {
-    try {
-      console.log("[useAuthHandler] registerTraditional llamado con:", userData);
-      return await createUser({ ...userData, isGoogleUser: false });
-    } catch (error: any) {
-      console.error("[useAuthHandler] Error en registerTraditional:", error?.response?.data || error);
-      throw error;
-    }
-  }, [createUser]);
-
-  // MANEJAR AUTH USER (debug)
+  // ✅ MANEJAR AUTH USER (con fallback para usuarios que salieron del modal)
   const handleAuthUser = useCallback(async () => {
     if (isLoading || !isAuthenticated || !user || isProcessingRef.current) return;
 
@@ -214,6 +309,23 @@ export const useAuthHandler = () => {
 
     const savedToken = getFromSession('auth_token');
     const savedRole = getFromSession('user_role');
+    const needsExtraData = getFromSession('user_needs_extra_data');
+
+    // ✅ MODIFICADO: Si necesita datos extra y no tiene nombre, usar email como fallback
+    if (savedToken && savedRole && needsExtraData === 'true') {
+      const userName = getFromSession('user_name');
+      if (!userName) {
+        console.log("[useAuthHandler] Usuario salió del modal, usando email como nombre fallback");
+        saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
+        saveToSession('auth_completed', 'true');
+      }
+      dispatch(setToken(savedToken));
+      dispatch(setRol(savedRole));
+      setAuthStatus('completed');
+      processedUserRef.current = user.sub;
+      return;
+    }
+
     if (savedToken && savedRole) {
       console.log("[useAuthHandler] Token y rol ya en sessionStorage");
       return;
@@ -232,9 +344,9 @@ export const useAuthHandler = () => {
         saveToSession('auth_token', token);
         saveToSession('user_role', rol);
         saveToSession('auth_completed', 'true');
-        saveToSession('user_name', getFirstName(user?.name) || user?.nickname || user?.given_name || "Usuario");
         saveToSession('user_email', user?.email || "");
         saveToSession('user_picture', user?.picture || "");
+        saveToSession('user_name', getFirstName(user?.name) || user?.email?.split('@')[0] || "Usuario");
         processedUserRef.current = user.sub;
         setAuthStatus('completed');
         console.log("[useAuthHandler] Rol desde Auth0, acceso directo");
@@ -258,11 +370,12 @@ export const useAuthHandler = () => {
         saveToSession('auth_token', token);
         saveToSession('user_role', userRole);
         saveToSession('auth_completed', 'true');
-        saveToSession('user_name', getFirstName(user?.name) || user?.nickname || user?.given_name || "Usuario");
+        saveToSession('user_name', getFirstName(response.data.nombreCompleto) || user?.email?.split('@')[0] || "Usuario");
         saveToSession('user_email', user?.email || "");
         saveToSession('user_picture', user?.picture || "");
         saveToSession('user_id_db', response.data.id);
         saveToSession('user_telefono', response.data.telefono || "");
+        saveToSession('user_needs_extra_data', 'false');
         processedUserRef.current = user.sub;
         setAuthStatus('completed');
         console.log("[useAuthHandler] Usuario encontrado en BD, acceso por BD");
@@ -286,12 +399,6 @@ export const useAuthHandler = () => {
             auth0Id: user.sub,
             isGoogleUser: true
           });
-          if (createResult?.data?.id) {
-            saveToSession('user_id_db', createResult.data.id);
-            console.log("[useAuthHandler] Usuario creado, id:", createResult.data.id);
-          } else {
-            console.warn("[useAuthHandler] Usuario creado pero no se recibió id en la respuesta:", createResult);
-          }
           console.log("[useAuthHandler] Usuario creado");
           return;
         } else {
@@ -307,9 +414,10 @@ export const useAuthHandler = () => {
       saveToSession('auth_token', token);
       saveToSession('user_role', 'Cliente');
       saveToSession('auth_completed', 'true');
-      saveToSession('user_name', getFirstName(user?.name) || user?.nickname || user?.given_name || "Usuario");
       saveToSession('user_email', user?.email || "");
       saveToSession('user_picture', user?.picture || "");
+      // ✅ MODIFICADO: No guardar user_name aquí si es fallback
+      saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
       setAuthStatus('completed');
       console.log("[useAuthHandler] Fallback acceso como Cliente");
     } finally {
@@ -343,7 +451,8 @@ export const useAuthHandler = () => {
     isCreatingUser: authStatus === 'creating-user',
     isProcessing: authStatus === 'checking' || authStatus === 'creating-user',
     createUser,
-    loginTraditional,
-    registerTraditional
+    loginTraditional, // ✅ Función para login tradicional
+    registerTraditional, // ✅ Función para registro tradicional
+    completeSessionData // ✅ Función para completar datos
   };
 };

@@ -36,10 +36,11 @@ export const MiPerfilUsuarioPage = () => {
     }
   });
 
-  const nombreUsuario = user?.name || user?.nickname || user?.given_name || "Usuario";
+  const nombreUsuario = sessionStorage.getItem('user_name') || "";
   const emailUsuario = user?.email || "Sin email";
   const fotoUsuario = user?.picture || usuarioImg;
   const telefonoUsuario = sessionStorage.getItem('user_telefono') || user?.phone_number || "";
+  
 
   // Cargar datos del usuario al montar el componente
   useEffect(() => {

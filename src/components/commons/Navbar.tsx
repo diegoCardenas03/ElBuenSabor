@@ -39,7 +39,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
   const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
 
-  const { logout } = useAuth0();
+  const { logout, loginWithPopup, loginWithRedirect} = useAuth0();
+
+  const handleAuthLogin = async () => {
+  try {
+    await loginWithPopup({
+      authorizationParams: {
+        prompt: 'select_account'
+      }
+    });
+  } catch (error) {
+    console.error('Error en login:', error);
+  }
+};
 
   // ✅ AGREGAR: Función para manejar clics en enlaces
   const handleLinkClick = () => {
@@ -90,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <button
               className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-2 rounded-full font-semibold cursor-pointer"
-              onClick={abrirLogin}
+              onClick={() => loginWithRedirect()}
             >
               Ingresar
             </button>

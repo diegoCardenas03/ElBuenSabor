@@ -59,7 +59,7 @@ const ModalLogin: React.FC<ModalLoginProps> = ({ onClose, onSwitchToRegister }) 
       Swal.fire({
         icon: 'success',
         title: '¡Bienvenido!',
-        text: `Hola ${result.cliente.nombreCompleto}`,
+        text: `Hola ${result.data.nombreCompleto}`,
         timer: 2000,
         showConfirmButton: false
       });
