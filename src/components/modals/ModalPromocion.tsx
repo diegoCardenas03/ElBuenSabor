@@ -148,19 +148,32 @@ export const ModalPromocion = ({
                 imageUrl = data.secure_url;
               }
 
-              const detallePromociones = values.detallePromociones.map(
-                (detalle: any) => ({
-                  productoId:
-                    detalle.productoId && detalle.productoId !== 0
-                      ? detalle.productoId
-                      : null,
-                  insumoId:
-                    detalle.insumoId && detalle.insumoId !== 0
-                      ? detalle.insumoId
-                      : null,
-                  cantidad: detalle.cantidad,
+              // ------- FIX DETALLE PROMOCIONES -------
+              const detallePromociones = values.detallePromociones
+                .map((detalle: any) => {
+                  let productoId =
+                    detalle.productoId ??
+                    (detalle.producto ? detalle.producto.id : null);
+                  let insumoId =
+                    detalle.insumoId ??
+                    (detalle.insumo ? detalle.insumo.id : null);
+
+                  if (productoId === 0) productoId = null;
+                  if (insumoId === 0) insumoId = null;
+
+                  return {
+                    productoId,
+                    insumoId,
+                    cantidad: detalle.cantidad,
+                  };
                 })
-              );
+                .filter(
+                  (d: any) =>
+                    // Solo uno debe estar presente, y no ambos nulos
+                    (d.productoId && !d.insumoId) ||
+                    (!d.productoId && d.insumoId)
+                );
+              // ---------------------------------------
 
               const payload = {
                 ...values,
@@ -270,7 +283,7 @@ export const ModalPromocion = ({
                       >
                         <option value={0}>Seleccione un insumo</option>
                         {insumos
-                          .filter((insumo) => !insumo.esParaElaborar) 
+                          .filter((insumo) => !insumo.esParaElaborar)
                           .map((insumo) => (
                             <option key={insumo.id} value={insumo.id}>
                               {insumo.denominacion}

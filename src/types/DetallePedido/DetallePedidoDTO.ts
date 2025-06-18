@@ -3,4 +3,5 @@ export interface DetallePedidoDTO {
   cantidad: number;
   productoId?: number;
   insumoId?: number;
+  promocionId?: number;
 }
