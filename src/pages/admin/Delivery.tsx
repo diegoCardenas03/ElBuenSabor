@@ -112,19 +112,9 @@ const Delivery = () => {
                     </div>
                   )}
                   {opcionPrincipal === "Retirar" ? (
-                    <button
-                      className="self-end mr-2 w-30 font-medium py-1 bg-secondary rounded-2xl text-white cursor-pointer transition-colors hover:bg-red-500"
-                      onClick={() => actualizarEstadoPedido(pedido.id, "EN_CAMINO")}
-                    >
-                      Tomar Pedido
-                    </button>
+                    <button className="self-end mr-2 w-30 font-medium py-1 bg-secondary rounded-2xl text-white cursor-pointer transition-colors hover:bg-red-500" onClick={() => actualizarEstadoPedido(pedido.id, "EN_CAMINO")} > Tomar Pedido </button>
                   ) : (
-                    <button
-                      className="self-end mr-2 w-30 font-medium py-1 bg-secondary rounded-2xl text-white cursor-pointer transition-colors hover:bg-red-500"
-                      onClick={() => actualizarEstadoPedido(pedido.id, "ENTREGADO")}
-                    >
-                      Entregado
-                    </button>
+                    <button className="self-end mr-2 w-30 font-medium py-1 bg-secondary rounded-2xl text-white cursor-pointer transition-colors hover:bg-red-500" onClick={() => actualizarEstadoPedido(pedido.id, "ENTREGADO")} > Entregado </button>
                   )}
                 </li>
               ))}
