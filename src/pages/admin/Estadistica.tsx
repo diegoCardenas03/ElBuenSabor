@@ -57,12 +57,21 @@ const Estadistica = () => {
             </ol>
             <button className="cursor-pointer font-semibold bg-tertiary mt-5 rounded-2xl px-4 py-1 ">Ver más</button>
           </div>
-          <div className="flex w-3/5 bg-white">
+          <div className="flex w-3/5 ">
             {/* Aquí puedes agregar otros datos estadísticos */}
-            <div className="flex flex-col items-center w-full">
-              <div className="flex items-center justify-between">
-                <div></div>
-                <div></div>
+            <div className="flex flex-col items-center w-full justify-between gap-5">
+              <div className="flex items-center justify-around w-full">
+                <div className="h-40 shadow-md gap-4 w-40 bg-white flex flex-col items-center justify-center rounded-3xl px-3">
+                  <span className="text-lg text-secondary font-bold">Pedidos</span>
+                  <h3 className="font-bold px-2 text-4xl">$150</h3>
+                </div>
+                <div className="h-40 shadow-md gap-4 w-40 bg-white flex flex-col items-center justify-center rounded-3xl px-3">
+                  <span className="text-lg text-secondary font-bold">Ganancias</span>
+                  <h3 className="font-bold text-3xl">$120000</h3>
+                </div>
+              </div>
+              <div className="h-30 flex flex-col items-center justify-center bg-white shadow-md w-85">
+                <h3 className="text-lg text-secondary font-bold">Ingresos y Egresos</h3>
               </div>
             </div>
           </div>
