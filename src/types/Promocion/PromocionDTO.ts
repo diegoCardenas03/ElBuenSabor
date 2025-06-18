@@ -6,5 +6,6 @@ export interface PromocionDTO {
     fechaDesde: string;      // LocalDate como string
     fechaHasta: string;      // LocalDate como string
     descuento: number;       // Double como number
+    
     detallePromociones: DetallePromocionDTO[];
 }
