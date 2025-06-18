@@ -147,6 +147,30 @@ const RoutesApp = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/Empleados"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+            <Empleados />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Clientes"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+            <Clientes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Estadistica"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+            <Estadistica />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
 
     /*  
