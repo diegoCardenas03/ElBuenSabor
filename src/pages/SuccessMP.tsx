@@ -15,13 +15,11 @@ function SuccessMP() {
         const params = new URLSearchParams(window.location.search);
         const status = params.get("status");
         if (status === "approved" && pedido) {
-            pedidoService.post(pedido).then(() => {
-                localStorage.removeItem("pedidoMP");
+            localStorage.removeItem("pedidoMP");
                 dispatch(vaciarCarrito());
                 setTimeout(() => {
                     navigate('/');
                 }, 3000);
-            });
         }
     }, []);
 
