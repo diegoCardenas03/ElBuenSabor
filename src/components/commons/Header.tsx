@@ -18,12 +18,20 @@ interface HeaderProps {
   backgroundColor?: string;
 }
 
+ 
 export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   onBackClick,
   whiteUserBar = false,
   backgroundColor = "none",
 }) => {
+
+  const getFirstName = (fullName?: string) => {
+  if (!fullName) return "Usuario";
+  return fullName.split(" ")[0];
+};
+
+ 
   const [navbarOpen, setNavbarOpen] = useState(false);
   const carrito = useAppSelector((state) => state.carrito.items);
   const carritoAbierto = useAppSelector((state) => state.carritoUI.abierto);
@@ -146,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({
         <span
           className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
           onClick={handleUserClick}
-          title={nombreUsuario}
+          title={getFirstName(nombreUsuario)}
         >
           {nombreUsuario}
         </span>

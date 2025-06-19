@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash, FaPen } from "react-icons/fa";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useAppSelector } from "../hooks/redux";
 
 type PerfilForm = {
   nombre: string;
@@ -18,6 +19,7 @@ export const MiPerfilUsuarioPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const { user, isAuthenticated } = useAuth0();
+  const clienteId = useAppSelector((state) => state.auth.userId);
 
   // Datos iniciales para comparar cambios
   const initialValues = useRef<PerfilForm>({
@@ -76,9 +78,6 @@ export const MiPerfilUsuarioPage = () => {
     telefono !== initialValues.current.telefono ||
     password.length > 0 ||
     repeatPassword.length > 0;
-
-  // Obtener el id del cliente (deberías guardarlo en sessionStorage al loguear)
-  const clienteId = sessionStorage.getItem("user_id_db");
 
   //Obtener id del rol auth0
 

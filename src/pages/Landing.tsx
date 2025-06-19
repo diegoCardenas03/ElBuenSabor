@@ -23,7 +23,7 @@ const Landing = () => {
     dispatch(fetchRubrosInsumos());
   }, [dispatch]);
   const { categories } = useCategories();
-  console.log('categorias', categories)
+  // console.log('categorias', categories)
 
   const items = categories.map((cat, idx) => ({
     id: idx,

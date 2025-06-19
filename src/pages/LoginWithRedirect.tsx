@@ -3,12 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useAuthHandler } from "../hooks/useAuthHandler";
 import { Loader } from "../components/commons/Loader";
 import ModalUserExtraData from "../components/modals/ModalExtraData";
+import { useAppSelector } from "../hooks/redux";
 
 export const LoginRedirect = () => {
   const navigate = useNavigate();
   const { authStatus, isAuthenticated, isProcessing } = useAuthHandler();
   const [showExtraDataModal, setShowExtraDataModal] = useState(false);
-  const [clienteId, setClienteId] = useState<number | null>(null);
+  const clienteId = useAppSelector((state) => state.auth.userId);
+
+ 
 
   useEffect(() => {
     console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
@@ -23,16 +26,18 @@ export const LoginRedirect = () => {
     // Si la autenticación está completa y exitosa
     if (authStatus === 'completed' && isAuthenticated) {
       console.log("[LoginRedirect] Autenticación completada exitosamente");
-      
-      // Verificar si necesita datos adicionales
-      const userIdDb = sessionStorage.getItem('user_id_db');
-      const userTelefono = sessionStorage.getItem('user_telefono');
-      
-      console.log("[LoginRedirect] Datos del usuario:", { userIdDb, userTelefono });
 
-      if (userIdDb && (!userTelefono || userTelefono === "")) {
+
+
+      // Verificar si necesita datos adicionales
+      const userTelefono = sessionStorage.getItem('user_telefono');
+
+      
+
+      console.log("[LoginRedirect] Datos del usuario:", { clienteId, userTelefono });
+
+      if (clienteId && (!userTelefono || userTelefono === "")) {
         console.log("[LoginRedirect] Usuario necesita completar datos adicionales");
-        setClienteId(parseInt(userIdDb));
         setShowExtraDataModal(true);
       } else {
         console.log("[LoginRedirect] Usuario completo, redirigiendo a home");
@@ -59,8 +64,8 @@ export const LoginRedirect = () => {
             {isProcessing && authStatus === 'idle' && "Procesando autenticación..."}
           </h2>
           <p className="text-sm text-gray-500 mt-2">
-            <Loader message="Por favor espera un momento"/>
-            
+            <Loader message="Por favor espera un momento" />
+
           </p>
         </div>
       </div>
@@ -71,7 +76,7 @@ export const LoginRedirect = () => {
   if (showExtraDataModal && clienteId) {
     return (
       <ModalUserExtraData
-        clienteId={clienteId}
+        clienteId={parseInt(clienteId)}
         onComplete={handleExtraDataComplete}
       />
     );

@@ -20,6 +20,15 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     return data as ResponseType;
   }
 
+  async getByAny(any: string, argument: string): Promise<ResponseType | null> {
+    const response = await fetch(`${this.baseUrl}/${any}/${argument}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data as ResponseType;
+  }
+
   async post(data: RequestType): Promise<ResponseType> {
     //  const response = 
      await fetch(`${this.baseUrl}/save`, {

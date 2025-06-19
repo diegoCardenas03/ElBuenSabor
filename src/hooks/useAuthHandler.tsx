@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { setToken, setRol, clearAuth } from "../hooks/redux/slices/AuthReducer";
+import { setToken, setRol, setUserId, clearAuth } from "../hooks/redux/slices/AuthReducer";
 import { interceptorApiClient } from '../interceptors/Axios.interceptor'
 import { UsuarioDTO } from "../types/Usuario/UsuarioDTO";
 import { ClienteDTO } from "../types/Cliente/ClienteDTO";
@@ -9,27 +9,24 @@ import { ClienteDTO } from "../types/Cliente/ClienteDTO";
 const saveToSession = (key: string, value: string) => {
   try {
     sessionStorage.setItem(key, value);
-    console.log(`[useAuthHandler] Guardado en sessionStorage: ${key} = ${value}`);
+    // console.log(`[useAuthHandler] Guardado en sessionStorage: ${key} = ${value}`);
   } catch (e) {
-    console.error(`[useAuthHandler] Error guardando en sessionStorage: ${key}`, e);
+    // console.error(`[useAuthHandler] Error guardando en sessionStorage: ${key}`, e);
   }
 };
 
 const getFromSession = (key: string): string | null => {
   try {
     const value = sessionStorage.getItem(key);
-    console.log(`[useAuthHandler] Leyendo sessionStorage: ${key} = ${value}`);
+    // console.log(`[useAuthHandler] Leyendo sessionStorage: ${key} = ${value}`);
     return value;
   } catch (e) {
-    console.error(`[useAuthHandler] Error leyendo sessionStorage: ${key}`, e);
+    // console.error(`[useAuthHandler] Error leyendo sessionStorage: ${key}`, e);
     return null;
   }
 };
 
-const getFirstName = (fullName?: string) => {
-  if (!fullName) return "Usuario";
-  return fullName.split(" ")[0];
-};
+
 
 const clearSession = () => {
   try {
@@ -42,9 +39,9 @@ const clearSession = () => {
     sessionStorage.removeItem('user_id_db');
     sessionStorage.removeItem('user_telefono');
     sessionStorage.removeItem('user_needs_extra_data');
-    console.log("[useAuthHandler] clearSession ejecutado");
+    // console.log("[useAuthHandler] clearSession ejecutado");
   } catch (e) {
-    console.error("[useAuthHandler] Error limpiando sessionStorage", e);
+    // console.error("[useAuthHandler] Error limpiando sessionStorage", e);
   }
 };
 
@@ -66,14 +63,14 @@ export const useAuthHandler = () => {
       dispatch(setRol(savedRole));
       setAuthStatus('completed');
       processedUserRef.current = user?.sub || null;
-      console.log("[useAuthHandler] Restaurando estado desde sessionStorage");
+      // console.log("[useAuthHandler] Restaurando estado desde sessionStorage");
       return;
     }
 
     if (isAuthenticated && user && !isProcessingRef.current) {
       setAuthStatus('checking');
     } else if (!isAuthenticated && !isLoading) {
-      console.log("[useAuthHandler] No autenticado (Auth0 listo), limpiando sessionStorage");
+      // console.log("[useAuthHandler] No autenticado (Auth0 listo), limpiando sessionStorage");
       dispatch(clearAuth());
       clearSession();
       setAuthStatus('completed');
@@ -86,126 +83,18 @@ export const useAuthHandler = () => {
   // ✅ NUEVA FUNCIÓN: Completar datos de sessionStorage después del modal
   const completeSessionData = useCallback(async (clienteData: any) => {
     try {
-      console.log("[useAuthHandler] Completando datos de sessionStorage:", clienteData);
+      // console.log("[useAuthHandler] Completando datos de sessionStorage:", clienteData);
 
-      saveToSession('user_name', getFirstName(clienteData.nombreCompleto) || "Usuario");
+      saveToSession('user_name', clienteData.nombreCompleto || "Usuario");
       saveToSession('user_telefono', clienteData.telefono || "");
       saveToSession('user_needs_extra_data', 'false');
       saveToSession('auth_completed', 'true');
 
-      console.log("[useAuthHandler] Datos de sessionStorage completados");
+      // console.log("[useAuthHandler] Datos de sessionStorage completados");
     } catch (error) {
-      console.error("[useAuthHandler] Error completando sessionStorage:", error);
+      // console.error("[useAuthHandler] Error completando sessionStorage:", error);
     }
   }, []);
-
-  // ✅ LOGIN TRADICIONAL
-  const loginTraditional = useCallback(async (email: string, password: string) => {
-    try {
-      setAuthStatus('checking');
-      console.log("[useAuthHandler] Iniciando login tradicional para:", email);
-
-      const loginResponse = await interceptorApiClient.post('/api/clientes/login', {
-        email,
-        password
-      });
-
-      const { token, cliente } = loginResponse.data;
-      console.log("[useAuthHandler] Login exitoso:", cliente);
-
-      dispatch(setToken(token));
-      dispatch(setRol("Cliente"));
-
-      // Guardar datos en sessionStorage
-      saveToSession('auth_token', token);
-      saveToSession('user_role', 'Cliente');
-      saveToSession('user_name', getFirstName(cliente.nombreCompleto) || "Usuario");
-      saveToSession('user_email', cliente.usuario?.email || email);
-      saveToSession('user_picture', "");
-      saveToSession('user_id_db', cliente.id || "");
-      saveToSession('user_telefono', cliente.telefono || "");
-      saveToSession('auth_completed', 'true');
-      saveToSession('user_needs_extra_data', 'false');
-
-      setAuthStatus('completed');
-      console.log("[useAuthHandler] Login tradicional completado");
-
-      return { success: true, data: cliente };
-    } catch (error: any) {
-      setAuthStatus('completed');
-      console.error("[useAuthHandler] Error en login tradicional:", error?.response?.data || error);
-      throw error;
-    }
-  }, [dispatch]);
-
-  // ✅ REGISTRO TRADICIONAL
-  const registerTraditional = useCallback(async (userData: {
-    email: string;
-    nombreCompleto: string;
-    telefono: string;
-    password: string;
-  }) => {
-    try {
-      setAuthStatus('creating-user');
-      console.log("[useAuthHandler] Iniciando registro tradicional para:", userData.email);
-
-      const roleResponse = await interceptorApiClient.get('/api/admin/roles');
-      const clienteRole = roleResponse.data.find((role: any) => role.nombre === 'Cliente');
-
-      if (!clienteRole?.auth0RolId) {
-        throw new Error('Rol Cliente no encontrado');
-      }
-
-      const usuarioDTO: UsuarioDTO = {
-        email: userData.email,
-        nombreCompleto: userData.nombreCompleto,
-        contrasenia: userData.password,
-        connection: "Username-Password-Authentication",
-        roles: [clienteRole.auth0RolId]
-      };
-
-      const clienteDTO: ClienteDTO = {
-        nombreCompleto: userData.nombreCompleto,
-        telefono: userData.telefono,
-        usuario: usuarioDTO
-      };
-
-      console.log("[useAuthHandler] Creando usuario tradicional:", clienteDTO);
-
-      const createResponse = await interceptorApiClient.post("/api/clientes/save", clienteDTO);
-
-      // Login automático después del registro
-      const loginResponse = await interceptorApiClient.post('/api/clientes/login', {
-        email: userData.email,
-        password: userData.password
-      });
-
-      const { token, cliente } = loginResponse.data;
-
-      dispatch(setToken(token));
-      dispatch(setRol("Cliente"));
-
-      // Guardar datos completos en sessionStorage
-      saveToSession('auth_token', token);
-      saveToSession('user_role', 'Cliente');
-      saveToSession('user_name', getFirstName(cliente.nombreCompleto) || "Usuario");
-      saveToSession('user_email', cliente.usuario?.email || userData.email);
-      saveToSession('user_picture', "");
-      saveToSession('user_id_db', cliente.id || "");
-      saveToSession('user_telefono', cliente.telefono || "");
-      saveToSession('auth_completed', 'true');
-      saveToSession('user_needs_extra_data', 'false');
-
-      setAuthStatus('completed');
-      console.log("[useAuthHandler] Registro tradicional completado");
-
-      return { success: true, data: cliente };
-    } catch (error: any) {
-      setAuthStatus('completed');
-      console.error("[useAuthHandler] Error en registro tradicional:", error?.response?.data || error);
-      throw error;
-    }
-  }, [dispatch]);
 
   // ✅ CREAR USUARIO (para Auth0 social)
   const createUser = useCallback(async (userData: {
@@ -218,14 +107,14 @@ export const useAuthHandler = () => {
   }) => {
     try {
       setAuthStatus('creating-user');
-      console.log("[useAuthHandler] createUser llamado con:", userData);
+      // console.log("[useAuthHandler] createUser llamado con:", userData);
 
       const roleResponse = await interceptorApiClient.get('/api/admin/roles');
-      console.log("[useAuthHandler] Roles obtenidos:", roleResponse.data);
+      // console.log("[useAuthHandler] Roles obtenidos:", roleResponse.data);
       const clienteRole = roleResponse.data.find((role: any) => role.nombre === 'Cliente');
 
       if (!clienteRole?.auth0RolId) {
-        console.error("[useAuthHandler] Rol Cliente no encontrado en roles:", roleResponse.data);
+        // console.error("[useAuthHandler] Rol Cliente no encontrado en roles:", roleResponse.data);
         throw new Error('Rol Cliente no encontrado');
       }
 
@@ -245,65 +134,54 @@ export const useAuthHandler = () => {
         usuario: usuarioDTO
       };
 
-      console.log("[useAuthHandler] Enviando clienteDTO al backend:", clienteDTO);
+      // console.log("[useAuthHandler] Enviando clienteDTO al backend:", clienteDTO);
 
       const createResponse = await interceptorApiClient.post("/api/clientes/save", clienteDTO);
 
-      console.log("[useAuthHandler] Respuesta del backend al crear usuario:", createResponse.data);
+      // console.log("[useAuthHandler] Respuesta del backend al crear usuario:", createResponse.data);
 
       let token: string;
-      if (userData.isGoogleUser && userData.auth0Id) {
-        token = await getAccessTokenSilently({ cacheMode: "off" });
-        console.log("[useAuthHandler] Token obtenido con Google:", token);
-      } else {
-        const loginResponse = await interceptorApiClient.post('/api/clientes/login', {
-          email: userData.email,
-          password: userData.password
-        });
-        token = loginResponse.data.token;
-        console.log("[useAuthHandler] Token obtenido con login tradicional:", token);
-      }
+
+      token = await getAccessTokenSilently({ cacheMode: "off" });
+      // console.log("[useAuthHandler] Token obtenido con Google:", token);
+
 
       dispatch(setToken(token));
       dispatch(setRol("Cliente"));
+      dispatch(setUserId(createResponse.data.id));
 
       // ✅ CAMBIO PRINCIPAL: Solo guardar datos esenciales, marcar que necesita datos extra
       saveToSession('auth_token', token);
       saveToSession('user_role', 'Cliente');
-      saveToSession('user_id_db', createResponse.data.id || "");
       saveToSession('user_email', userData.email || user?.email || "");
       saveToSession('user_picture', user?.picture || "");
 
       // ✅ CONDICIONAL: Si es nuevo usuario de Google y no tiene teléfono, marcar para datos extra
-      if (userData.isGoogleUser && (!createResponse.data.telefono || createResponse.data.telefono === "")) {
-        saveToSession('user_needs_extra_data', 'true');
-        // No guardar user_name ni auth_completed aún
-        console.log("[useAuthHandler] Usuario nuevo de Google, requiere datos adicionales");
-      } else {
-        // Usuario tradicional o ya tiene datos completos
-        saveToSession('user_name', getFirstName(createResponse.data.nombreCompleto) || "Usuario");
-        saveToSession('user_telefono', createResponse.data.telefono || "");
-        saveToSession('auth_completed', 'true');
-        saveToSession('user_needs_extra_data', 'false');
-      }
+
+      saveToSession('user_needs_extra_data', 'true');
+      // console.log("[useAuthHandler] Usuario nuevo de Google, requiere datos adicionales");
+
 
       setAuthStatus('completed');
       processedUserRef.current = userData.auth0Id || null;
 
       return { success: true, data: createResponse.data };
+
     } catch (error: any) {
       setAuthStatus('completed');
-      console.error("[useAuthHandler] Error en createUser:", error?.response?.data || error);
+      // console.error("[useAuthHandler] Error en createUser:", error?.response?.data || error);
       throw error;
     }
   }, [dispatch, getAccessTokenSilently, user]);
+
+
 
   // ✅ MANEJAR AUTH USER (con fallback para usuarios que salieron del modal)
   const handleAuthUser = useCallback(async () => {
     if (isLoading || !isAuthenticated || !user || isProcessingRef.current) return;
 
     if (processedUserRef.current === user.sub && authStatus === 'completed') {
-      console.log("[useAuthHandler] Usuario ya procesado:", user.sub);
+      // console.log("[useAuthHandler] Usuario ya procesado:", user.sub);
       return;
     }
 
@@ -315,7 +193,7 @@ export const useAuthHandler = () => {
     if (savedToken && savedRole && needsExtraData === 'true') {
       const userName = getFromSession('user_name');
       if (!userName) {
-        console.log("[useAuthHandler] Usuario salió del modal, usando email como nombre fallback");
+        // console.log("[useAuthHandler] Usuario salió del modal, usando email como nombre fallback");
         saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
         saveToSession('auth_completed', 'true');
       }
@@ -327,7 +205,7 @@ export const useAuthHandler = () => {
     }
 
     if (savedToken && savedRole) {
-      console.log("[useAuthHandler] Token y rol ya en sessionStorage");
+      // console.log("[useAuthHandler] Token y rol ya en sessionStorage");
       return;
     }
 
@@ -335,7 +213,7 @@ export const useAuthHandler = () => {
 
     try {
       const rol = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0];
-      console.log("[useAuthHandler] Rol detectado en user:", rol);
+      // console.log("[useAuthHandler] Rol detectado en user:", rol);
 
       if (rol) {
         const token = await getAccessTokenSilently();
@@ -346,18 +224,18 @@ export const useAuthHandler = () => {
         saveToSession('auth_completed', 'true');
         saveToSession('user_email', user?.email || "");
         saveToSession('user_picture', user?.picture || "");
-        saveToSession('user_name', getFirstName(user?.name) || user?.email?.split('@')[0] || "Usuario");
+        saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
         processedUserRef.current = user.sub;
         setAuthStatus('completed');
-        console.log("[useAuthHandler] Rol desde Auth0, acceso directo");
+        // console.log("[useAuthHandler] Rol desde Auth0, acceso directo");
         return;
       }
 
       // Verificar si usuario existe en BD
       try {
-        console.log("[useAuthHandler] Buscando usuario en BD por email:", user.email);
+        // console.log("[useAuthHandler] Buscando usuario en BD por email:", user.email);
         const response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
-        console.log("[useAuthHandler] Usuario encontrado en BD:", response.data);
+        // console.log("[useAuthHandler] Usuario encontrado en BD:", response.data);
 
         const token = await getAccessTokenSilently();
 
@@ -367,10 +245,11 @@ export const useAuthHandler = () => {
 
         dispatch(setToken(token));
         dispatch(setRol(userRole));
+        dispatch(setUserId(response.data.id))
         saveToSession('auth_token', token);
         saveToSession('user_role', userRole);
         saveToSession('auth_completed', 'true');
-        saveToSession('user_name', getFirstName(response.data.nombreCompleto) || user?.email?.split('@')[0] || "Usuario");
+        saveToSession('user_name', response.data.nombreCompleto || user?.email?.split('@')[0] || "Usuario");
         saveToSession('user_email', user?.email || "");
         saveToSession('user_picture', user?.picture || "");
         saveToSession('user_id_db', response.data.id);
@@ -378,48 +257,34 @@ export const useAuthHandler = () => {
         saveToSession('user_needs_extra_data', 'false');
         processedUserRef.current = user.sub;
         setAuthStatus('completed');
-        console.log("[useAuthHandler] Usuario encontrado en BD, acceso por BD");
+        // console.log("[useAuthHandler] Usuario encontrado en BD, acceso por BD");
       } catch (userError: any) {
-        console.log("userError completo:", userError);
+        // console.log("userError completo:", userError);
         const is404Error = (userError.response && userError.response.status === 404) ||
           (userError.message && (
             userError.message.includes("404") ||
             userError.message.toLowerCase().includes("not found")
           ));
 
-        console.log('Error: ' + is404Error);
-        console.error("[useAuthHandler] Error buscando usuario en BD:", userError?.response?.data || userError);
+        // console.log('Error: ' + is404Error);
+        // console.error("[useAuthHandler] Error buscando usuario en BD:", userError?.response?.data || userError);
 
         if (is404Error) {
-          console.log("[useAuthHandler] Usuario no existe en BD, creando usuario...");
-          const createResult = await createUser({
+          // console.log("[useAuthHandler] Usuario no existe en BD, creando usuario...");
+           await createUser({
             email: user.email,
             nombreCompleto: user.name || user.email,
             telefono: user.phone_number || "",
             auth0Id: user.sub,
             isGoogleUser: true
           });
-          console.log("[useAuthHandler] Usuario creado");
+          // console.log("[useAuthHandler] Usuario creado");
           return;
         } else {
           throw userError;
         }
       }
 
-    } catch (error: any) {
-      console.error("[useAuthHandler] Error general en handleAuthUser:", error?.response?.data || error);
-      const token = await getAccessTokenSilently();
-      dispatch(setToken(token));
-      dispatch(setRol("Cliente"));
-      saveToSession('auth_token', token);
-      saveToSession('user_role', 'Cliente');
-      saveToSession('auth_completed', 'true');
-      saveToSession('user_email', user?.email || "");
-      saveToSession('user_picture', user?.picture || "");
-      // ✅ MODIFICADO: No guardar user_name aquí si es fallback
-      saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
-      setAuthStatus('completed');
-      console.log("[useAuthHandler] Fallback acceso como Cliente");
     } finally {
       isProcessingRef.current = false;
     }
@@ -427,7 +292,7 @@ export const useAuthHandler = () => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      console.log("[useAuthHandler] No autenticado (Auth0 listo), limpiando sessionStorage");
+      // console.log("[useAuthHandler] No autenticado (Auth0 listo), limpiando sessionStorage");
       dispatch(clearAuth());
       clearSession();
       setAuthStatus('completed');
@@ -439,7 +304,7 @@ export const useAuthHandler = () => {
     const hasSessionData = getFromSession('auth_completed') === 'true';
     if (!hasSessionData && authStatus === 'checking') {
       handleAuthUser().catch((e) => {
-        console.error("[useAuthHandler] Error en effect principal:", e?.response?.data || e);
+        // console.error("[useAuthHandler] Error en effect principal:", e?.response?.data || e);
         setAuthStatus('completed');
       });
     }
@@ -450,9 +315,7 @@ export const useAuthHandler = () => {
     isAuthenticated,
     isCreatingUser: authStatus === 'creating-user',
     isProcessing: authStatus === 'checking' || authStatus === 'creating-user',
-    createUser,
-    loginTraditional, // ✅ Función para login tradicional
-    registerTraditional, // ✅ Función para registro tradicional
+    createUser, 
     completeSessionData // ✅ Función para completar datos
   };
 };
