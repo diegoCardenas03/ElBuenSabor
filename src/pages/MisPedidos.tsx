@@ -110,6 +110,8 @@ const MisPedidos = () => {
         return "En camino";
       case Estado.ENTREGADO:
         return "Entregado";
+      case Estado.TERMINADO:
+        return "Terminado";
       default:
         return "Desconocido";
     }

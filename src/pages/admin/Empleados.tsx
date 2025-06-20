@@ -28,7 +28,7 @@ const Empleados = () => {
     const dispatch = useAppDispatch();
     const rolesUnicos: string[] = Array.from(
         new Set(
-            empleados.flatMap(e => e.usuario.roles.map(r => r.nombre))
+            empleados.flatMap(e => e.usuario.roles?.map(r => r.nombre)),
         )
     );
 
@@ -48,7 +48,7 @@ const Empleados = () => {
         {
             label: "Rol",
             key: "rol",
-            render: (empleado: EmpleadoResponseDTO) => empleado.usuario.roles.map(r => r.nombre).join(', ')
+            render: (empleado: EmpleadoResponseDTO) => empleado.usuario.roles?.map(r => r.nombre).join(', ')
         },
         {
             label: "Activo",
