@@ -124,14 +124,14 @@ const DetalleCompra = () => {
 
     const pedidoArmado = (): PedidoDTO => {
         const detallePedidos: DetallePedidoDTO[] = carrito.map(({ item, cant }) => {
+            if (isPromocion(item)) {
+                return { cantidad: cant, promocionId: item.id };
+            }
             if (isProducto(item)) {
                 return { cantidad: cant, productoId: item.id };
             }
             if (isInsumo(item)) {
                 return { cantidad: cant, insumoId: item.id };
-            }
-            if (isPromocion(item)) {
-                return { cantidad: cant, promocionId: item.id };
             }
             throw new Error("Ítem desconocido en el carrito");
         });

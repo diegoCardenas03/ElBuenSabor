@@ -253,7 +253,7 @@ const MisPedidos = () => {
                   <ul className='pl-10'>
                     {pedidoSeleccionado.detallePedidos.map((detalle, index) => (
                       <li key={index}>
-                        <p>{detalle.cantidad}x - {detalle.producto?.denominacion || detalle.insumo?.denominacion}</p>
+                        <p>{detalle.cantidad}x - {detalle.producto?.denominacion || detalle.insumo?.denominacion || detalle.promocion?.denominacion}</p>
                       </li>
                     ))}
                   </ul>
