@@ -95,7 +95,6 @@ const MisPedidos = () => {
     },
   ];
 
-
   const filtrarPedidos = (pedidos: PedidoResponseDTO[]): PedidoResponseDTO[] => {
     let pedidosFiltrados = pedidos;
 
