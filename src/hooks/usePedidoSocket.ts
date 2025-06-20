@@ -3,13 +3,13 @@ import  SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { PedidoResponseDTO } from "../types/Pedido/PedidoResponseDTO";
 
-const WS_URL = "https://6428-38-51-31-203.ngrok-free.app/ws"; 
+const WS_URL = "https://2d7e-38-51-31-203.ngrok-free.app/ws"; 
 type Callback = (pedido: PedidoResponseDTO) => void;
 
 export function usePedidosSocket(onPedidoActualizado: Callback) {
   useEffect(() => {
     const stompClient = new Client({
-      webSocketFactory: () => new SockJS(WS_URL) as any,
+      webSocketFactory: () => new WebSocket("wss://2d7e-38-51-31-203.ngrok-free.app/ws"),
       onConnect: () => {
         console.log("📡 Conectado a WebSocket");
         stompClient.subscribe("/topic/pedidos", (message) => {
