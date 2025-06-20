@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PromocionResponseDTO } from "../../types/Promocion/PromocionResponseDTO";     
 import { TableGeneric } from "../../components/TableGeneric";
 import { CircularProgress } from "@mui/material";
@@ -35,21 +35,21 @@ export const ScreenPromocion = () => {
     { label: "Fecha Hasta", key: "fechaHasta" },
     { label: "Descuento (%)", key: "descuento" },
      {
-      label: "Total",
-      key: "total",
+      label: "Precio Venta",
+      key: "precioVenta",
       render: (promo: PromocionResponseDTO) => (
         <span>
-          ${promo.total.toLocaleString("es-AR")}
+          ${promo.precioVenta.toLocaleString("es-AR")}
         </span>
       ),
 
     },
     {
-      label: "Total Costo",
-      key: "totalCosto",
+      label: "Precio Costo",
+      key: "precioCosto",
       render: (promo: PromocionResponseDTO) => (
         <span>
-          ${promo.totalCosto.toLocaleString("es-AR")}
+          ${promo.precioCosto.toLocaleString("es-AR")}
         </span>
       ),
     },

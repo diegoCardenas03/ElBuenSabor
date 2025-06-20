@@ -17,7 +17,7 @@ import { isInsumo, isProducto } from '../types/ProductoUnificado/ProductoUnifica
 import { PedidosService } from '../services/PedidosService';
 import { TbCash } from "react-icons/tb";
 import Swal from 'sweetalert2';
-
+import { isPromocion } from '../utils/isPromocion';
 const DetalleCompra = () => {
     const dispatch = useAppDispatch();
     const carrito = useAppSelector((state) => state.carrito.items);
@@ -123,12 +123,18 @@ const DetalleCompra = () => {
     };
 
     const pedidoArmado = (): PedidoDTO => {
-        const detallePedidos: DetallePedidoDTO[] = carrito.map(({ item, cant }) => ({
-            cantidad: cant,
-            productoId: isProducto(item) ? item.id : undefined,
-            insumoId: isInsumo(item) ? item.id : undefined,
-        }));
-
+        const detallePedidos: DetallePedidoDTO[] = carrito.map(({ item, cant }) => {
+            if (isProducto(item)) {
+                return { cantidad: cant, productoId: item.id };
+            }
+            if (isInsumo(item)) {
+                return { cantidad: cant, insumoId: item.id };
+            }
+            if (isPromocion(item)) {
+                return { cantidad: cant, promocionId: item.id };
+            }
+            throw new Error("Ítem desconocido en el carrito");
+        });
         return {
             tipoEnvio: tipoEntrega!,
             formaPago: metodoPago!,
@@ -278,7 +284,7 @@ const DetalleCompra = () => {
                             <div>
                                 <div className="flex justify-between mb-3">
                                     <p>Productos</p>
-                                    <p>${subTotal}</p>
+                                    <p>${subTotal} </p>
                                 </div>
                                 {tipoEntrega === TipoEnvio.DELIVERY && (
                                     <div className="flex justify-between mb-3">

@@ -74,7 +74,7 @@ npm start
 - ✅ Manejo de estado global con Redux Toolkit
 - ✅ Paneles para distintos roles de usuario
 - ✅ Navegación protegida y validaciones
-- ⏳ Integración Mercado Pago Checkout Pro
+- ✅ Integración Mercado Pago Checkout Pro
 - ⏳ Autenticación con Auth0
 - ⏳ Implementación de WebSockets
 - ⏳ Dockerización del proyecto

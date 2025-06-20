@@ -7,19 +7,19 @@ import Swal from 'sweetalert2';
 type ProductoUnificadoOConPromo = ProductoUnificado | PromocionResponseDTO;
 
 interface ProductCardsProps {
-  products: ProductoUnificado[];
-  onCardClick?: (product: ProductoUnificado) => void;
+  products: ProductoUnificadoOConPromo[];
+  onCardClick?: (product: ProductoUnificadoOConPromo) => void;
   showBadges?: boolean;
 }
 
-export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick, showBadges }) => {
+export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick}) => {
   const dispatch = useDispatch();
 
   const handleAgregar = (product: ProductoUnificadoOConPromo) => {
-    if ('descuento' in product) {
+    if (dispatch(agregarProducto(product)) && 'fechaDesde' in product && 'fechaHasta' in product) {
       Swal.fire({
-        icon: "info",
-        title: "Promoción seleccionada",
+        icon: "success",
+        title: "Promoción agregada al carrito",
         text: product.denominacion,
         timer: 1000,
         showConfirmButton: false,
@@ -56,7 +56,7 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
         // Detectar si es promoción
         const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
         const price = isPromo
-          ? (product as PromocionResponseDTO).total
+          ? (product as PromocionResponseDTO).precioVenta
           : isInsumo(product)
             ? product.precioVenta
             : (product.precioVenta || 0);

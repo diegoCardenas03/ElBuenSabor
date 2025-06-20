@@ -13,6 +13,8 @@ import CarritoLateral from '../components/commons/CarritoLateral';
 import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 import { agregarProducto } from '../hooks/redux/slices/CarritoReducer';
 import Swal from 'sweetalert2';
+import { PromocionResponseDTO } from '../types/Promocion/PromocionResponseDTO';
+import {PromocionService} from '../services/PromocionService';
 
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -36,6 +38,7 @@ export const MenuPage: React.FC = () => {
   // Estados locales
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductoUnificado | null>(null);
+  const [promociones, setPromociones] = useState<PromocionResponseDTO[]>([]);
 
   // Cargar datos al montar
   useEffect(() => {
@@ -43,10 +46,14 @@ export const MenuPage: React.FC = () => {
     dispatch(fetchInsumosVendibles());
     dispatch(fetchRubrosProductos());
     dispatch(fetchRubrosInsumos());
+
+    // Cargar promociones
+    const promocionService = new PromocionService();
+    promocionService.getAll().then((data) => {
+      console.log("Promociones recibidas:", data);
+      setPromociones(data);
+    });
   }, [dispatch]);
-
-  // Debug logs
-
 
   // Función para abrir modal
   const handleCardClick = (product: ProductoUnificado) => {
@@ -98,6 +105,14 @@ export const MenuPage: React.FC = () => {
         onFiltersChange={(f) => dispatch(setFilters(f))}
       >
         <div className="flex flex-col items-center">
+          <h3 className='text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase'>Promociones Vigentes</h3>
+          <ProductCards
+            products={promociones}
+            onCardClick={handleCardClick}
+            showBadges={true}
+          />
+        </div>
+        <div className="flex flex-col items-center mt-8">
           {/* Categorías */}
           <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
             Explorar categorías
@@ -137,4 +152,4 @@ export const MenuPage: React.FC = () => {
   );
 };
 
-export default MenuPage;
+export default MenuPage; 

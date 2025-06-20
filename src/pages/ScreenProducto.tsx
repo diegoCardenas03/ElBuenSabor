@@ -49,6 +49,14 @@ export const ScreenProducto = () => {
       key: "tiempoEstimadoPreparacion",
     },
     {
+      label: "Rubro",
+      key: "rubroId",
+      render: (producto: ProductoDTO) => {
+        const rubro = rubrosProductos.find(r => r.id === producto.rubroId);
+        return rubro ? rubro.denominacion : "-";
+      },
+    },
+    {
       label: "Activo",
       key: "activo",
       render: (producto: ProductoDTO) => (
@@ -69,19 +77,6 @@ export const ScreenProducto = () => {
           color="primary"
         />
       ),
-    },
-    {
-      label: "Rubro",
-      key: "rubroId",
-      render: (producto: ProductoDTO) => {
-        const rubro = rubrosProductos.find(r => r.id === producto.rubroId);
-        return rubro ? rubro.denominacion : "-";
-      },
-    },
-    {
-      label: "Precio de venta",
-      key: "precioVenta",
-      render: (producto: ProductoDTO) => producto.precioVenta,
     },
     {
       label: "Acciones",
@@ -125,7 +120,7 @@ export const ScreenProducto = () => {
         detalleProductos: p.detalleProductos.map((d) => ({
           id: d.id,
           cantidad: d.cantidad,
-          insumoId: d.insumo?.id ?? 0, 
+          insumoId: d.insumo?.id ?? 0,
         })),
       }));
       dispatch(setDataTable(productosDTO));
@@ -159,7 +154,7 @@ export const ScreenProducto = () => {
 
   return (
     <>
-      <AdminHeader text = "Productos"/>
+      <AdminHeader text="Productos" />
       <div className="bg-[#FFF4E0] h-screen" >
         <div
           style={{
