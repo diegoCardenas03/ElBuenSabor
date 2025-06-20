@@ -3,22 +3,23 @@ import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FormaPago } from '../types/enums/FormaPago';
 
 export const mostrarSoloNumero = (codigo: string) => {
-  const partes = codigo.split("-");
-  return partes[partes.length - 1];
+  return codigo.replace(/^PED-/, '');
 };
 
 export const getEstadoTexto = (estado: Estado) => {
   switch (estado) {
     case Estado.SOLICITADO:
       return "Solicitado";
-    case Estado.PENDIENTE:
-      return "Pendiente";
     case Estado.EN_PREPARACION:
       return "En preparación";
     case Estado.EN_CAMINO:
       return "En camino";
     case Estado.ENTREGADO:
       return "Entregado";
+    case Estado.TERMINADO:
+      return "Terminado";
+    case Estado.CANCELADO:
+      return "Cancelado";
     default:
       return "Desconocido";
   }

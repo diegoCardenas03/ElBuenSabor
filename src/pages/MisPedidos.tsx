@@ -10,8 +10,8 @@ import { TableGeneric } from '../components/TableGeneric';
 import { setDataTable } from '../hooks/redux/slices/TableReducer';
 import { Estado } from '../types/enums/Estado';
 import { TipoEnvio } from '../types/enums/TipoEnvio';
-import { FormaPago } from '../types/enums/FormaPago';
 import { FaSearch } from "react-icons/fa";
+import { getEstadoTexto, getFormaPagoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -94,50 +94,6 @@ const MisPedidos = () => {
       className: "",
     },
   ];
-
-  const mostrarSoloNumero = (codigo: string) => {
-    const partes = codigo.split("-");
-    return partes[partes.length - 1];
-  };
-
-  const getEstadoTexto = (estado: Estado) => {
-    switch (estado) {
-      case Estado.SOLICITADO:
-        return "Solicitado";
-      case Estado.EN_PREPARACION:
-        return "En preparación";
-      case Estado.EN_CAMINO:
-        return "En camino";
-      case Estado.ENTREGADO:
-        return "Entregado";
-      case Estado.TERMINADO:
-        return "Terminado";
-      default:
-        return "Desconocido";
-    }
-  };
-
-  const getTipoEnvioTexto = (tipoEnvio: TipoEnvio) => {
-    switch (tipoEnvio) {
-      case TipoEnvio.DELIVERY:
-        return "Delivery";
-      case TipoEnvio.RETIRO_LOCAL:
-        return "Retiro en local";
-      default:
-        return "Desconocido";
-    }
-  };
-
-  const getFormaPagoTexto = (formaPago: FormaPago) => {
-    switch (formaPago) {
-      case FormaPago.MERCADO_PAGO:
-        return "Mercado Pago";
-      case FormaPago.EFECTIVO:
-        return "Efectivo";
-      default:
-        return "Desconocido";
-    }
-  };
 
   const filtrarPedidos = (pedidos: PedidoResponseDTO[]): PedidoResponseDTO[] => {
     let pedidosFiltrados = pedidos;
