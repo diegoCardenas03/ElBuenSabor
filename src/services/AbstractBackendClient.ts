@@ -9,6 +9,8 @@ export abstract class AbstractBackendClient<RequestType, ResponseType> {
 
   abstract getById(id: number): Promise<ResponseType | null>;
 
+  abstract getByAuth0Id(id: number): Promise<ResponseType | null>;
+
   abstract post(data: RequestType): Promise<ResponseType>;
   abstract put(id: number, data: RequestType): Promise<ResponseType>;
 

@@ -25,9 +25,6 @@ const authSlice = createSlice({
     setRol: (state, action: PayloadAction<string | null>) => {
       state.rol = action.payload;
     },
-    setUserId: (state, action: PayloadAction<string | null>) => {
-      state.userId = action.payload;
-    },
     clearAuth: (state) => {
       state.token = null;
       state.rol = null;
@@ -37,5 +34,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setToken, setRol, setUserId, clearAuth } = authSlice.actions;
+export const { setToken, setRol, clearAuth } = authSlice.actions;
 export default authSlice.reducer;

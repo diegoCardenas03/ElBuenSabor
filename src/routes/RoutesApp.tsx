@@ -13,7 +13,7 @@ import MisDirecciones from '../pages/misDirecciones';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
-import {Estadistica} from '../pages/admin/Estadistica';
+import { Estadistica } from '../pages/admin/Estadistica';
 
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
@@ -22,15 +22,17 @@ import Empleados from '../pages/admin/Empleados';
 import { CallbackPage } from '../pages/CallBackPage';
 import { LoginRedirect } from '../pages/LoginWithRedirect';
 import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
+import { PublicRoute } from './PublicRoute';
 
 const RoutesApp = () => {
   return (
     <Routes>
       {/* Rutas públicas */}
-      <Route path="/" element={<Landing />} />
-      <Route path="/Menu" element={<Menu />} />
-      <Route path="/callback" element={<CallbackPage />} />
-      <Route path="/login-redirect" element={<LoginRedirect />} />
+      <Route path="/"
+        element={<PublicRoute> <Landing /> </PublicRoute>} />
+      <Route path="/Menu" element={<PublicRoute><Menu /></PublicRoute>} />
+      <Route path="/callback" element={<PublicRoute><CallbackPage /></PublicRoute>} />
+      <Route path="/login-redirect" element={<PublicRoute><LoginRedirect /></PublicRoute>} />
 
       {/* Rutas privadas para clientes */}
       <Route
@@ -44,7 +46,7 @@ const RoutesApp = () => {
       <Route
         path="/MisDirecciones"
         element={
-          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin']}>
             <MisDirecciones />
           </ProtectedRoute>
         }
@@ -142,7 +144,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/MiPerfil"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
             <MiPerfilEmpleadoPage />
           </ProtectedRoute>
         }
@@ -150,7 +152,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/Empleados"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin' , 'Admin']}>
             <Empleados />
           </ProtectedRoute>
         }
@@ -158,7 +160,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/Clientes"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
             <Clientes />
           </ProtectedRoute>
         }
@@ -166,7 +168,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/Estadistica"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
             <Estadistica />
           </ProtectedRoute>
         }

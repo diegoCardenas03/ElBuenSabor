@@ -20,8 +20,8 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     return data as ResponseType;
   }
 
-  async getByAny(any: string, argument: string): Promise<ResponseType | null> {
-    const response = await fetch(`${this.baseUrl}/${any}/${argument}`);
+  async getByAuth0Id(id: number): Promise<ResponseType | null> {
+    const response = await fetch(`${this.baseUrl}/auth0/${id}`);
     if (!response.ok) {
       return null;
     }

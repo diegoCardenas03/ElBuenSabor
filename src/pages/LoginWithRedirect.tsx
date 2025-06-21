@@ -3,48 +3,41 @@ import { useNavigate } from "react-router-dom";
 import { useAuthHandler } from "../hooks/useAuthHandler";
 import { Loader } from "../components/commons/Loader";
 import ModalUserExtraData from "../components/modals/ModalExtraData";
-import { useAppSelector } from "../hooks/redux";
+
 
 export const LoginRedirect = () => {
   const navigate = useNavigate();
   const { authStatus, isAuthenticated, isProcessing } = useAuthHandler();
   const [showExtraDataModal, setShowExtraDataModal] = useState(false);
-  const clienteId = useAppSelector((state) => state.auth.userId);
+  const userRole = sessionStorage.getItem('user_role');
 
- 
 
   useEffect(() => {
-    console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
+  console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
 
-    // Si no está autenticado, redirigir al login
-    if (!isAuthenticated && authStatus === 'completed') {
-      console.log("[LoginRedirect] No autenticado, redirigiendo a login");
-      navigate("/login");
-      return;
+  // Si no está autenticado, redirigir al login
+  if (!isAuthenticated && authStatus === 'completed') {
+    console.log("[LoginRedirect] No autenticado, redirigiendo a login");
+    navigate("/login");
+    return;
+  }
+
+  // Si la autenticación está completa y exitosa
+  if (authStatus === 'completed' && isAuthenticated) {
+    console.log("[LoginRedirect] Autenticación completada exitosamente");
+
+    // Solo mostrar el modal si el usuario fue recién creado
+    const needsExtraData = sessionStorage.getItem('user_needs_extra_data');
+    if (userRole === "Cliente" && needsExtraData === 'true') {
+      setShowExtraDataModal(true);
+    } else if (userRole === "Admin" || userRole === "SuperAdmin") {
+      // Redirige a la configuración de admin
+      navigate("/admin/Configuracion");
+    } else {
+      navigate("/");
     }
-
-    // Si la autenticación está completa y exitosa
-    if (authStatus === 'completed' && isAuthenticated) {
-      console.log("[LoginRedirect] Autenticación completada exitosamente");
-
-
-
-      // Verificar si necesita datos adicionales
-      const userTelefono = sessionStorage.getItem('user_telefono');
-
-      
-
-      console.log("[LoginRedirect] Datos del usuario:", { clienteId, userTelefono });
-
-      if (clienteId && (!userTelefono || userTelefono === "")) {
-        console.log("[LoginRedirect] Usuario necesita completar datos adicionales");
-        setShowExtraDataModal(true);
-      } else {
-        console.log("[LoginRedirect] Usuario completo, redirigiendo a home");
-        navigate("/");
-      }
-    }
-  }, [authStatus, isAuthenticated, navigate]);
+  }
+}, [authStatus, isAuthenticated, navigate, userRole]);
 
   const handleExtraDataComplete = () => {
     console.log("[LoginRedirect] Datos adicionales completados");
@@ -73,10 +66,9 @@ export const LoginRedirect = () => {
   }
 
   // Mostrar modal de datos adicionales si es necesario
-  if (showExtraDataModal && clienteId) {
+  if (showExtraDataModal) {
     return (
       <ModalUserExtraData
-        clienteId={parseInt(clienteId)}
         onComplete={handleExtraDataComplete}
       />
     );

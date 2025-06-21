@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
   const dispatch = useAppDispatch();
 
   // ✅ NUEVO: Auth0 integration
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, user } = useAuth0();
   const { authStatus } = useAuthHandler();
 
   // --- OPTIMIZACIÓN: Leer datos de sessionStorage si existen ---
@@ -64,6 +64,8 @@ export const Header: React.FC<HeaderProps> = ({
   const isAppLoading =
     (!hasSessionData && isLoading) ||
     (isAuthenticated && authStatus === 'checking');
+
+  const isAEmployee = user?.[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] !== 'Cliente';
 
 
   useEffect(() => {

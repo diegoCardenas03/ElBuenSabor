@@ -3,21 +3,22 @@ import Swal from "sweetalert2";
 import interceptorApiClient from "../../interceptors/Axios.interceptor";
 import { useAuthHandler } from "../../hooks/useAuthHandler";
 import { Loader } from "../commons/Loader";
+import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
 
 interface ModalUserExtraDataProps {
-  clienteId: number;
   onComplete: () => void;
 }
 
 export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
-  clienteId,
   onComplete,
 }) => {
   const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
   const [nombre, setNombre] = useState(""); // ✅ VACÍO POR DEFECTO
   const [loading, setLoading] = useState(false);
   const [clienteData, setClienteData] = useState<any>(null);
+  const { user } = useAuth0();
+  const isGoogleAcount = user?.sub?.startsWith('google');
 
   // ✅ Importar función para completar sessionStorage
   const { completeSessionData } = useAuthHandler();
@@ -26,12 +27,11 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
   useEffect(() => {
     const fetchClienteData = async () => {
       try {
-        const response = await interceptorApiClient.get(`/api/clientes/${clienteId}`);
+        const response = await interceptorApiClient.get(`/api/clientes/email/${user?.email}`);
         setClienteData(response.data);
 
         // Pre-llenar campos si ya existen
         if (response.data.telefono) setTelefono(response.data.telefono);
-        if (response.data.direccion) setDireccion(response.data.direccion);
 
         // ✅ MODIFICADO: NO pre-llenar el nombre, dejarlo vacío
         // Solo si por alguna razón ya tiene nombre completo lo mostramos
@@ -45,7 +45,7 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
     };
 
     fetchClienteData();
-  }, [clienteId]);
+  },[]);
 
   // Obtener id del rol auth0
   const obtenerIdRolAuth0Cliente = async () => {
@@ -114,7 +114,15 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
 
       console.log("Enviando clienteDTO:", clienteDTO);
 
-      const response = await interceptorApiClient.put(`/api/clientes/update/${clienteId}`, clienteDTO);
+      await axios.put(
+        `${import.meta.env.VITE_API_SERVER_URL}/api/clientes/update/auth0Id/${user?.sub}`,
+        clienteDTO,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+          },
+        }
+      );
 
       // ✅ NUEVO: Completar datos de sessionStorage usando la función del hook
       await completeSessionData({
@@ -163,28 +171,27 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
           Por favor, completa tus datos para continuar.
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
+         {!isGoogleAcount ? ( <input
             type="text"
             placeholder="Nombre completo"
             className="mb-4 border-b border-secondary outline-none bg-transparent"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
-          />
+          />) : ( <input
+            type="text"
+            placeholder="Nombre completo"
+            className="mb-4 border-b border-secondary outline-none bg-transparent cursor-not-allowed"
+            value={nombre}
+            disabled
+            readOnly
+          />) }
           <input
             type="tel"
             placeholder="Teléfono"
             className="mb-4 border-b border-secondary outline-none bg-transparent"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Dirección"
-            className="mb-4 border-b border-secondary outline-none bg-transparent"
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
             required
           />
           <button

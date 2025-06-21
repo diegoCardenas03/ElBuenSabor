@@ -1,101 +1,92 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch, FaPen, FaChevronDown, FaChevronUp, FaEyeSlash } from "react-icons/fa";
 import PermisosModal from "./RolModal";
-
-// Datos mock con permisos y oculto
-const mockRoles = [
-  {
-    id: 1,
-    name: "Cocinero",
-    permisos: ["Insumos", "Productos", "Pedidos"],
-    oculto: false,
-  },
-  {
-    id: 2,
-    name: "Cajero",
-    permisos: [],
-    oculto: false,
-  },
-  {
-    id: 3,
-    name: "Delivery",
-    permisos: [],
-    oculto: false,
-  },
-  {
-    id: 4,
-    name: "Cliente",
-    permisos: [],
-    oculto: false,
-  },
-  {
-    id: 5,
-    name: "Administrador",
-    permisos: [],
-    oculto: false,
-  }
-];
+import { RolService } from "../../services/RolService";
+import { RolResponseDTO } from "../../types/Rol/RolResponseDTO";
 
 const Roles = () => {
   const [busqueda, setBusqueda] = useState<string>("");
-  const [roles, setRoles] = useState(mockRoles);
-  const [loading] = useState(false);
-  const [error] = useState<string | null>(null);
+  const [roles, setRoles] = useState<RolResponseDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [expandedRole, setExpandedRole] = useState<number | null>(null);
+
+  useEffect(() => {
+    const getRoles = async () => {
+      try {
+        setLoading(true);
+        const rolesService = new RolService();
+        const rolesData = await rolesService.getAll();
+        setRoles(rolesData);
+        setError(null);
+      } catch (error) {
+        setError('[Roles.tsx] Ocurrió un error al traer roles');
+        console.log('[Roles.tsx] Ocurrió un error al traer roles: ', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getRoles();
+  }, []);
 
   // Modal state
   const [modalAbierto, setModalAbierto] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [rolSeleccionado, setRolSeleccionado] = useState<any>(null);
+  const [rolSeleccionado, setRolSeleccionado] = useState<RolResponseDTO | null>(null);
 
   // Filtrado por búsqueda
   const filteredRoles = roles.filter(rol =>
-    rol.name.toLowerCase().includes(busqueda.toLowerCase())
+    rol.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  // Ordenar: visibles primero, ocultos después
+  // Ordenar: visibles primero, ocultos después (si tienes un campo oculto)
   const orderedRoles = [
-    ...filteredRoles.filter(rol => !rol.oculto),
-    ...filteredRoles.filter(rol => rol.oculto),
+    ...filteredRoles.filter((rol: any) => !rol.oculto),
+    ...filteredRoles.filter((rol: any) => rol.oculto),
   ];
 
-  // Abrir modal para editar/agregar permisos
-  const handleAbrirModal = (rol?: typeof mockRoles[0]) => {
+  // Abrir modal para editar/agregar rol
+  const handleAbrirModal = (rol?: RolResponseDTO) => {
     if (rol) {
       setIsEditing(true);
       setRolSeleccionado(rol);
     } else {
       setIsEditing(false);
       setRolSeleccionado({
-        id: Date.now(),
-        name: "",
-        permisos: [],
-        oculto: false
+        id: 0, // No se enviará al backend, solo para evitar undefined
+        nombre: "",
+        descripcion: "",
+        auth0RolId: "",
       });
     }
     setModalAbierto(true);
   };
 
-  // Guardar permisos y/o cambios del rol
-  const handleGuardarRol = (data: { nombre: string; permisos: string[]; oculto: boolean }) => {
+  // Guardar cambios del rol
+  const handleGuardarRol = async (data: { nombre: string; descripcion: string }) => {
     if (isEditing && rolSeleccionado) {
+      // Editar rol existente (puedes agregar lógica para actualizar en backend si lo necesitas)
       setRoles(prevRoles =>
         prevRoles.map(rol =>
           rol.id === rolSeleccionado.id
-            ? { ...rol, name: data.nombre, permisos: data.permisos, oculto: data.oculto }
+            ? { ...rol, nombre: data.nombre, descripcion: data.descripcion }
             : rol
         )
       );
     } else {
-      setRoles(prevRoles => [
-        ...prevRoles,
-        {
-          id: Date.now(),
-          name: data.nombre,
-          permisos: data.permisos,
-          oculto: data.oculto
-        }
-      ]);
+      // Crear nuevo rol (no enviar id, el backend lo genera)
+      try {
+        const rolesService = new RolService();
+        const nuevoRol = await rolesService.post({
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+        });
+        setRoles(prevRoles => [...prevRoles, nuevoRol]);
+      } catch (error) {
+        setError('[Roles.tsx] Error al crear rol');
+        console.log('[Roles.tsx] Error al crear rol:', error);
+      }
     }
   };
 
@@ -139,7 +130,7 @@ const Roles = () => {
           {!loading && !error && orderedRoles.length === 0 && (
             <p className="text-red-500 p-4 bg-white rounded-b-2xl shadow">No hay ningún rol creado...</p>
           )}
-          {!loading && !error && orderedRoles.map((rol) => (
+          {!loading && !error && orderedRoles.map((rol: any) => (
             <li
               key={rol.id}
               className={`
@@ -164,7 +155,7 @@ const Roles = () => {
                     className={`text-lg font-semibold cursor-pointer py-4 ${expandedRole === rol.id ? "text-secondary" : ""}`}
                     onClick={() => setExpandedRole(expandedRole === rol.id ? null : rol.id)}
                   >
-                    {rol.name}
+                    {rol.nombre}
                   </span>
                   {rol.oculto && <FaEyeSlash className="ml-2 text-gray-400" title="Oculto" />}
                 </div>
@@ -183,24 +174,15 @@ const Roles = () => {
                   </button>
                 </div>
               </div>
-              {/* Permisos */}
+              {/* Puedes mostrar más info si lo deseas */}
               {expandedRole === rol.id && (
                 <div className="mt-2 mb-4 ml-2">
-                  {rol.permisos.length === 0 ? (
-                    <span className="text-gray-500 text-base ml-4">Sin permisos asignados</span>
-                  ) : (
-                    <ul className="ml-4 mb-2">
-                      {rol.permisos.map((permiso, idx) => (
-                        <li key={idx} className="text-base text-black">- {permiso}</li>
-                      ))}
-                    </ul>
-                  )}
-                  <button
-                    className="text-secondary text-sm ml-4 font-bold hover:underline"
-                    onClick={() => handleAbrirModal(rol)}
-                  >
-                    + Agregar permiso
-                  </button>
+                  <div className="ml-4 mb-2 text-gray-700">
+                    <strong>Descripción:</strong> {rol.descripcion || "Sin descripción"}
+                  </div>
+                  <div className="ml-4 mb-2 text-gray-700">
+                    <strong>Auth0 Rol ID:</strong> {rol.auth0RolId || "No asignado"}
+                  </div>
                 </div>
               )}
             </li>
@@ -211,9 +193,8 @@ const Roles = () => {
         open={modalAbierto}
         onClose={() => setModalAbierto(false)}
         onSave={handleGuardarRol}
-        initialPermisos={rolSeleccionado?.permisos}
-        rolName={rolSeleccionado?.name}
-        initialOculto={rolSeleccionado?.oculto}
+        rolName={rolSeleccionado?.nombre}
+        initialDescripcion={rolSeleccionado?.descripcion}
       />
     </div>
   );

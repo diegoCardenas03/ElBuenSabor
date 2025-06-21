@@ -6,6 +6,11 @@ import { FaEye, FaEyeSlash, FaPen } from "react-icons/fa";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { EmpleadoDTO } from "../types/Empleado/EmpleadoDTO";
+import { EmpleadoResponseDTO } from "../types/Empleado/EmpleadoResponseDTO";
+import { DomicilioResponseDTO } from "../types/Domicilio/DomicilioResponseDTO";
+import { DomicilioDTO } from "../types/Domicilio/DomicilioDTO";
+import { setDireccion } from "../hooks/redux/slices/CarritoReducer";
 
 type PerfilEmpleadoForm = {
   nombre: string;
@@ -18,6 +23,7 @@ export const MiPerfilEmpleadoPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const { user, isAuthenticated } = useAuth0();
+  const [empleadoResponseDto, setEmpleadoResponseDto] = useState<EmpleadoResponseDTO | null>(null);
 
   // Valores iniciales para comparar cambios
   const initialValues = useRef<PerfilEmpleadoForm>({
@@ -46,7 +52,6 @@ export const MiPerfilEmpleadoPage = () => {
   useEffect(() => {
     if (isAuthenticated && user) {
       setValue("nombre", nombreEmpleado);
-      setValue("telefono", telefonoEmpleado);
       setValue("password", "");
       setValue("repeatPassword", "");
       initialValues.current = {
@@ -62,6 +67,24 @@ export const MiPerfilEmpleadoPage = () => {
         repeatPassword: "",
       });
     }
+
+    const obtenerEmpleado = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_SERVER_URL}/api/empleados/email/${user?.email}`, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+          },
+        });
+        if (response) {
+          setEmpleadoResponseDto(response.data);
+          setValue("telefono", response.data.telefono);
+        }
+      } catch (error) {
+        console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      }
+    }
+    obtenerEmpleado();
+
   }, [isAuthenticated, user, setValue, nombreEmpleado, telefonoEmpleado, reset]);
 
   // Detectar cambios
@@ -76,18 +99,48 @@ export const MiPerfilEmpleadoPage = () => {
     password.length > 0 ||
     repeatPassword.length > 0;
 
+  const obtenerIdRolAuth0Cliente = async () => {
+    const rolName = sessionStorage.getItem('user_role');
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_SERVER_URL}/api/admin/roles/nombre/${rolName}`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+        },
+      });
+      return response.data.auth0RolId as string;
+    } catch (error) {
+      console.log(`Error en obtenerIdRolAuth0: ${error}`);
+    }
+  }
+
+
+
+
   // Guardar cambios (ajusta según tu backend)
   const onSubmit = async (data: PerfilEmpleadoForm) => {
     try {
-      // Aquí deberías armar el DTO y hacer el request a tu backend
-      // Ejemplo:
-      /*
+      console.log('nombre: ', data.nombre + 'telefono: ', data.telefono);
+      const domicilio: DomicilioDTO = empleadoResponseDto!.domicilio;
+      const auth0RolId = await obtenerIdRolAuth0Cliente();
+      // Construir el objeto ClienteDTO
+      const empleadoDTO: EmpleadoDTO = {
+        nombreCompleto: data.nombre,
+        telefono: data.telefono,
+        usuario: {
+          email: user?.email,
+          nombreCompleto: data.nombre,
+          contrasenia: data.password.length > 0 ? data.password : undefined,
+          roles: [auth0RolId!]
+        },
+        domicilio: domicilio
+      };
+
       await axios.put(
-        `${import.meta.env.VITE_API_SERVER_URL}/api/empleados/update/${empleadoId}`,
-        { ... },
+        `${import.meta.env.VITE_API_SERVER_URL}/api/empleados/update/auth0Id/${user?.sub}`,
+        empleadoDTO,
         { headers: { Authorization: `Bearer ${sessionStorage.getItem("auth_token")}` } }
       );
-      */
+
       // Actualizar sessionStorage si cambió el nombre o teléfono
       if (data.nombre !== initialValues.current.nombre) {
         sessionStorage.setItem("user_name", data.nombre);
@@ -120,18 +173,18 @@ export const MiPerfilEmpleadoPage = () => {
 
   return (
     <>
-      <AdminHeader text="MI PERFIL"/>
+      <AdminHeader text="MI PERFIL" />
       <div className="min-h-screen bg-[#FDF5E6] flex justify-center items-start pt-8 px-4">
         <div className="w-full max-w-4xl flex flex-col md:flex-row items-start justify-center gap-8 relative">
           <div className="flex-shrink-0 flex flex-col items-center w-full md:w-auto pt-8">
-            <img 
-              src={fotoEmpleado} 
-              alt="Empleado" 
+            <img
+              src={fotoEmpleado}
+              alt="Empleado"
               className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover mb-2"
             />
           </div>
-          <form 
-            onSubmit={handleSubmit(onSubmit)} 
+          <form
+            onSubmit={handleSubmit(onSubmit)}
             className="flex-1 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col gap-2 mt-2 md:mt-0 pt-8 mx-auto"
           >
             <label className="font-semibold text-base mb-1">Nombre*

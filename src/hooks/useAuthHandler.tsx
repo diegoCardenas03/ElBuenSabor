@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { setToken, setRol, setUserId, clearAuth } from "../hooks/redux/slices/AuthReducer";
+import { setToken, setRol, clearAuth } from "../hooks/redux/slices/AuthReducer";
 import { interceptorApiClient } from '../interceptors/Axios.interceptor'
 import { UsuarioDTO } from "../types/Usuario/UsuarioDTO";
 import { ClienteDTO } from "../types/Cliente/ClienteDTO";
@@ -28,7 +28,7 @@ const getFromSession = (key: string): string | null => {
 
 
 
-const clearSession = () => {
+export const clearSession = () => {
   try {
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('user_role');
@@ -36,7 +36,6 @@ const clearSession = () => {
     sessionStorage.removeItem('user_email');
     sessionStorage.removeItem('user_picture');
     sessionStorage.removeItem('auth_completed');
-    sessionStorage.removeItem('user_id_db');
     sessionStorage.removeItem('user_telefono');
     sessionStorage.removeItem('user_needs_extra_data');
     // console.log("[useAuthHandler] clearSession ejecutado");
@@ -143,18 +142,19 @@ export const useAuthHandler = () => {
       let token: string;
 
       token = await getAccessTokenSilently({ cacheMode: "off" });
-      // console.log("[useAuthHandler] Token obtenido con Google:", token);
+      console.log("[useAuthHandler] Token obtenido con Google:", token);
 
 
       dispatch(setToken(token));
       dispatch(setRol("Cliente"));
-      dispatch(setUserId(createResponse.data.id));
+
 
       // ✅ CAMBIO PRINCIPAL: Solo guardar datos esenciales, marcar que necesita datos extra
       saveToSession('auth_token', token);
       saveToSession('user_role', 'Cliente');
       saveToSession('user_email', userData.email || user?.email || "");
       saveToSession('user_picture', user?.picture || "");
+      saveToSession('user_id_db', createResponse.data.id || "");
 
       // ✅ CONDICIONAL: Si es nuevo usuario de Google y no tiene teléfono, marcar para datos extra
 
@@ -189,7 +189,7 @@ export const useAuthHandler = () => {
     const savedRole = getFromSession('user_role');
     const needsExtraData = getFromSession('user_needs_extra_data');
 
-    // ✅ MODIFICADO: Si necesita datos extra y no tiene nombre, usar email como fallback
+    // ✅ MODIFICADO: Si necesita datos extra y no tiene nombre, usar email como fallback (Salio del modal)
     if (savedToken && savedRole && needsExtraData === 'true') {
       const userName = getFromSession('user_name');
       if (!userName) {
@@ -213,7 +213,12 @@ export const useAuthHandler = () => {
 
     try {
       const rol = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0];
+      console.log('user:', user);
+      console.log('VITE_AUTH0_AUDIENCE:', import.meta.env.VITE_AUTH0_AUDIENCE);
+      console.log('roles en user:', user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]);
+      console.log('rolUsuario:', rol);
       // console.log("[useAuthHandler] Rol detectado en user:", rol);
+
 
       if (rol) {
         const token = await getAccessTokenSilently();
@@ -233,8 +238,19 @@ export const useAuthHandler = () => {
 
       // Verificar si usuario existe en BD
       try {
+
+
+
         // console.log("[useAuthHandler] Buscando usuario en BD por email:", user.email);
-        const response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
+        let response;
+        const rolUsuario = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] || "Cliente";
+        console.log('Rol detectado para usuario:', rolUsuario);
+        if (rolUsuario === "Cliente") {
+          response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
+        } else {
+          response = await interceptorApiClient.get(`/api/empleados/email/${user.email}`);
+          console.log('respuesta empleado: ', response);
+        }
         // console.log("[useAuthHandler] Usuario encontrado en BD:", response.data);
 
         const token = await getAccessTokenSilently();
@@ -245,7 +261,6 @@ export const useAuthHandler = () => {
 
         dispatch(setToken(token));
         dispatch(setRol(userRole));
-        dispatch(setUserId(response.data.id))
         saveToSession('auth_token', token);
         saveToSession('user_role', userRole);
         saveToSession('auth_completed', 'true');
@@ -271,7 +286,7 @@ export const useAuthHandler = () => {
 
         if (is404Error) {
           // console.log("[useAuthHandler] Usuario no existe en BD, creando usuario...");
-           await createUser({
+          await createUser({
             email: user.email,
             nombreCompleto: user.name || user.email,
             telefono: user.phone_number || "",
@@ -315,7 +330,8 @@ export const useAuthHandler = () => {
     isAuthenticated,
     isCreatingUser: authStatus === 'creating-user',
     isProcessing: authStatus === 'checking' || authStatus === 'creating-user',
-    createUser, 
-    completeSessionData // ✅ Función para completar datos
+    createUser,
+    completeSessionData,
+    clearSession // ✅ Función para completar datos
   };
 };

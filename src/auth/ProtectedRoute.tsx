@@ -1,9 +1,12 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAppSelector } from "../hooks/redux";
+// import { useAppSelector } from "../hooks/redux";
 import { useAuthHandler } from "../hooks/useAuthHandler";
 import { Loader } from "../components/commons/Loader";
+import axios from "axios";
+import { UsuarioResponseDTO } from "../types/Usuario/UsuarioResponseDTO";
+import Swal from "sweetalert2";
 
 interface Props {
   children: ReactNode;
@@ -12,48 +15,107 @@ interface Props {
 
 export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   const { isAuthenticated, isLoading } = useAuth0();
-  const { authStatus } = useAuthHandler();
-  const userRole = useAppSelector((state) => state.auth.rol);
+  const { clearSession } = useAuthHandler();
+  const [userDataState, setUserDataState] = useState<UsuarioResponseDTO | null>(null);
 
-  const sessionRole = sessionStorage.getItem('user_role');
-  const sessionCompleted = sessionStorage.getItem('auth_completed') === 'true';
+  // const userRole = useAppSelector((state) => state.auth.rol);
+
+  // const sessionRole = sessionStorage.getItem('user_role');
+  // const sessionCompleted = sessionStorage.getItem('auth_completed') === 'true';
+
+  //Envia el token a validar y trae la data del usuario
+  const userData = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_SERVER_URL}/api/usuarios/me`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+        },
+      });
+      return response.data as UsuarioResponseDTO;
+    } catch (error) {
+      console.log(`[Protected Route] Error al validar token: ${error}`);
+    }
+  }
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const data = await userData();
+      console.log('userDatA: ', data)
+      if (data) setUserDataState(data);
+    };
+    fetchUserData();
+  }, []);
+
+  // Ejemplo: verificar si el usuario tiene algún rol permitido
+  const hasAllowedRole =
+    userDataState?.roles?.some((rol: any) => allowedRoles.includes(rol.nombre));
+
+  console.log('Has allowed Role, ', hasAllowedRole);
 
   // 1. Loading de Auth0
   if (isLoading) {
     console.log("[ProtectedRoute] Auth0 loading...");
-    return <Loader/>;
+    return <Loader />;
   }
 
   // 2. No autenticado
   if (!isAuthenticated) {
     console.log("[ProtectedRoute] No autenticado, redirigiendo al home");
+    clearSession();
     return <Navigate to="/" replace />;
   }
 
-  // 3. Esperar a que useAuthHandler termine si no hay datos aún
-  if (
-    isAuthenticated &&
-    !sessionCompleted &&
-    (!userRole || !allowedRoles.includes(userRole)) &&
-    (authStatus === 'idle' || authStatus === 'checking' || authStatus === 'creating-user')
-  ) {
-    console.log("[ProtectedRoute] Esperando datos de sesión o rol...");
-    return null;
+  // 3. Esperar a que los datos del usuario estén listos
+  if (userDataState === null) {
+    return <Loader message="Cargando datos de usuario..." />;
   }
 
-  // 4. Si hay datos en sessionStorage válidos, permite acceso
-  if (sessionCompleted && sessionRole && allowedRoles.includes(sessionRole)) {
-    console.log("[ProtectedRoute] Acceso por sessionStorage");
-    return <>{children}</>;
-  }
-
-  // 5. Si hay datos en Redux válidos, permite acceso
-  if (userRole && allowedRoles.includes(userRole)) {
+  // 4. Si está autenticado, es valido el token y cumple con los roles se redirige al hijo
+  if (isAuthenticated && hasAllowedRole) {
     console.log("[ProtectedRoute] Acceso por Redux");
     return <>{children}</>;
   }
 
   // 6. Si terminó el proceso y no tiene permisos, redirige
   console.log("[ProtectedRoute] Sin permisos, redirigiendo al home");
-  return <Navigate to="/" replace />;
+  Swal.fire({
+    title: "¡Error!",
+    text: "Ten cuidado amiguito, se donde vives.",
+    icon: "error",
+    confirmButtonText: "Aceptar",
+  })
+
+  if (userDataState.roles[0].nombre === 'Cliente')
+    return <Navigate to="/" replace />;
+  else if (userDataState.roles[0].nombre === 'Admin') {
+    return <Navigate to="/admin/configuracion" replace />
+  }
+  else if(userDataState.roles[0].nombre === 'Cocinero') {
+    return <Navigate to="/admin/pedidos" replace />
+  }
+  else if(userDataState.roles[0].nombre === 'Delivery') {
+    return <Navigate to="/admin/delivery" replace />
+  }
+  else if(userDataState.roles[0].nombre === 'Cajero') {
+    return <Navigate to="/admin/pantallaCajero" replace />
+  }
 };
+
+
+
+// // 3. Esperar a que useAuthHandler termine si no hay datos aún
+// if (
+//   isAuthenticated &&
+//   !sessionCompleted &&
+//   (hasAllowedRole) &&
+//   (authStatus === 'idle' || authStatus === 'checking' || authStatus === 'creating-user')
+// ) {
+//   console.log("[ProtectedRoute] Esperando datos de sesión o rol...");
+//   return <Loader message="Esperando datos de sesión..." />;
+// }
+
+// // 4. Si hay datos en sessionStorage válidos, permite acceso
+// if (sessionCompleted && hasAllowedRole) {
+//   console.log("[ProtectedRoute] Acceso por sessionStorage");
+//   return <>{children}</>;
+// }

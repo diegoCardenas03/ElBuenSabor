@@ -6,7 +6,7 @@ import { FaEye, FaEyeSlash, FaPen } from "react-icons/fa";
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useAppSelector } from "../hooks/redux";
+import { ClienteDTO } from "../types/Cliente/ClienteDTO";
 
 type PerfilForm = {
   nombre: string;
@@ -19,7 +19,10 @@ export const MiPerfilUsuarioPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const { user, isAuthenticated } = useAuth0();
-  const clienteId = useAppSelector((state) => state.auth.userId);
+  const isGoogleAccount = user?.sub?.startsWith('google');
+
+
+
 
   // Datos iniciales para comparar cambios
   const initialValues = useRef<PerfilForm>({
@@ -42,7 +45,7 @@ export const MiPerfilUsuarioPage = () => {
   const emailUsuario = user?.email || "Sin email";
   const fotoUsuario = user?.picture || usuarioImg;
   const telefonoUsuario = sessionStorage.getItem('user_telefono') || user?.phone_number || "";
-  
+
 
   // Cargar datos del usuario al montar el componente
   useEffect(() => {
@@ -90,30 +93,32 @@ export const MiPerfilUsuarioPage = () => {
           Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
         },
       });
-      return response.data.auth0RolId as String;
+      return response.data.auth0RolId as string;
     } catch (error) {
       console.log(`Error en obtenerIdRolAuth0: ${error}`);
     }
   }
+
 
   // Guardar cambios
   const onSubmit = async (data: PerfilForm) => {
     try {
       const auth0RolId = await obtenerIdRolAuth0Cliente();
       // Construir el objeto ClienteDTO
-      const clienteDTO = {
+
+      const clienteDTO: ClienteDTO = {
         nombreCompleto: data.nombre,
         telefono: data.telefono,
         usuario: {
           email: emailUsuario,
           nombreCompleto: data.nombre,
           contrasenia: data.password.length > 0 ? data.password : undefined,
-          roles: [auth0RolId]
+          roles: [auth0RolId!]
         }
       };
 
       await axios.put(
-        `${import.meta.env.VITE_API_SERVER_URL}/api/clientes/update/${clienteId}`,
+        `${import.meta.env.VITE_API_SERVER_URL}/api/clientes/update/auth0Id/${user?.sub}`,
         clienteDTO,
         {
           headers: {
@@ -170,16 +175,29 @@ export const MiPerfilUsuarioPage = () => {
           />
         </div>
         <form className="flex-1 w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col gap-2 mt-2 md:mt-0 pt-8 mx-auto" onSubmit={handleSubmit(onSubmit)} >
-          <label className="font-semibold text-base mb-1">Nombre
+
+          {!isGoogleAccount ? (<label className="font-semibold text-base mb-1">Nombre
             <div className="flex items-center">
               <input className="w-full border-b border-black bg-transparent font-bold outline-none py-1"
                 {...register("nombre", { required: true })}
                 type="text"
+                disabled={isGoogleAccount}
               />
               <FaPen className="ml-2 text-[#222] cursor-pointer w-4 h-4" />
             </div>
             {errors.nombre && <span className="text-xs text-red-500">Este campo es requerido</span>}
-          </label>
+          </label>) : (<label className="font-semibold text-base mb-1">Nombre
+            <div className="flex items-center">
+              <input className="w-full border-b border-black bg-transparent font-normal outline-none py-1 cursor-not-allowed"
+                {...register("nombre", { required: true })}
+                type="text"
+                disabled={isGoogleAccount}
+                readOnly
+              />
+            </div>
+            {errors.nombre && <span className="text-xs text-red-500">Este campo es requerido</span>}
+          </label>)}
+
           <label className="font-semibold text-base mb-1">Teléfono
             <div className="flex items-center">
               <input
@@ -192,6 +210,7 @@ export const MiPerfilUsuarioPage = () => {
             </div>
             {errors.telefono && <span className="text-xs text-red-500">Este campo es requerido</span>}
           </label>
+
           <label className="font-semibold text-base mb-1">Email
             <div className="flex items-center">
               <input
@@ -203,7 +222,8 @@ export const MiPerfilUsuarioPage = () => {
               />
             </div>
           </label>
-          <label className="font-semibold text-base mb-1 mt-2">Contraseña
+
+          {!isGoogleAccount && (<label className="font-semibold text-base mb-1 mt-2">Contraseña
             <div className="flex items-center">
               <input
                 type={showPassword ? "text" : "password"}
@@ -236,8 +256,9 @@ export const MiPerfilUsuarioPage = () => {
                 {errors.password.message || "Contraseña inválida"}
               </span>
             )}
-          </label>
-          <label className="font-semibold text-base mb-1">Repetir contraseña
+          </label>)}
+
+          {!isGoogleAccount && (<label className="font-semibold text-base mb-1">Repetir contraseña
             <div className="flex items-center">
               <input
                 type={showRepeatPassword ? "text" : "password"}
@@ -264,7 +285,9 @@ export const MiPerfilUsuarioPage = () => {
                 {errors.repeatPassword.message}
               </span>
             )}
-          </label>
+          </label>)}
+
+
           <a href="/MisDirecciones" className="text-[#d32f2f] font-semibold text-sm mt-2 hover:underline" >Editar mis direcciones &gt;</a>
           <button
             type="submit"

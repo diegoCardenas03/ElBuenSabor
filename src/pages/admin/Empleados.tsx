@@ -106,6 +106,8 @@ const Empleados = () => {
             );
         }
 
+        empleadoFiltrados = empleadoFiltrados.filter((e) => e.usuario.roles[0].nombre !== 'Admin');
+
         return empleadoFiltrados;
     };
 
