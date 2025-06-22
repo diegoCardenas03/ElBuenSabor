@@ -10,6 +10,8 @@ import Swal from "sweetalert2";
 import { EmpleadoResponseDTO } from "../../types/Empleado/EmpleadoResponseDTO";
 import { EmpleadosService } from "../../services/EmpleadosService";
 import { BiSolidPencil } from "react-icons/bi";
+import { ModalEmpleado } from "../../components/modals/ModalEmpleado";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type FiltroState = {
     estado: "TODOS" | "ACTIVO" | "INACTIVO";
@@ -31,6 +33,11 @@ const Empleados = () => {
             empleados.flatMap(e => e.usuario.roles.map(r => r.nombre))
         )
     );
+    const [openModalEmpleado, setOpenModalEmpleado] = useState(false);
+    const [empleadoEditar, setEmpleadoEditar] = useState<EmpleadoResponseDTO | null>(null);
+    const usuarioActualEmail = sessionStorage.getItem('user_email');
+
+
 
     const ColumnsTableEmpleados = [
         {
@@ -53,35 +60,41 @@ const Empleados = () => {
         {
             label: "Activo",
             key: "activo",
-            render: (empleado: EmpleadoResponseDTO) => (
-                <Switch
-                    checked={empleado.activo}
-                    onChange={async () => {
-                        try {
-                            await empleadosService.updateEstado(empleado.id)
-                            getEmpleados();
-                        } catch (error) {
-                            Swal.fire(
-                                error instanceof Error ? error.message : String(error),
-                                "No se pudo actualizar el estado",
-                                "error"
-                            );
-                        }
-                    }}
-                    color="primary"
-                />
-            ),
+            render: (empleado: EmpleadoResponseDTO) =>
+                empleado.usuario.email === usuarioActualEmail ? (
+                    <span className="text-gray-400">No disponible</span>
+                ) : (
+                    <Switch
+                    
+                        checked={empleado.activo}
+                        onChange={async () => {
+                            try {
+                                await empleadosService.updateEstado(empleado.id)
+                                getEmpleados();
+                            } catch (error) {
+                                Swal.fire(
+                                    error instanceof Error ? error.message : String(error),
+                                    "No se pudo actualizar el estado",
+                                    "error"
+                                );
+                            }
+                        }}
+                        color="primary"
+                    />
+                ),
         },
         {
             label: "",
             key: "",
-            render: (empleado: EmpleadoResponseDTO) => (
-                <button
-                    className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
-                >
-                    <BiSolidPencil size={20} />
-                </button>
-            ),
+            render: (empleado: EmpleadoResponseDTO) =>
+                empleado.usuario.email === usuarioActualEmail ? null : (
+                    <button
+                        className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
+                        onClick={() => handleOpenEditarEmpleado(empleado)}
+                    >
+                        <BiSolidPencil size={20} />
+                    </button>
+                ),
         },
     ]
 
@@ -106,7 +119,7 @@ const Empleados = () => {
             );
         }
 
-        empleadoFiltrados = empleadoFiltrados.filter((e) => e.usuario.roles[0].nombre !== 'Admin');
+ 
 
         return empleadoFiltrados;
     };
@@ -138,6 +151,16 @@ const Empleados = () => {
         setLoading(true);
         getEmpleados();
     }, [filtros]);
+
+    const handleOpenCrearEmpleado = () => {
+        setEmpleadoEditar(null); // Para crear, no hay empleado seleccionado
+        setOpenModalEmpleado(true);
+    };
+
+    const handleOpenEditarEmpleado = (empleado: EmpleadoResponseDTO) => {
+        setEmpleadoEditar(empleado);
+        setOpenModalEmpleado(true);
+    };
 
     return (
         <>
@@ -178,6 +201,7 @@ const Empleados = () => {
                     </div>
                     <button
                         className="rounded-3xl bg-secondary text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
+                        onClick={handleOpenCrearEmpleado}
 
                     >
                         + Agregar Empleado
@@ -287,6 +311,13 @@ const Empleados = () => {
                     </div>
                 </div>
             )}
+
+            <ModalEmpleado
+                open={openModalEmpleado}
+                onClose={() => setOpenModalEmpleado(false)}
+                getEmpleados={getEmpleados}
+                empleado={empleadoEditar}
+            />
         </>
     )
 }

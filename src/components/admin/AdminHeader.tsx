@@ -68,21 +68,20 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/configuracion', label: 'Configuración' },
       { path: '/admin/delivery', label: 'Delivery' },
     ],
-    COCINERO: [
-      { path: '/admin/perfil', label: 'Mi Perfil' },
+    Cocinero: [
+      { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/insumos', label: 'Insumos' },
       { path: '/admin/productos', label: 'Productos' },
       { path: '/admin/pedidos', label: 'Pedidos' }
     ],
-    CAJERO: [
-      { path: '/admin/perfil', label: 'Mi Perfil' },
+    Cajero: [
+      { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/pedidos', label: 'Pedidos' }
     ],
-    DELIVERY: [
-      { path: '/admin/perfil', label: 'Mi Perfil' },
+    Delivery: [
+      { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/entregas', label: 'Entregas' }
-    ],
-    CLIENTE: []
+    ]
   };
 
   // Mapeo de nombres amigables para los roles

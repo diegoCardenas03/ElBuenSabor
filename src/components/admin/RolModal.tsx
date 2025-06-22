@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2"; 
 
 interface PermisosModalProps {
   open: boolean;
@@ -44,7 +45,7 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
       <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-secondary text-2xl"
+          className="absolute top-3 right-3 text-gray-400 hover:text-secondary text-2xl cursor-pointer"
         >
           ×
         </button>
@@ -86,13 +87,13 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
         </div>
         <div className="flex justify-end gap-2">
           <button
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 cursor-pointer"
             onClick={onClose}
           >
             Cancelar
           </button>
           <button
-            className="px-4 py-2 rounded bg-secondary text-white hover:bg-[#bd1e23ce]"
+            className="px-4 py-2 rounded bg-secondary text-white hover:bg-[#bd1e23ce] cursor-pointer"
             onClick={handleSave}
             disabled={!nombre.trim()}
           >

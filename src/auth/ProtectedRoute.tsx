@@ -14,9 +14,10 @@ interface Props {
 }
 
 export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, logout, getAccessTokenSilently } = useAuth0();
   const { clearSession } = useAuthHandler();
   const [userDataState, setUserDataState] = useState<UsuarioResponseDTO | null>(null);
+  
 
   // const userRole = useAppSelector((state) => state.auth.rol);
 
@@ -26,14 +27,24 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   //Envia el token a validar y trae la data del usuario
   const userData = async () => {
     try {
+      const token = await getAccessTokenSilently();
       const response = await axios.get(`${import.meta.env.VITE_API_SERVER_URL}/api/usuarios/me`, {
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       return response.data as UsuarioResponseDTO;
     } catch (error) {
       console.log(`[Protected Route] Error al validar token: ${error}`);
+      Swal.fire({
+        title: "¡Error!",
+        text: "Su identidad no ha podido validarse. Redirigiendo...",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      })
+      logout();
+      <Navigate to="/" replace />;
+
     }
   }
 
@@ -90,13 +101,13 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   else if (userDataState.roles[0].nombre === 'Admin') {
     return <Navigate to="/admin/configuracion" replace />
   }
-  else if(userDataState.roles[0].nombre === 'Cocinero') {
-    return <Navigate to="/admin/pedidos" replace />
+  else if (userDataState.roles[0].nombre === 'Cocinero') {
+    return <Navigate to="/admin/PedidosCocinero" replace />
   }
-  else if(userDataState.roles[0].nombre === 'Delivery') {
+  else if (userDataState.roles[0].nombre === 'Delivery') {
     return <Navigate to="/admin/delivery" replace />
   }
-  else if(userDataState.roles[0].nombre === 'Cajero') {
+  else if (userDataState.roles[0].nombre === 'Cajero') {
     return <Navigate to="/admin/pantallaCajero" replace />
   }
 };

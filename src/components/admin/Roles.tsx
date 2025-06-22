@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { FaSearch, FaPen, FaChevronDown, FaChevronUp, FaEyeSlash } from "react-icons/fa";
+import { FaSearch, FaPen, FaChevronDown, FaChevronUp, FaEyeSlash, FaTrash } from "react-icons/fa";
 import PermisosModal from "./RolModal";
 import { RolService } from "../../services/RolService";
 import { RolResponseDTO } from "../../types/Rol/RolResponseDTO";
+import Swal from "sweetalert2";
 
 const Roles = () => {
   const [busqueda, setBusqueda] = useState<string>("");
@@ -10,6 +11,46 @@ const Roles = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedRole, setExpandedRole] = useState<number | null>(null);
+  const [reloadRoles, setReloadRoles] = useState(0);
+
+  // Guardar cambios del rol
+  const handleGuardarRol = async (data: { nombre: string; descripcion: string }) => {
+    const rolesService = new RolService();
+    if (isEditing && rolSeleccionado) {
+      try {
+        // Llama al servicio para actualizar el rol por auth0RolId
+        await rolesService.putByAuth0Id(rolSeleccionado.auth0RolId, {
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+        });
+        Swal.fire("¡Éxito!", "Rol actualizado correctamente.", "success");
+        setReloadRoles(prev => prev + 1);
+      } catch (error) {
+        setError('[Roles.tsx] Error al editar rol');
+        Swal.fire("Error", "No se pudo editar el rol.", "error");
+        console.log('[Roles.tsx] Error al editar rol:', error);
+      }
+    } else {
+      // Crear nuevo rol (no enviar id, el backend lo genera)
+      try {
+        const nuevoRol = await rolesService.post({
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+        });
+        Swal.fire({
+          title: "¡Éxito!",
+          text: "Rol creado correctamente!.",
+          icon: "success",
+          confirmButtonText: "Aceptar",
+        });
+        setRoles(prevRoles => [...prevRoles, nuevoRol]);
+        setReloadRoles(prev => prev + 1);
+      } catch (error) {
+        setError('[Roles.tsx] Error al crear rol');
+        console.log('[Roles.tsx] Error al crear rol:', error);
+      }
+    }
+  };
 
   useEffect(() => {
     const getRoles = async () => {
@@ -28,7 +69,7 @@ const Roles = () => {
     };
 
     getRoles();
-  }, []);
+  }, [reloadRoles]);
 
   // Modal state
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -36,8 +77,8 @@ const Roles = () => {
   const [rolSeleccionado, setRolSeleccionado] = useState<RolResponseDTO | null>(null);
 
   // Filtrado por búsqueda
-  const filteredRoles = roles.filter(rol =>
-    rol.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  const filteredRoles = roles.filter(
+    rol => rol.nombre && rol.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   // Ordenar: visibles primero, ocultos después (si tienes un campo oculto)
@@ -63,32 +104,32 @@ const Roles = () => {
     setModalAbierto(true);
   };
 
-  // Guardar cambios del rol
-  const handleGuardarRol = async (data: { nombre: string; descripcion: string }) => {
-    if (isEditing && rolSeleccionado) {
-      // Editar rol existente (puedes agregar lógica para actualizar en backend si lo necesitas)
-      setRoles(prevRoles =>
-        prevRoles.map(rol =>
-          rol.id === rolSeleccionado.id
-            ? { ...rol, nombre: data.nombre, descripcion: data.descripcion }
-            : rol
-        )
-      );
-    } else {
-      // Crear nuevo rol (no enviar id, el backend lo genera)
+  const handleEliminarRol = async (rol: RolResponseDTO) => {
+    const confirm = await Swal.fire({
+      title: "¿Eliminar rol?",
+      text: `¿Seguro que deseas eliminar el rol "${rol.nombre}"? Esta acción no se puede deshacer.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (confirm.isConfirmed) {
       try {
         const rolesService = new RolService();
-        const nuevoRol = await rolesService.post({
-          nombre: data.nombre,
-          descripcion: data.descripcion,
-        });
-        setRoles(prevRoles => [...prevRoles, nuevoRol]);
+        await rolesService.deletePhysicalByAuth0Id(rol.auth0RolId);
+        Swal.fire("Eliminado", "El rol fue eliminado correctamente.", "success");
+        setReloadRoles(prev => prev + 1);
       } catch (error) {
-        setError('[Roles.tsx] Error al crear rol');
-        console.log('[Roles.tsx] Error al crear rol:', error);
+        Swal.fire("Error", "No se pudo eliminar el rol.", "error");
+        console.error("[Roles.tsx] Error al eliminar rol:", error);
       }
     }
   };
+
+
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen py-10">
@@ -161,16 +202,23 @@ const Roles = () => {
                 </div>
                 <div className="flex items-center gap-5">
                   <button
-                    className="p-1 text-secondary hover:bg-gray-100 rounded-full"
+                    className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+                    onClick={() => setExpandedRole(expandedRole === rol.id ? null : rol.id)}
+                  >
+                    {expandedRole === rol.id ? <FaChevronUp size={18} /> : <FaChevronDown size={18} />}
+                  </button>
+                  <button
+                    className="p-1 text-secondary hover:bg-gray-100 rounded-full cursor-pointer"
                     onClick={() => handleAbrirModal(rol)}
                   >
                     <FaPen size={18} />
                   </button>
                   <button
-                    className="p-1 hover:bg-gray-100 rounded-full"
-                    onClick={() => setExpandedRole(expandedRole === rol.id ? null : rol.id)}
+                    className="p-1 text-red-500 hover:bg-red-100 rounded-full cursor-pointer"
+                    onClick={() => handleEliminarRol(rol)}
+                    title="Eliminar rol"
                   >
-                    {expandedRole === rol.id ? <FaChevronUp size={18} /> : <FaChevronDown size={18} />}
+                    <FaTrash size={18} />
                   </button>
                 </div>
               </div>

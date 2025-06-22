@@ -7,9 +7,5 @@ export class ClientesService extends BackendClient<ClienteDTO, ClienteResponseDT
     super("http://localhost:8080/api/clientes"); 
   }
 
-  //Exclusivos de cliente
 
-  async getByEmail(email: string): Promise<ClienteResponseDTO | null> {
-    return this.getByAny('email', email);
-  }
 }

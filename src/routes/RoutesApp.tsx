@@ -96,7 +96,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/Insumos"
         element={
-          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin', 'Cocinero']}>
             <ScreenInsumo />
           </ProtectedRoute>
         }
@@ -104,7 +104,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/productos"
         element={
-          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin', 'Cocinero']}>
             <ScreenProducto />
           </ProtectedRoute>
         }
@@ -144,7 +144,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/MiPerfil"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin', 'Cocinero', 'Delivery', 'Cajero']}>
             <MiPerfilEmpleadoPage />
           </ProtectedRoute>
         }
