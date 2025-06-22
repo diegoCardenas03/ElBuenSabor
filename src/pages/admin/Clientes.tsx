@@ -40,7 +40,7 @@ const Clientes = () => {
         {
             label: "Rol",
             key: "rol",
-            render: (cliente: ClienteResponseDTO) => cliente.usuario.roles.map(r => r.nombre).join(', ')
+            render: (cliente: ClienteResponseDTO) => cliente.usuario.roles?.map(r => r.nombre).join(', ')
         },
         {
             label: "Activo",

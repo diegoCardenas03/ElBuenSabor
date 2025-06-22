@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PromocionResponseDTO } from "../../types/Promocion/PromocionResponseDTO";     
 import { TableGeneric } from "../../components/TableGeneric";
 import { CircularProgress } from "@mui/material";

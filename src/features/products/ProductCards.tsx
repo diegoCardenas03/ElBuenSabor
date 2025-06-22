@@ -4,51 +4,54 @@ import { agregarProducto } from "../../hooks/redux/slices/CarritoReducer";
 import { PromocionResponseDTO } from '../../types/Promocion/PromocionResponseDTO';
 import Swal from 'sweetalert2';
 
-type ProductoUnificadoOConPromo = ProductoUnificado | PromocionResponseDTO;
-
+ 
 interface ProductCardsProps {
-  products: ProductoUnificadoOConPromo[];
-  onCardClick?: (product: ProductoUnificadoOConPromo) => void;
+  products: ProductoUnificado[];
+  onCardClick?: (product: ProductoUnificado) => void;
   showBadges?: boolean;
 }
 
 export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick}) => {
   const dispatch = useDispatch();
 
-  const handleAgregar = (product: ProductoUnificadoOConPromo) => {
-    if (dispatch(agregarProducto(product)) && 'fechaDesde' in product && 'fechaHasta' in product) {
-      Swal.fire({
-        icon: "success",
-        title: "Promoción agregada al carrito",
-        text: product.denominacion,
-        timer: 1000,
-        showConfirmButton: false,
-        width: "20em"
-      });
-      // Si querés agregar promociones al carrito, adaptá aquí
-      return;
-    }
-    // Producto/Insumo normal
-    if (dispatch(agregarProducto(product))) {
-      Swal.fire({
-        position: "bottom-end",
-        icon: "success",
-        title: "Producto agregado correctamente",
-        showConfirmButton: false,
-        timer: 1000,
-        width: "20em"
-      });
-    } else {
-      Swal.fire({
-        position: "bottom-end",
-        icon: "error",
-        title: "El producto no se pudo agregar al carrito",
-        showConfirmButton: false,
-        timer: 1000,
-        width: "20em"
-      });
-    }
-  };
+ const handleAgregar = (product: ProductoUnificado) => {
+  const result = dispatch(agregarProducto(product)); // <- SOLO UNA VEZ
+
+  const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
+
+  if (result && isPromo) {
+    Swal.fire({
+      icon: "success",
+      title: "Promoción agregada al carrito",
+      text: product.denominacion,
+      timer: 1000,
+      showConfirmButton: false,
+      width: "20em"
+    });
+    return;
+  }
+
+  if (result) {
+    Swal.fire({
+      position: "bottom-end",
+      icon: "success",
+      title: "Producto agregado correctamente",
+      showConfirmButton: false,
+      timer: 1000,
+      width: "20em"
+    });
+  } else {
+    Swal.fire({
+      position: "bottom-end",
+      icon: "error",
+      title: "El producto no se pudo agregar al carrito",
+      showConfirmButton: false,
+      timer: 1000,
+      width: "20em"
+    });
+  }
+};
+
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-center">
