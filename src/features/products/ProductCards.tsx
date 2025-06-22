@@ -15,7 +15,7 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
   const dispatch = useDispatch();
 
  const handleAgregar = (product: ProductoUnificado) => {
-  const result = dispatch(agregarProducto(product)); // <- SOLO UNA VEZ
+  const result = dispatch(agregarProducto(product)); 
 
   const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
 
