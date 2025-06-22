@@ -72,11 +72,11 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/insumos', label: 'Insumos' },
       { path: '/admin/productos', label: 'Productos' },
-      { path: '/admin/pedidos', label: 'Pedidos' }
+      { path: '/admin/pedidosCocinero', label: 'Pedidos' }
     ],
     Cajero: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
-      { path: '/admin/pedidos', label: 'Pedidos' }
+      { path: '/admin/pedidosCocinero', label: 'Pedidos' }
     ],
     Delivery: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },

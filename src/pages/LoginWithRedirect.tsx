@@ -30,10 +30,8 @@ export const LoginRedirect = () => {
     const needsExtraData = sessionStorage.getItem('user_needs_extra_data');
     if (userRole === "Cliente" && needsExtraData === 'true') {
       setShowExtraDataModal(true);
-    } else if (userRole === "Admin" || userRole === "SuperAdmin") {
-      // Redirige a la configuración de admin
-      navigate("/admin/Configuracion");
-    } else {
+    } 
+    else {
       navigate("/");
     }
   }

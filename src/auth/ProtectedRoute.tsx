@@ -110,6 +110,9 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   else if (userDataState.roles[0].nombre === 'Cajero') {
     return <Navigate to="/admin/pantallaCajero" replace />
   }
+  else {
+    return <Navigate to="/" replace />
+  }
 };
 
 

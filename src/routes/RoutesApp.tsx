@@ -78,7 +78,7 @@ const RoutesApp = () => {
       <Route
         path="/MiPerfil"
         element={
-          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['Cliente']}>
             <MiPerfilUsuarioPage />
           </ProtectedRoute>
         }
