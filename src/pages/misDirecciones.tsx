@@ -13,7 +13,7 @@ const MisDirecciones = () => {
     const [direccionNueva, setDireccionNueva] = useState({ calle: "", numero: 0, localidad: '', codigoPostal: 0 });
     const { calle, numero, localidad, codigoPostal } = direccionNueva;
     const [modoEditar, setModoEditar] = useState<boolean>(false);
-    const [direccionEditando, setDireccionEditando] = useState<DomicilioDTO | null>(null);
+    const [direccionEditando, setDireccionEditando] = useState<DomicilioResponseDTO | null>(null);
     const cerrarModal = () => {
         setMostrarModal(false);
         setModoEditar(false);

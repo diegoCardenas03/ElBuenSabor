@@ -88,13 +88,13 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   }
 
   // 6. Si terminó el proceso y no tiene permisos, redirige
-  console.log("[ProtectedRoute] Sin permisos, redirigiendo al home");
-  Swal.fire({
-    title: "¡Error!",
-    text: "Ten cuidado amiguito, se donde vives.",
-    icon: "error",
-    confirmButtonText: "Aceptar",
-  })
+  // console.log("[ProtectedRoute] Sin permisos, redirigiendo al home");
+  // Swal.fire({
+  //   title: "¡Error!",
+  //   text: "Ten cuidado amiguito, se donde vives.",
+  //   icon: "error",
+  //   confirmButtonText: "Aceptar",
+  // })
 
   if (userDataState.roles[0].nombre === 'Cliente')
     return <Navigate to="/" replace />;

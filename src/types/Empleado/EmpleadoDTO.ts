@@ -6,5 +6,5 @@ export interface EmpleadoDTO {
     telefono: string;
     usuario: UsuarioDTO;
     domicilio: DomicilioDTO;
-    activo: boolean;
+    activo?: boolean;
 }

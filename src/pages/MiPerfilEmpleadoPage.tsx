@@ -129,6 +129,7 @@ export const MiPerfilEmpleadoPage = () => {
         usuario: {
           email: user?.email,
           nombreCompleto: data.nombre,
+          connection: "Username-Password-Authentication",
           contrasenia: data.password.length > 0 ? data.password : undefined,
           roles: [auth0RolId!]
         },
@@ -206,12 +207,23 @@ export const MiPerfilEmpleadoPage = () => {
                   type="text"
                   className="w-full border-b border-black bg-transparent font-bold outline-none py-1"
                   placeholder="2658579568"
-                  {...register("telefono", { required: "Este campo es requerido" })}
+                  {...register("telefono", {
+                    required: true,
+                    minLength: {
+                      value: 10,
+                      message: "El teléfono debe tener 10 caracteres"
+                    },
+                    maxLength: {
+                      value: 10,
+                      message: "El teléfono no puede tener más de 10 caracteres"
+                    }
+                  })}
                 />
                 <FaPen className="ml-2 text-[#222] cursor-pointer w-4 h-4" />
               </div>
+              <span className="text-xs text-gray-500">Debe contener al menos 10 caracteres</span>
               {errors.telefono && (
-                <span className="text-xs text-red-500">{errors.telefono.message}</span>
+                <div><span className="text-xs text-red-500">{errors.telefono.message}</span> </div>
               )}
             </label>
             <label className="font-semibold text-base mb-1">Email*

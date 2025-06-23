@@ -45,7 +45,7 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
     };
 
     fetchClienteData();
-  },[]);
+  }, []);
 
   // Obtener id del rol auth0
   const obtenerIdRolAuth0Cliente = async () => {
@@ -78,6 +78,16 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
         icon: "warning",
         title: "Nombre requerido",
         text: "Por favor, ingresa tu nombre completo.",
+      });
+      return;
+    }
+
+    // Validar teléfono de 10 caracteres
+    if (!/^\d{10}$/.test(telefono)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Teléfono inválido",
+        text: "El teléfono debe tener exactamente 10 números.",
       });
       return;
     }
@@ -171,24 +181,24 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
           Por favor, completa tus datos para continuar.
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-         {!isGoogleAcount ? ( <input
+          {!isGoogleAcount ? (<input
             type="text"
             placeholder="Nombre completo"
             className="mb-4 border-b border-secondary outline-none bg-transparent"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
-          />) : ( <input
+          />) : (<input
             type="text"
             placeholder="Nombre completo"
             className="mb-4 border-b border-secondary outline-none bg-transparent cursor-not-allowed"
             value={nombre}
             disabled
             readOnly
-          />) }
+          />)}
           <input
             type="tel"
-            placeholder="Teléfono"
+            placeholder="Por ejemplo: 2619587586"
             className="mb-4 border-b border-secondary outline-none bg-transparent"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}

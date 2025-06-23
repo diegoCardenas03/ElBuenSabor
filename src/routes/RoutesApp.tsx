@@ -23,10 +23,12 @@ import { CallbackPage } from '../pages/CallBackPage';
 import { LoginRedirect } from '../pages/LoginWithRedirect';
 import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import { PublicRoute } from './PublicRoute';
+import { PaginaNoExiste } from '../pages/PaginaNoExiste';
 
 const RoutesApp = () => {
   return (
     <Routes>
+      <Route path="*" element={<PaginaNoExiste />} />
       {/* Rutas públicas */}
       <Route path="/"
         element={<PublicRoute> <Landing /> </PublicRoute>} />
@@ -46,7 +48,7 @@ const RoutesApp = () => {
       <Route
         path="/MisDirecciones"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
             <MisDirecciones />
           </ProtectedRoute>
         }
@@ -152,7 +154,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/Empleados"
         element={
-          <ProtectedRoute allowedRoles={['SuperAdmin' , 'Admin']}>
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
             <Empleados />
           </ProtectedRoute>
         }

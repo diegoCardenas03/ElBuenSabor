@@ -7,6 +7,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { ClienteDTO } from "../types/Cliente/ClienteDTO";
+import { ClienteResponseDTO } from "../types/Cliente/ClienteResponseDTO";
 
 type PerfilForm = {
   nombre: string;
@@ -18,6 +19,7 @@ type PerfilForm = {
 export const MiPerfilUsuarioPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [clienteResponseDto, setClienteResponseDto] = useState<ClienteResponseDTO | null>(null);
   const { user, isAuthenticated } = useAuth0();
   const isGoogleAccount = user?.sub?.startsWith('google');
 
@@ -68,6 +70,23 @@ export const MiPerfilUsuarioPage = () => {
         repeatPassword: "",
       });
     }
+
+    const obtenerCliente = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_SERVER_URL}/api/clientes/email/${user?.email}`, {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("auth_token")}`,
+          },
+        });
+        if (response) {
+          setClienteResponseDto(response.data);
+          setValue("telefono", response.data.telefono);
+        }
+      } catch (error) {
+        console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      }
+    }
+    obtenerCliente();
   }, [isAuthenticated, user, setValue, nombreUsuario, telefonoUsuario, reset]);
 
   // Detectar si hay cambios en cualquier campo
@@ -202,13 +221,24 @@ export const MiPerfilUsuarioPage = () => {
             <div className="flex items-center">
               <input
                 className="w-full border-b border-black bg-transparent font-bold outline-none py-1"
-                placeholder="Por ejemplo: +5492614789652"
-                {...register("telefono", { required: true })}
+                placeholder="Por ejemplo: 2616589865"
+                {...register("telefono", {
+                  required: true,
+                  minLength: {
+                    value: 10,
+                    message: "El teléfono debe tener 10 caracteres"
+                  },
+                  maxLength: {
+                    value: 10,
+                    message: "El teléfono no puede tener más de 10 caracteres"
+                  }
+                })}
                 type="text"
               />
               <FaPen className="ml-2 text-[#222] cursor-pointer w-4 h-4" />
             </div>
-            {errors.telefono && <span className="text-xs text-red-500">Este campo es requerido</span>}
+             <span className="text-xs text-gray-500">Debe contener al menos 10 caracteres</span>
+            {errors.telefono && <div> <span className="text-xs text-red-500">Número inválido</span> </div>}
           </label>
 
           <label className="font-semibold text-base mb-1">Email
@@ -293,7 +323,7 @@ export const MiPerfilUsuarioPage = () => {
             type="submit"
             className="w-full sm:w-auto mx-auto mt-6 bg-[#FF9D3A] hover:bg-[#e68a1f] text-black font-bold py-2 px-8 rounded-full text-base shadow cursor-pointer
               disabled:bg-[#FFD59E] disabled:hover:bg-[#FFD59E] disabled:text-black disabled:cursor-not-allowed disabled:opacity-100"
-            disabled={!isDirty}
+            disabled={!isDirty || !!errors.telefono}
           >Guardar Cambios
           </button>
         </form>
