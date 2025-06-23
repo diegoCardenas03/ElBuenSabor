@@ -9,16 +9,26 @@ import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { Switch } from "@mui/material";
+import { ModalCompra } from "../components/modals/ModalCompra";
 // Definición de la URL base de la API
 // const API_URL = import.meta.env.VITE_API_URL;
 export const ScreenInsumo = () => {
   // Estado para controlar la carga de datos
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
+  const [openModalCompra, setOpenModalCompra] = useState(false);
+  const [insumos, setInsumos] = useState<InsumoResponseDTO[]>([]);
 
   const insumoService = new InsumoService();
   const dispatch = useAppDispatch();
-
+  const cargarInsumos = async () => {
+    const api = new InsumoService();
+    const data = await api.getAll();
+    setInsumos(data);
+  };
+  useEffect(() => {
+    cargarInsumos();
+  }, []);
 
   // Columnas de la tabla de insumos
   const ColumnsTableInsumo = [
@@ -38,7 +48,8 @@ export const ScreenInsumo = () => {
     {
       label: "Precio Venta",
       key: "precioVenta",
-      render: (insumo: InsumoResponseDTO) => insumo.precioVenta ? insumo.precioVenta : "Sin precio venta",
+      render: (insumo: InsumoResponseDTO) =>
+        insumo.precioVenta ? insumo.precioVenta : "Sin precio venta",
     },
     {
       label: "Stock Actual",
@@ -56,7 +67,8 @@ export const ScreenInsumo = () => {
     {
       label: "Para Elaborar",
       key: "esParaElaborar",
-      render: (insumo: InsumoResponseDTO) => (insumo.esParaElaborar ? "Sí" : "No"),
+      render: (insumo: InsumoResponseDTO) =>
+        insumo.esParaElaborar ? "Sí" : "No",
     },
     {
       label: "Activo",
@@ -66,7 +78,7 @@ export const ScreenInsumo = () => {
           checked={insumo.activo}
           onChange={async () => {
             try {
-              await insumoService.updateEstado(insumo.id)
+              await insumoService.updateEstado(insumo.id);
               getInsumos(); // Actualizás la tabla
             } catch (error) {
               Swal.fire(
@@ -84,7 +96,8 @@ export const ScreenInsumo = () => {
     {
       label: "Rubro",
       key: "rubro",
-      render: (insumo: InsumoResponseDTO) => insumo.rubro?.denominacion ?? "Sin rubro"
+      render: (insumo: InsumoResponseDTO) =>
+        insumo.rubro?.denominacion ?? "Sin rubro",
     },
 
     {
@@ -93,7 +106,7 @@ export const ScreenInsumo = () => {
     },
   ];
 
-  // Función para manejar el borrado de una persona
+  // Función para manejar el borrado de un insumo
   const handleDelete = async (id: number) => {
     // Mostrar confirmación antes de eliminar
     Swal.fire({
@@ -110,7 +123,6 @@ export const ScreenInsumo = () => {
         // Eliminar la persona si se confirma
         insumoService.delete(id).then(() => {
           getInsumos();
-
         });
       }
     });
@@ -132,29 +144,25 @@ export const ScreenInsumo = () => {
   return (
     <>
       <AdminHeader text="Insumos" />
-      <div className=" bg-[#FFF4E0] h-screen">
-        <div
-          style={{
-            padding: ".4rem",
-            display: "flex",
-            justifyContent: "flex-end",
-            width: "90%",
-
-          }}
-        >
-
-          {/* Botón para abrir el modal de agregar insumos */}
-          <button className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 
-          font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
-            style={{ borderRadius: '9999px' }}
-            onClick={() => {
-              setOpenModal(true);
-            }}
-          // variant="contained"
-          >
-            + Crear insumo
-          </button>
-        </div>
+      <div className=" bg-[#FFF4E0] h-screen mt">
+<div
+  className="flex justify-end w-[90%] gap-4 p-[.4rem]"
+>
+  
+  <button
+    className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
+    style={{ borderRadius: "9999px" }}
+    onClick={() => setOpenModal(true)}
+  >
+    + Crear insumo
+  </button>
+  <button
+    onClick={() => setOpenModalCompra(true)}
+    className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
+  >
+    Registrar Compra
+  </button>
+</div>
         {/* Mostrar indicador de carga mientras se cargan los datos */}
         {loading ? (
           <div
@@ -178,7 +186,10 @@ export const ScreenInsumo = () => {
             columns={ColumnsTableInsumo}
             setOpenModal={setOpenModal}
             getRowClassName={(insumo) =>
-              insumo.stockActual < insumo.stockMinimo ? "bg-red-100 text-red-900 font-semibold" : ""}
+              insumo.stockActual < insumo.stockMinimo
+                ? "bg-red-100 text-red-900 font-semibold"
+                : ""
+            }
           />
         )}
       </div>
@@ -188,6 +199,12 @@ export const ScreenInsumo = () => {
         getInsumos={getInsumos}
         openModal={openModal}
         setOpenModal={setOpenModal}
+      />
+      <ModalCompra
+        open={openModalCompra}
+        setOpen={setOpenModalCompra}
+        insumos={insumos}
+        onCompraExitosa={cargarInsumos}
       />
     </>
   );

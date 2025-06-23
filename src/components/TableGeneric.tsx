@@ -6,22 +6,22 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import TableSortLabel from "@mui/material/TableSortLabel";
 import { useEffect, useState } from "react";
 import { ButtonsTable } from "./ButtonsTable/ButtonsTable";
 import { useAppSelector } from "../hooks/redux";
 
 // Definimos la interfaz para cada columna de la tabla
 interface ITableColumn<T> {
-  label: string; // Etiqueta de la columna
-  key: string; // Clave que corresponde a la propiedad del objeto en los datos
-  render?: (item: T) => React.ReactNode; // Función opcional para personalizar la renderización del contenido de la celda
-  className?: string; // Clase CSS opcional para aplicar estilos a la celda
-
+  label: string;
+  key: string;
+  render?: (item: T) => React.ReactNode;
+  className?: string;
 }
 
 export interface ITableProps<T> {
-  columns: ITableColumn<T>[]; // Definición de las columnas de la tabla
-  handleDelete: (id: number) => void; // Función para manejar la eliminación de un elemento
+  columns: ITableColumn<T>[];
+  handleDelete: (id: number) => void;
   setOpenModal: (state: boolean) => void;
   getRowClassName?: (row: T) => string;
 }
@@ -34,112 +34,133 @@ export const TableGeneric = <T extends { id: any }>({
 }: ITableProps<T>) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+  const [orderBy, setOrderBy] = useState<string>(columns[0]?.key || '');
+  const [filter, setFilter] = useState('');
+  const [rows, setRows] = useState<any[]>([]);
+  const dataTable = useAppSelector((state) => state.tablaReducer.dataTable);
 
-  // Función para cambiar de página
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  useEffect(() => {
+    setRows(dataTable);
+  }, [dataTable]);
 
-  // Función para cambiar el número de filas por página
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
-  // Estado para almacenar las filas de la tabla
-  const [rows, setRows] = useState<any[]>([]);
+  const handleRequestSort = (property: string) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
 
-  // Obtener los datos de la tabla del estado global
-  const dataTable = useAppSelector((state) => state.tablaReducer.dataTable);
+  // Filtro
+  const filteredRows = rows.filter((row) =>
+    columns.some((col) =>
+      String(row[col.key]).toLowerCase().includes(filter.toLowerCase())
+    )
+  );
 
-  // Actualizar las filas cuando cambien los datos de la tabla
-  useEffect(() => {
-    setRows(dataTable);
-  }, [dataTable]);
+  // Orden
+  const getComparator = (order: 'asc' | 'desc', orderBy: string) =>
+    order === 'desc'
+      ? (a: any, b: any) => (b[orderBy] < a[orderBy] ? -1 : b[orderBy] > a[orderBy] ? 1 : 0)
+      : (a: any, b: any) => (a[orderBy] < b[orderBy] ? -1 : a[orderBy] > b[orderBy] ? 1 : 0);
+
+  const sortedRows = [...filteredRows].sort(getComparator(order, orderBy));
 
   return (
     <div
       style={{
         width: "100%",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
+      
       {/* Contenedor del componente Paper */}
       <Paper sx={{ width: "90%", overflow: "hidden" }}>
-        {/* Contenedor de la tabla */}
         <TableContainer sx={{ maxHeight: "80vh" }}>
-          {/* Tabla */}
           <Table stickyHeader aria-label="sticky table">
-            {/* Encabezado de la tabla */}
             <TableHead>
               <TableRow>
                 {columns.map((column, i: number) => (
-                  <TableCell key={i} align={"center"} className={column.className}
+                  <TableCell
+                    key={i}
+                    align={"center"}
+                    className={column.className}
+                    sortDirection={orderBy === column.key ? order : false}
                     sx={{
+                      cursor: "pointer",
+                      userSelect: "none",
                       display: {
                         xs: column.className?.includes("hidden") ? "none" : "table-cell",
                         sm: "table-cell",
                       },
-                    }}>
-                    {column.label}
+                    }}
+                    onClick={() => handleRequestSort(column.key)}
+                  >
+                    <TableSortLabel
+                      active={orderBy === column.key}
+                      direction={orderBy === column.key ? order : 'asc'}
+                    >
+                      {column.label}
+                    </TableSortLabel>
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
-            {/* Cuerpo de la tabla */}
             <TableBody>
-              {rows
+              {sortedRows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index: number) => {
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={index}
-                      className={getRowClassName ? getRowClassName(row) : ""}
-                    >
-                      {/* Celdas de la fila */}
-                      {columns.map((column, i: number) => {
-                        return (
-                          <TableCell key={i} align={"center"} className={column.className}
-                            sx={{
-                              display: {
-                                xs: column.className?.includes("hidden") ? "none" : "table-cell",
-                                sm: "table-cell",
-                              },
-                            }}>
-                            {
-                              column.render ? ( // Si existe la función "render" se ejecuta
-                                column.render(row)
-                              ) : column.label === "Acciones" ? ( // Si el label de la columna es "Acciones" se renderizan los botones de acción
-                                <ButtonsTable
-                                  el={row}
-                                  handleDelete={handleDelete}
-                                  setOpenModal={setOpenModal}
-                                />
-                              ) : (
-                                row[column.key]
-                              ) // Si no hay una función personalizada, se renderiza el contenido de la celda tal cual
-                            }
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
+                .map((row, index: number) => (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={index}
+                    className={getRowClassName ? getRowClassName(row) : ""}
+                  >
+                    {columns.map((column, i: number) => (
+                      <TableCell
+                        key={i}
+                        align={"center"}
+                        className={column.className}
+                        sx={{
+                          display: {
+                            xs: column.className?.includes("hidden") ? "none" : "table-cell",
+                            sm: "table-cell",
+                          },
+                        }}
+                      >
+                        {column.render
+                          ? column.render(row)
+                          : column.label === "Acciones"
+                          ? (
+                            <ButtonsTable
+                              el={row}
+                              handleDelete={handleDelete}
+                              setOpenModal={setOpenModal}
+                            />
+                          ) : (
+                            row[column.key]
+                          )
+                        }
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
-        {/* Paginación de la tabla */}
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={rows.length}
+          count={sortedRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
