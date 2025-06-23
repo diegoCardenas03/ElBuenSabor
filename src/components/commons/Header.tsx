@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 import Swal from 'sweetalert2';
+import { fetchPedidoByCodigo } from '../../hooks/redux/slices/PedidoReducer';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -29,6 +30,23 @@ export const Header: React.FC<HeaderProps> = ({
   const dispatch = useAppDispatch();
 
   const usuarioLogeado = true;
+  const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
+  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
+
+  useEffect(() => {
+    const raw = localStorage.getItem('pedidoEnCurso');
+    console.log("Valor pedidoEnCurso", raw);
+    let codigo: string | null = null;
+    if (raw && raw !== "undefined" && raw !== "null") {
+      try {
+        codigo = JSON.parse(raw);
+      } catch { }
+    }
+    if (codigo) {
+      dispatch(fetchPedidoByCodigo(codigo));
+    }
+  }, [dispatch]);
+
 
   useEffect(() => {
     if (carritoAbierto && carrito.length === 0) {
@@ -58,7 +76,24 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
           </div>
         ) : (
-          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+          <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+            <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+            {!showBackButton && pedidoEnCurso && (
+              <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+                <div
+                  className={`h-5 border-l flex-shrink-0 text-secondary`}
+                ></div>
+                <span
+                  key={pedidoEnCurso.id}
+                  className="font-secondary text-base cursor-pointer max-w-[120px] truncate text-secondary"
+                  onClick={() => setModalPedidoEnCurso(true)}
+                >
+                  Ver pedido en curso
+                </span>
+
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -89,15 +124,15 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex-shrink-0 cursor-pointer"
           fill={whiteUserBar ? "white" : ""}
           color={whiteUserBar ? "white" : "black"}
-          onClick={() => carrito.length === 0 ? 
-          Swal.fire({
-            position: "center",
-            icon: "error",
-            title: "El carrito esta vacio",
-            showConfirmButton: false,
-            timer: 1000,
-            width: "20em"
-          }) : dispatch(abrirCarrito())}
+          onClick={() => carrito.length === 0 ?
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: "El carrito esta vacio",
+              showConfirmButton: false,
+              timer: 1500,
+              width: "20em"
+            }) : dispatch(abrirCarrito())}
         />
         {carritoAbierto && (
           <div className="fixed inset-0 z-50">
@@ -117,6 +152,6 @@ export const Header: React.FC<HeaderProps> = ({
         nombreUsuario={nombreUsuario}
         whiteUserBar={navbarOpen ? true : whiteUserBar} // <- SIEMPRE BLANCO SI ESTÁ ABIERTO
       />
-    </header>
+    </header >
   );
 };

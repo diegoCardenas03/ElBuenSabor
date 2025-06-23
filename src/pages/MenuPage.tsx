@@ -68,7 +68,7 @@ export const MenuPage: React.FC = () => {
       Swal.fire({
         position: "bottom-end",
         icon: "success",
-        title: "Producto agregado correctamente",
+        text: "Producto agregado correctamente",
         showConfirmButton: false,
         timer: 1000,
         width: "20em"
@@ -77,7 +77,7 @@ export const MenuPage: React.FC = () => {
       Swal.fire({
         position: "bottom-end",
         icon: "error",
-        title: "El producto no se pudo agregar al carrito",
+        text: "El producto no se pudo agregar al carrito",
         showConfirmButton: false,
         timer: 1000,
         width: "20em"

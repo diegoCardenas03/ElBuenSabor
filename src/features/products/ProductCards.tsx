@@ -18,9 +18,9 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
   const handleAgregar = (product: ProductoUnificadoOConPromo) => {
     if (dispatch(agregarProducto(product)) && 'fechaDesde' in product && 'fechaHasta' in product) {
       Swal.fire({
+        position: "bottom-end",
         icon: "success",
-        title: "Promoción agregada al carrito",
-        text: product.denominacion,
+        text: "Promoción agregada al carrito",
         timer: 1000,
         showConfirmButton: false,
         width: "20em"
@@ -33,7 +33,7 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
       Swal.fire({
         position: "bottom-end",
         icon: "success",
-        title: "Producto agregado correctamente",
+        text: "Producto agregado correctamente",
         showConfirmButton: false,
         timer: 1000,
         width: "20em"
@@ -42,7 +42,7 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
       Swal.fire({
         position: "bottom-end",
         icon: "error",
-        title: "El producto no se pudo agregar al carrito",
+        text: "El producto no se pudo agregar al carrito",
         showConfirmButton: false,
         timer: 1000,
         width: "20em"

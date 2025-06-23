@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Header } from '../components/commons/Header'
 import { PedidosService } from '../services/PedidosService';
-import { useAppDispatch } from '../hooks/redux';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { MdRemoveRedEye, MdOutlineFileDownload } from "react-icons/md";
 import { IoFilterSharp } from "react-icons/io5";
@@ -12,6 +12,7 @@ import { Estado } from '../types/enums/Estado';
 import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getFormaPagoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
+import { updateEstadoPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -60,6 +61,7 @@ const MisPedidos = () => {
     {
       label: "Total",
       key: "totalVenta",
+       render: (pedido: PedidoResponseDTO) => (<p>${pedido.totalVenta}</p>),
       className: "hidden sm:table-cell",
     },
     {
@@ -94,6 +96,25 @@ const MisPedidos = () => {
       className: "",
     },
   ];
+
+  const cancelarPedido = async (pedido: PedidoResponseDTO) => {
+    try {
+      let nuevoEstado = pedido.estado;
+      if (pedido.estado === Estado.SOLICITADO) {
+        nuevoEstado = Estado.CANCELADO;
+      } else {
+        return;
+      }
+
+      await dispatch(updateEstadoPedidoThunk({pedidoId: pedido.id, nuevoEstado: nuevoEstado}));
+
+      getPedidos();
+      setPedidoSeleccionado(null);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const filtrarPedidos = (pedidos: PedidoResponseDTO[]): PedidoResponseDTO[] => {
     let pedidosFiltrados = pedidos;
@@ -268,6 +289,14 @@ const MisPedidos = () => {
                 </strong>
               </li>
             </ul>
+            <div className='flex justify-end items-center'>
+              <button
+                className={`${pedidoSeleccionado.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
+                onClick={() => cancelarPedido(pedidoSeleccionado)}
+              >
+                Cancelar pedido
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -284,7 +313,6 @@ const MisPedidos = () => {
             >
               ✕
             </button>
-
 
             <h2 className='text-secondary text-base font-bold text-center mb-1'>Filtros</h2>
             <button

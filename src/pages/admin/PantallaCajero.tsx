@@ -12,6 +12,8 @@ import { Estado } from "../../types/enums/Estado";
 import PedidoDetalleModal from "../../components/modals/PedidoDetalleModal"
 import { PedidosService } from "../../services/PedidosService";
 import { mostrarSoloNumero } from "../../utils/PedidoUtils";
+import { TipoEnvio } from "../../types/enums/TipoEnvio";
+import { updateEstadoPedidoThunk } from "../../hooks/redux/slices/PedidoReducer";
 
 const estadosTabs = [
   { label: "Solicitado", value: Estado.SOLICITADO },
@@ -34,10 +36,10 @@ export const PantallaCajero = () => {
   const dispatch = useAppDispatch();
 
   const ColumnsTablePedido = [
-    { 
-      label: "Orden", 
+    {
+      label: "Orden",
       key: "codigo",
-       render: (pedido: PedidoResponseDTO) => mostrarSoloNumero(pedido.codigo),
+      render: (pedido: PedidoResponseDTO) => mostrarSoloNumero(pedido.codigo),
     },
     {
       label: "Envío",
@@ -51,10 +53,10 @@ export const PantallaCajero = () => {
     {
       label: "Hora estimada finalización",
       key: "horaEstimadaFin",
-      render: (pedido: PedidoResponseDTO) => pedido.horaEstimadaFin || "Sin dato",
+      render: (pedido: PedidoResponseDTO) => estadoActual == Estado.CANCELADO ? "---" : pedido.horaEstimadaFin,
     },
     {
-      label: "Agregar tiempo",
+      label: estadoActual == Estado.ENTREGADO || estadoActual == Estado.CANCELADO ? "" : "Agregar tiempo",
       key: "agregarTiempo",
       render: (pedido: PedidoResponseDTO) =>
         pedido.estado === Estado.ENTREGADO || pedido.estado === Estado.CANCELADO ? (
@@ -62,8 +64,8 @@ export const PantallaCajero = () => {
         ) : (
           <div className="flex justify-center items-center">
             <AiOutlinePlus
-              className="text-red-600 text-xl cursor-pointer hover:scale-110 transition"
-              onClick={() => agregarTiempo(pedido)}
+              className={`${pedido.estado == Estado.TERMINADO && pedido.tipoEnvio == TipoEnvio.RETIRO_LOCAL ? "disabled" : "text-red-600 text-xl cursor-pointer hover:scale-110 transition"}`}
+              onClick={() => { pedido.estado == Estado.TERMINADO && pedido.tipoEnvio == TipoEnvio.RETIRO_LOCAL ? '' : agregarTiempo(pedido) }}
             />
           </div>
         ),
@@ -89,6 +91,28 @@ export const PantallaCajero = () => {
           />
         </div>
       ),
+    },
+    {
+      label: estadoActual == Estado.TERMINADO ? "Siguiente estado" : "",
+      key: "estado",
+      render: (pedido: PedidoResponseDTO) => {
+        let texto = "";
+        if (pedido.estado === Estado.SOLICITADO) {
+          texto = "Cancelar pedido";
+        } else if (pedido.estado === Estado.TERMINADO) {
+          if (pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
+            texto = "Entregar"
+          }
+        }
+        return (
+          <button 
+            {...texto == "" ? { className: "" } : { className: "bg-secondary text-white rounded-full px-1 py-1 w-[70%] cursor-pointer hover:scale-105 transition-transform" }}
+            onClick={() => cambiarEstado(pedido)}
+            >
+            {texto}
+          </button>
+        );
+      }
     },
   ];
 
@@ -146,6 +170,27 @@ export const PantallaCajero = () => {
         }
       }
     });
+  };
+
+  const cambiarEstado = async (pedido: PedidoResponseDTO) => {
+    try {
+      let nuevoEstado = pedido.estado;
+      if (pedido.estado === Estado.SOLICITADO) {
+        nuevoEstado = Estado.CANCELADO;
+      } else if (pedido.estado === Estado.TERMINADO && pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
+        nuevoEstado = Estado.ENTREGADO;
+      } else {
+        return;
+      }
+
+      await dispatch(updateEstadoPedidoThunk({pedidoId: pedido.id, nuevoEstado: nuevoEstado}));
+
+      getPedidos();
+      setPedidoSeleccionado(null);
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {

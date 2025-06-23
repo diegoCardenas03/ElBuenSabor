@@ -39,9 +39,11 @@ function loadCarritoState(): CarritoState {
     };
 }
 
-// Cambiá las funciones de identificación si es necesario:
 export const obtenerId = (item: CarritoItemType): number => {
-    return item.id;
+    
+        return item.id;
+
+    
 };
 
 const carritoReducer = createSlice({

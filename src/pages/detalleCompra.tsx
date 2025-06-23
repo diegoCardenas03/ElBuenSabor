@@ -18,6 +18,8 @@ import { PedidosService } from '../services/PedidosService';
 import { TbCash } from "react-icons/tb";
 import Swal from 'sweetalert2';
 import { isPromocion } from '../utils/isPromocion';
+import { enviarPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
+
 const DetalleCompra = () => {
     const dispatch = useAppDispatch();
     const carrito = useAppSelector((state) => state.carrito.items);
@@ -41,7 +43,6 @@ const DetalleCompra = () => {
     useEffect(() => {
         if (carritoAbierto) dispatch(cerrarCarrito());
         if (tipoEntregaState) {
-            // Si es DELIVERY, selecciona Mercado Pago por defecto
             dispatch(setMetodoPago(FormaPago.MERCADO_PAGO));
         }
     }, [tipoEntregaState, dispatch, direcciones, carritoAbierto]);
@@ -79,9 +80,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Elige donde quieres recibir el pedido",
+                text: "Elige donde quieres recibir el pedido",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -90,9 +91,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Elige un método de pago",
+                text: "Elige un método de pago",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -101,9 +102,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Selecciona una dirección",
+                text: "Selecciona una dirección",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -112,9 +113,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "El carrito está vacío",
+                text: "El carrito está vacío",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -150,11 +151,12 @@ const DetalleCompra = () => {
 
         const pedido = pedidoArmado();
         try {
-            await pedidoService.post(pedido);
+            await dispatch(enviarPedidoThunk(pedido));
+
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "Pedido realizado con exito",
+                text: "Pedido realizado con exito",
                 showConfirmButton: false,
                 timer: 1000,
                 width: "20em"
@@ -162,7 +164,14 @@ const DetalleCompra = () => {
             dispatch(vaciarCarrito());
             navigate('/');
         } catch (error) {
-            alert(error instanceof Error ? error.message : "Error al realizar el pedido");
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                text: "Error al realizar el pedido",
+                showConfirmButton: false,
+                timer: 1500,
+                width: "20em"
+            });
         }
     };
 

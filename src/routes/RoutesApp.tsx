@@ -14,11 +14,11 @@ import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
 import {Estadistica} from '../pages/admin/Estadistica';
-
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 import Clientes from '../pages/admin/Clientes';
 import Empleados from '../pages/admin/Empleados';
+
 const RoutesApp = () => {
   return (
     <BrowserRouter>
@@ -40,7 +40,6 @@ const RoutesApp = () => {
         <Route path="/admin/Clientes" element={<Clientes />} />
         <Route path="/admin/Empleados" element={<Empleados />} />
         <Route path="/admin/Promociones" element={<ScreenPromocion />} />
-        
         <Route path='/admin/Delivery' element={<Delivery />} />
         <Route path='/admin/Estadistica' element={<Estadistica />} />
       </Routes>

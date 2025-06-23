@@ -5,6 +5,7 @@ import PreferenceMP from '../../types/PreferenceMP';
 import { createPreferenceMP } from './mpService';
 import { useAppSelector } from '../../hooks/redux';
 import mpIcon from '../../assets/icons/mpIcon.svg'
+import Swal from 'sweetalert2';
 
 type Props = {
     pedido: PedidoDTO;
@@ -27,10 +28,15 @@ function CheckoutMP({ pedido }: Props) {
                 }
             } catch (error) {
                 console.error('Error al crear la preferencia de Mercado Pago:', error);
-                alert('Hubo un error al procesar el pago con Mercado Pago.');
+                Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    text: "Hubo un error al procesar el pago con Mercado Pago.",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    width: "20em"
+                });
             }
-        } else {
-            alert('Agregue al menos un instrumento al carrito');
         }
     };
 
