@@ -58,6 +58,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   // Menú por rol de usuario (usando string)
   const menuPorRol: Record<string, { path: string; label: string }[]> = {
+
+    SuperAdmin: [
+      { path: '/admin/MiPerfil', label: 'Mi Perfil' },
+      { path: '/admin/insumos', label: 'Insumos' },
+      { path: '/admin/productos', label: 'Productos' },
+      { path: '/admin/empleados', label: 'Empleados' },
+      { path: '/admin/clientes', label: 'Clientes' },
+      { path: '/admin/estadistica', label: 'Estadísticas' },
+      { path: '/admin/configuracion', label: 'Configuración' },
+      { path: '/admin/delivery', label: 'Delivery' },
+    ]
+,
     Admin: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/insumos', label: 'Insumos' },
