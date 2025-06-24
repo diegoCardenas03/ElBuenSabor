@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthHandler } from "../hooks/useAuthHandler";
+import { clearSession, useAuthHandler } from "../hooks/useAuthHandler";
 import { Loader } from "../components/commons/Loader";
 import ModalUserExtraData from "../components/modals/ModalExtraData";
+import Swal from "sweetalert2";
 
 
 export const LoginRedirect = () => {
@@ -13,29 +14,35 @@ export const LoginRedirect = () => {
 
 
   useEffect(() => {
-  console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
+    console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
 
-  // Si no está autenticado, redirigir al login
-  if (!isAuthenticated && authStatus === 'completed') {
-    console.log("[LoginRedirect] No autenticado, redirigiendo a login");
-    navigate("/login");
-    return;
-  }
-
-  // Si la autenticación está completa y exitosa
-  if (authStatus === 'completed' && isAuthenticated) {
-    console.log("[LoginRedirect] Autenticación completada exitosamente");
-
-    // Solo mostrar el modal si el usuario fue recién creado
-    const needsExtraData = sessionStorage.getItem('user_needs_extra_data');
-    if (userRole === "Cliente" && needsExtraData === 'true') {
-      setShowExtraDataModal(true);
-    } 
-    else {
+    // Si no está autenticado, redirigir al login
+    if (!isAuthenticated && authStatus === 'completed') {
+      console.log("[LoginRedirect] No autenticado, redirigiendo a login");
+      Swal.fire({
+        title: "¡Error!",
+        text: "Error al autenticarse, redirigiendo al home...",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+      clearSession();
       navigate("/");
     }
-  }
-}, [authStatus, isAuthenticated, navigate, userRole]);
+
+    // Si la autenticación está completa y exitosa
+    if (authStatus === 'completed' && isAuthenticated) {
+      console.log("[LoginRedirect] Autenticación completada exitosamente");
+
+      // Solo mostrar el modal si el usuario fue recién creado
+      const needsExtraData = sessionStorage.getItem('user_needs_extra_data');
+      if (userRole === "Cliente" && needsExtraData === 'true') {
+        setShowExtraDataModal(true);
+      }
+      else {
+        navigate("/");
+      }
+    }
+  }, [authStatus, isAuthenticated, navigate, userRole]);
 
   const handleExtraDataComplete = () => {
     console.log("[LoginRedirect] Datos adicionales completados");

@@ -18,7 +18,7 @@ interface HeaderProps {
   backgroundColor?: string;
 }
 
- 
+
 export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   onBackClick,
@@ -27,18 +27,18 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
 
   const getFirstName = (fullName?: string) => {
-  if (!fullName) return "Usuario";
-  return fullName.split(" ")[0];
-};
+    if (!fullName) return "Usuario";
+    return fullName.split(" ")[0];
+  };
 
- 
+
   const [navbarOpen, setNavbarOpen] = useState(false);
   const carrito = useAppSelector((state) => state.carrito.items);
   const carritoAbierto = useAppSelector((state) => state.carritoUI.abierto);
   const dispatch = useAppDispatch();
 
   // ✅ NUEVO: Auth0 integration
-  const { isAuthenticated, isLoading, user } = useAuth0();
+  const { isAuthenticated, isLoading, user, loginWithRedirect } = useAuth0();
   const { authStatus } = useAuthHandler();
 
   // --- OPTIMIZACIÓN: Leer datos de sessionStorage si existen ---
@@ -55,8 +55,8 @@ export const Header: React.FC<HeaderProps> = ({
     !!((isAuthenticated && authStatus === 'completed') || hasSessionData);
 
   const nombreUsuario = usuarioLogeado
-  ? (sessionName || "Usuario")
-  : "Invitado";
+    ? (sessionName || "Usuario")
+    : "Invitado";
   const emailUsuario = sessionEmail || "Sin email";
   const fotoUsuario = sessionPicture || "nada";
 
@@ -64,9 +64,6 @@ export const Header: React.FC<HeaderProps> = ({
   const isAppLoading =
     (!hasSessionData && isLoading) ||
     (isAuthenticated && authStatus === 'checking');
-
-  const isAEmployee = user?.[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] !== 'Cliente';
-
 
   useEffect(() => {
     if (isAppLoading) {
@@ -152,31 +149,43 @@ export const Header: React.FC<HeaderProps> = ({
       </Link>
 
       {/* Derecha - Usuario y carrito */}
+
       <div className="flex-shrink-0 flex items-center space-x-3 z-10">
-        <span
+        {isAuthenticated ? <span
           className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
           onClick={handleUserClick}
           title={getFirstName(nombreUsuario)}
         >
           {nombreUsuario}
-        </span>
-        <div
-          className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"}`}
-        ></div>
-        <FaShoppingCart
-          className="flex-shrink-0 cursor-pointer"
-          fill={whiteUserBar ? "white" : ""}
-          color={whiteUserBar ? "white" : "black"}
-          onClick={() => carrito.length === 0 ?
-            Swal.fire({
-              position: "center",
-              icon: "error",
-              title: "El carrito esta vacio",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            }) : dispatch(abrirCarrito())}
-        />
+        </span> : <span
+          className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
+          onClick={() => loginWithRedirect()}
+        >
+          INGRESAR
+        </span>}
+
+           <div
+            className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"}`}
+          >
+          </div>
+
+        {isAuthenticated && 
+         
+          <FaShoppingCart
+            className="flex-shrink-0 cursor-pointer"
+            fill={whiteUserBar ? "white" : ""}
+            color={whiteUserBar ? "white" : "black"}
+            onClick={() => carrito.length === 0 ?
+              Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "El carrito esta vacio",
+                showConfirmButton: false,
+                timer: 1000,
+                width: "20em"
+              }) : dispatch(abrirCarrito())}
+          /> }
+
         {carritoAbierto && (
           <div className="fixed inset-0 z-50">
             <div
