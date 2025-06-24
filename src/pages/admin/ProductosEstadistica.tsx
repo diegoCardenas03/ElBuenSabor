@@ -2,7 +2,12 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
 
-// El tipo puede ser así, adaptalo si tu DTO es distinto
+// Tipo para Producto o Insumo
+type ProductoOInsumo = {
+  denominacion: string;
+  id: number;
+};
+
 type ProductoRanking = {
   denominacion: string;
   cantidadCompras: number;
@@ -12,26 +17,24 @@ type ProductoRanking = {
 type PedidoResponseDTO = {
   detallePedidos: {
     cantidad: number;
-    producto: {
-      denominacion: string;
-      id: number;
-      // ...otros campos si quieres
-    };
-    subtotal: number;
+    producto?: ProductoOInsumo | null;
+    insumo?: ProductoOInsumo | null;
+    subTotal: number;
   }[];
   fecha: string;
   totalVenta: number;
-  // ...otros campos
 };
 
 const ProductosEstadistica = () => {
   const [fechaDesde, setFechaDesde] = useState<string>("");
   const [fechaHasta, setFechaHasta] = useState<string>("");
   const [productos, setProductos] = useState<ProductoRanking[]>([]);
+  const [insumos, setInsumos] = useState<ProductoRanking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Paginación
-  const [pagina, setPagina] = useState<number>(1);
+  const [paginaProductos, setPaginaProductos] = useState<number>(1);
+  const [paginaInsumos, setPaginaInsumos] = useState<number>(1);
   const filasPorPagina = 10;
 
   useEffect(() => {
@@ -48,29 +51,47 @@ const ProductosEstadistica = () => {
         if (fechaDesde) pedidosFiltrados = pedidosFiltrados.filter(p => p.fecha >= fechaDesde);
         if (fechaHasta) pedidosFiltrados = pedidosFiltrados.filter(p => p.fecha <= fechaHasta);
 
-        // Acumula compras por producto
+        // Acumula compras por producto (elaborados) y por insumo (no elaborable/bebidas)
         const productosMap: Record<string, ProductoRanking> = {};
+        const insumosMap: Record<string, ProductoRanking> = {};
+
         pedidosFiltrados.forEach(pedido => {
           pedido.detallePedidos.forEach(detalle => {
-            const key = detalle.producto.denominacion;
-            if (!productosMap[key]) {
-              productosMap[key] = {
-                denominacion: detalle.producto.denominacion,
-                cantidadCompras: 0,
-                importeTotal: 0,
-              };
+            if (detalle.producto) {
+              const key = detalle.producto.denominacion;
+              if (!productosMap[key]) {
+                productosMap[key] = {
+                  denominacion: detalle.producto.denominacion,
+                  cantidadCompras: 0,
+                  importeTotal: 0,
+                };
+              }
+              productosMap[key].cantidadCompras += detalle.cantidad;
+              productosMap[key].importeTotal += Number(detalle.subTotal) || 0;
+            } else if (detalle.insumo) {
+              const key = detalle.insumo.denominacion;
+              if (!insumosMap[key]) {
+                insumosMap[key] = {
+                  denominacion: detalle.insumo.denominacion,
+                  cantidadCompras: 0,
+                  importeTotal: 0,
+                };
+              }
+              insumosMap[key].cantidadCompras += detalle.cantidad;
+              insumosMap[key].importeTotal += Number(detalle.subTotal) || 0;
             }
-            productosMap[key].cantidadCompras += detalle.cantidad;
-            productosMap[key].importeTotal += Number(detalle.subTotal) || 0;
           });
         });
 
-        // Convierte el map a array y ordena por cantidad/compras
+        // Convierte los maps a arrays y ordena por cantidad/compras descendente
         const productosArray = Object.values(productosMap).sort((a, b) => b.cantidadCompras - a.cantidadCompras);
+        const insumosArray = Object.values(insumosMap).sort((a, b) => b.cantidadCompras - a.cantidadCompras);
 
         setProductos(productosArray);
+        setInsumos(insumosArray);
       } catch (e) {
         setProductos([]);
+        setInsumos([]);
       } finally {
         setLoading(false);
       }
@@ -79,24 +100,37 @@ const ProductosEstadistica = () => {
   }, [fechaDesde, fechaHasta]);
 
   // Lógica paginación
-  const totalPaginas = Math.max(1, Math.ceil(productos.length / filasPorPagina));
-  const productosPagina = productos.slice((pagina - 1) * filasPorPagina, pagina * filasPorPagina);
+  const totalPaginasProductos = Math.max(1, Math.ceil(productos.length / filasPorPagina));
+  const productosPagina = productos.slice((paginaProductos - 1) * filasPorPagina, paginaProductos * filasPorPagina);
 
-  const handleAnterior = () => {
-    if (pagina > 1) setPagina(pagina - 1);
+  const totalPaginasInsumos = Math.max(1, Math.ceil(insumos.length / filasPorPagina));
+  const insumosPagina = insumos.slice((paginaInsumos - 1) * filasPorPagina, paginaInsumos * filasPorPagina);
+
+  const handleAnteriorProductos = () => {
+    if (paginaProductos > 1) setPaginaProductos(paginaProductos - 1);
   };
 
-  const handleSiguiente = () => {
-    if (pagina < totalPaginas) setPagina(pagina + 1);
+  const handleSiguienteProductos = () => {
+    if (paginaProductos < totalPaginasProductos) setPaginaProductos(paginaProductos + 1);
+  };
+
+  const handleAnteriorInsumos = () => {
+    if (paginaInsumos > 1) setPaginaInsumos(paginaInsumos - 1);
+  };
+
+  const handleSiguienteInsumos = () => {
+    if (paginaInsumos < totalPaginasInsumos) setPaginaInsumos(paginaInsumos + 1);
   };
 
   const handleFechaDesde = (e: ChangeEvent<HTMLInputElement>) => {
     setFechaDesde(e.target.value);
-    setPagina(1);
+    setPaginaProductos(1);
+    setPaginaInsumos(1);
   };
   const handleFechaHasta = (e: ChangeEvent<HTMLInputElement>) => {
     setFechaHasta(e.target.value);
-    setPagina(1);
+    setPaginaProductos(1);
+    setPaginaInsumos(1);
   };
 
   return (
@@ -128,21 +162,20 @@ const ProductosEstadistica = () => {
           </button>
         </div>
 
-        {/* Tabla de ranking */}
-        <div className="bg-white w-full max-w-4xl rounded-2xl shadow-md p-5">
-          {/* Título */}
+        {/* Tabla de Productos */}
+        <div className="bg-white w-full max-w-4xl rounded-2xl shadow-md p-5 mb-8">
           <div className="flex justify-center mb-2">
             <div className="px-5 py-1 rounded-t-2xl bg-[#fff3e3] border-b-2 border-[#ff9c3a] font-bold text-[#d61c1c] text-lg">
-              Ranking Productos Cocina
+              Ranking Productos Elaborados
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left rounded-2xl">
+            <table className="w-full text-left rounded-2xl table-fixed">
               <thead>
                 <tr className="text-[#d61c1c] font-bold border-b border-gray-300">
-                  <th className="py-2 px-3">Nombre</th>
-                  <th className="py-2 px-3 text-center">Cantidad de compras</th>
-                  <th className="py-2 px-3 text-center">Importe Total</th>
+                  <th className="py-2 px-3 min-w-[160px]">Nombre</th>
+                  <th className="py-2 px-3 text-center min-w-[160px]">Cantidad de compras</th>
+                  <th className="py-2 px-3 text-center min-w-[160px]">Importe Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,9 +194,9 @@ const ProductosEstadistica = () => {
                 ) : (
                   productosPagina.map((producto, idx) => (
                     <tr key={idx} className="border-b last:border-b-0 hover:bg-gray-50">
-                      <td className="py-2 px-3">{producto.denominacion}</td>
-                      <td className="py-2 px-3 text-center">{producto.cantidadCompras}</td>
-                      <td className="py-2 px-3 text-center">
+                      <td className="py-2 px-3 min-w-[160px]">{producto.denominacion}</td>
+                      <td className="py-2 px-3 text-center min-w-[160px]">{producto.cantidadCompras}</td>
+                      <td className="py-2 px-3 text-center min-w-[160px]">
                         {producto.importeTotal.toLocaleString("es-AR", {
                           style: "currency",
                           currency: "ARS",
@@ -179,17 +212,82 @@ const ProductosEstadistica = () => {
           {/* Paginación */}
           <div className="flex items-center justify-end mt-4 gap-2">
             <span className="text-xs text-gray-500">
-              ({pagina} <span className="text-[#d61c1c] font-bold">/</span> {totalPaginas})
+              ({paginaProductos} <span className="text-[#d61c1c] font-bold">/</span> {totalPaginasProductos})
             </span>
             <button
               className={`w-7 h-7 rounded-full font-bold border border-gray-300 text-[#d61c1c] disabled:opacity-40`}
-              onClick={handleAnterior}
-              disabled={pagina === 1}
+              onClick={handleAnteriorProductos}
+              disabled={paginaProductos === 1}
             >{"<"}</button>
             <button
               className={`w-7 h-7 rounded-full font-bold border border-gray-300 text-[#d61c1c] disabled:opacity-40`}
-              onClick={handleSiguiente}
-              disabled={pagina === totalPaginas}
+              onClick={handleSiguienteProductos}
+              disabled={paginaProductos === totalPaginasProductos}
+            >{">"}</button>
+          </div>
+        </div>
+
+        {/* Tabla de Insumos/Bebidas */}
+        <div className="bg-white w-full max-w-4xl rounded-2xl shadow-md p-5">
+          <div className="flex justify-center mb-2">
+            <div className="px-5 py-1 rounded-t-2xl bg-[#fff3e3] border-b-2 border-[#ff9c3a] font-bold text-[#d61c1c] text-lg">
+              Ranking de Bebidas Vendidas
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left rounded-2xl table-fixed">
+              <thead>
+                <tr className="text-[#d61c1c] font-bold border-b border-gray-300">
+                  <th className="py-2 px-3 min-w-[160px]">Nombre</th>
+                  <th className="py-2 px-3 text-center min-w-[160px]">Cantidad de compras</th>
+                  <th className="py-2 px-3 text-center min-w-[160px]">Importe Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={3} className="text-center text-gray-400 py-6">
+                      Cargando...
+                    </td>
+                  </tr>
+                ) : insumosPagina.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="text-center text-gray-400 py-6">
+                      Sin datos
+                    </td>
+                  </tr>
+                ) : (
+                  insumosPagina.map((insumo, idx) => (
+                    <tr key={idx} className="border-b last:border-b-0 hover:bg-gray-50">
+                      <td className="py-2 px-3 min-w-[160px]">{insumo.denominacion}</td>
+                      <td className="py-2 px-3 text-center min-w-[160px]">{insumo.cantidadCompras}</td>
+                      <td className="py-2 px-3 text-center min-w-[160px]">
+                        {insumo.importeTotal.toLocaleString("es-AR", {
+                          style: "currency",
+                          currency: "ARS",
+                          maximumFractionDigits: 0,
+                        })}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          {/* Paginación */}
+          <div className="flex items-center justify-end mt-4 gap-2">
+            <span className="text-xs text-gray-500">
+              ({paginaInsumos} <span className="text-[#d61c1c] font-bold">/</span> {totalPaginasInsumos})
+            </span>
+            <button
+              className={`w-7 h-7 rounded-full font-bold border border-gray-300 text-[#d61c1c] disabled:opacity-40`}
+              onClick={handleAnteriorInsumos}
+              disabled={paginaInsumos === 1}
+            >{"<"}</button>
+            <button
+              className={`w-7 h-7 rounded-full font-bold border border-gray-300 text-[#d61c1c] disabled:opacity-40`}
+              onClick={handleSiguienteInsumos}
+              disabled={paginaInsumos === totalPaginasInsumos}
             >{">"}</button>
           </div>
         </div>
