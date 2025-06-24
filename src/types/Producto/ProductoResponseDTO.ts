@@ -8,6 +8,7 @@ export interface ProductoResponseDTO {
     tiempoEstimadoPreparacion: number;
     precioVenta: number;
     precioCosto: number;
+    margenGanancia: number;
     urlImagen: string;
     activo: boolean;
     rubro: RubroProductoResponseDTO;
