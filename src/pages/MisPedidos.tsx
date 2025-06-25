@@ -85,9 +85,7 @@ const MisPedidos = () => {
       render: (pedido: PedidoResponseDTO) => (
         <button
           className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
-          onClick={() => {
-            console.log(`Factura del pedido ${pedido.codigo}`);
-          }}
+          onClick={() => window.open(`http://localhost:8080/api/facturas/pdf/${pedido.id}`, '_blank')}   
         >
           <MdOutlineFileDownload size={23} />
         </button>
