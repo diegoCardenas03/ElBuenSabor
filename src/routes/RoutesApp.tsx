@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import DetalleCompra from '../pages/detalleCompra';
-import Landing from "../pages/Landing"
+import Landing from "../pages/Landing";
 import Menu from '../pages/MenuPage';
 import MiPerfilUsuarioPage from '../pages/MiPerfilUsuarioPage';
 import PedidosCocinero from '../pages/pedidosCocinero';
@@ -13,20 +13,21 @@ import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
-import {Estadistica} from '../pages/admin/Estadistica';
+import { Estadistica } from '../pages/admin/Estadistica';
 import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
-
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 import Clientes from '../pages/admin/Clientes';
 import Empleados from '../pages/admin/Empleados';
+import ClientesEstadisticas from '../pages/admin/ClientesEstadisticas';
+
 const RoutesApp = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />}/> 
-        <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
-        <Route path="/MisDirecciones" element={<MisDirecciones />} /> 
+        <Route path="/" element={<Landing />}/>
+        <Route path="/DetalleCompra" element={<DetalleCompra />} />
+        <Route path="/MisDirecciones" element={<MisDirecciones />} />
         <Route path="/Menu" element={<Menu />} />
         <Route path='/MisPedidos' element={<MisPedidos />} />
         <Route path='/Success' element={<SuccessMP/>}/>
@@ -41,10 +42,11 @@ const RoutesApp = () => {
         <Route path="/admin/Clientes" element={<Clientes />} />
         <Route path="/admin/Empleados" element={<Empleados />} />
         <Route path="/admin/Promociones" element={<ScreenPromocion />} />
-        
         <Route path='/admin/Delivery' element={<Delivery />} />
         <Route path='/admin/Estadistica' element={<Estadistica />} />
         <Route path="/admin/ProductosEstadistica" element={<ProductosEstadistica />} />
+        <Route path="/admin/ClientesEstadistica" element={<ClientesEstadisticas />} />
+        <Route path="/admin/ClientesEstadistica/:clienteNombre" element={<ClientesEstadisticas />} />
       </Routes>
     </BrowserRouter>
   );

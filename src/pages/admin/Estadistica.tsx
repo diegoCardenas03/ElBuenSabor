@@ -25,10 +25,8 @@ type ClienteTabla = {
   importe: number;
 };
 
-// Si tienes un DTO para ingresos/egresos mensual, impórtalo aquí.
-// Si no, define uno simple:
 type IngresosEgresosMensualDTO = {
-  mes: string; // formato "YYYY-MM"
+  mes: string;
   ingresos: number;
   egresos: number;
 };
@@ -38,6 +36,8 @@ type IngresosEgresosData = {
   egresos: number;
   gananciaTotal?: number;
 };
+
+const CLIENTES_POR_PAGINA = 10;
 
 const Estadistica = () => {
   const [fechaDesde, setFechaDesde] = useState<string>("");
@@ -54,14 +54,11 @@ const Estadistica = () => {
   const [clientes, setClientes] = useState<ClienteTabla[]>([]);
   const [filtroNombre, setFiltroNombre] = useState<string>("");
 
-  // Estado para evolución mensual
+  const [criterioOrden, setCriterioOrden] = useState<"importe" | "cantidad">("importe");
   const [evolucionIE, setEvolucionIE] = useState<IngresosEgresosMensualDTO[]>([]);
   const [loadingEvolucionIE, setLoadingEvolucionIE] = useState<boolean>(true);
 
-  // Filtrado de la tabla de clientes
-  const clientesFiltrados = clientes.filter((cliente) =>
-    cliente.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
-  );
+  const [paginaActual, setPaginaActual] = useState<number>(1);
 
   useEffect(() => {
     const fetchEstadisticas = async () => {
@@ -95,7 +92,6 @@ const Estadistica = () => {
         setGanancias(totalGanancias);
 
         // Agrupar pedidos por cliente para la tabla
-        // Si el cliente puede ser null, revisa antes de usar
         const clientesMap: Record<string, { cantidad: number; importe: number }> = {};
         pedidosFiltrados.forEach((pedido) => {
           const nombre = pedido.cliente?.nombreCompleto || "Sin nombre";
@@ -105,16 +101,19 @@ const Estadistica = () => {
           clientesMap[nombre].cantidad += 1;
           clientesMap[nombre].importe += pedido.totalVenta || 0;
         });
-        // Ordena por importe descendente y toma los top 5
+
+        // Ordena por el criterio seleccionado (importe o cantidad)
         const clientesTabla = Object.entries(clientesMap)
           .map(([nombre, datos]) => ({
             nombre,
             cantidad: datos.cantidad,
             importe: datos.importe,
           }))
-          .sort((a, b) => b.importe - a.importe)
-          .slice(0, 5);
-
+          .sort((a, b) =>
+            criterioOrden === "importe"
+              ? b.importe - a.importe
+              : b.cantidad - a.cantidad
+          );
         setClientes(clientesTabla);
 
         let urlIE = "http://localhost:8080/api/estadisticas/ingresos-egresos";
@@ -180,21 +179,26 @@ const Estadistica = () => {
     fetchEstadisticas();
     fetchTopProductos();
     fetchEvolucionIE();
-  }, [fechaDesde, fechaHasta]);
+    setPaginaActual(1); // Reinicia la página al cambiar filtros u orden
+  }, [fechaDesde, fechaHasta, criterioOrden]);
+
+  // Paginación y filtrado
+  const clientesFiltrados = clientes.filter((cliente) =>
+    cliente.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
+  );
+  const totalPaginas = Math.ceil(clientesFiltrados.length / CLIENTES_POR_PAGINA);
+  const clientesAMostrar = clientesFiltrados.slice(
+    (paginaActual - 1) * CLIENTES_POR_PAGINA,
+    paginaActual * CLIENTES_POR_PAGINA
+  );
+
+  const irPaginaAnterior = () => setPaginaActual((prev) => Math.max(1, prev - 1));
+  const irPaginaSiguiente = () => setPaginaActual((prev) => Math.min(totalPaginas, prev + 1));
+  useEffect(() => { setPaginaActual(1); }, [filtroNombre]);
 
   const ingresos = Number(ingresosEgresosData?.ingresos ?? 0);
   const egresos = Number(ingresosEgresosData?.egresos ?? 0);
   const ganancia = Number(ingresosEgresosData?.gananciaTotal ?? 0);
-
-  const ingresosEgresosChartData = ingresosEgresosData
-    ? [
-      { nombre: "Ingresos", Monto: ingresos },
-      { nombre: "Egresos", Monto: egresos },
-      { nombre: "Ganancia", Monto: ganancia },
-    ]
-    : [];
-
-  const noData = ingresos === 0 && egresos === 0 && ganancia === 0;
 
   return (
     <>
@@ -328,11 +332,19 @@ const Estadistica = () => {
                 <FiSearch className="text-gray-400" size={18} />
               </div>
               <span className="text-secondary font-black text-lg text-center flex-1">
-                Clientes con más pedidos
+                Clientes
               </span>
-              <button className="bg-tertiary text-dark font-semibold px-4 py-2 rounded-lg shadow hover:bg-[#ff9c3ac2] min-w-[120px] mt-2 md:mt-0">
-                Ver todos
-              </button>
+              <div className="flex items-center gap-2">
+                <label className="font-medium text-sm">Ordenar por:</label>
+                <select
+                  value={criterioOrden}
+                  onChange={(e) => setCriterioOrden(e.target.value as "importe" | "cantidad")}
+                  className="border rounded px-2 py-1 bg-white text-sm"
+                >
+                  <option value="importe">Importe Total</option>
+                  <option value="cantidad">Cantidad de Pedidos</option>
+                </select>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left rounded-2xl">
@@ -345,7 +357,7 @@ const Estadistica = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {clientesFiltrados.map((cliente, idx) => (
+                  {clientesAMostrar.map((cliente, idx) => (
                     <tr
                       key={cliente.nombre + idx}
                       className="border-b last:border-b-0 hover:bg-gray-50"
@@ -362,13 +374,15 @@ const Estadistica = () => {
                         })}
                       </td>
                       <td className="py-2 px-3 text-center">
-                        <button className="bg-tertiary hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1">
-                          Pedidos
-                        </button>
+                        <Link to={`/admin/ClientesEstadistica/${encodeURIComponent(cliente.nombre)}`}>
+                          <button className="bg-tertiary cursor-pointer hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1">
+                            Pedidos
+                          </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}
-                  {clientesFiltrados.length === 0 && (
+                  {clientesAMostrar.length === 0 && (
                     <tr>
                       <td colSpan={4} className="text-center text-gray-400 py-4">
                         No se encontraron resultados
@@ -378,6 +392,27 @@ const Estadistica = () => {
                 </tbody>
               </table>
             </div>
+            {totalPaginas > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-4">
+                <button
+                  onClick={irPaginaAnterior}
+                  disabled={paginaActual === 1}
+                  className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+                >
+                  Anterior
+                </button>
+                <span>
+                  Página {paginaActual} de {totalPaginas}
+                </span>
+                <button
+                  onClick={irPaginaSiguiente}
+                  disabled={paginaActual === totalPaginas}
+                  className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>
