@@ -45,8 +45,7 @@ const RoutesApp = () => {
         <Route path='/admin/Delivery' element={<Delivery />} />
         <Route path='/admin/Estadistica' element={<Estadistica />} />
         <Route path="/admin/ProductosEstadistica" element={<ProductosEstadistica />} />
-        <Route path="/admin/ClientesEstadistica" element={<ClientesEstadisticas />} />
-        <Route path="/admin/ClientesEstadistica/:clienteNombre" element={<ClientesEstadisticas />} />
+        <Route path="/admin/ClientesEstadistica/:clienteId" element={<ClientesEstadisticas />} />
       </Routes>
     </BrowserRouter>
   );

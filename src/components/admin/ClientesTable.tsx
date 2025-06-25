@@ -1,8 +1,9 @@
 import { ChangeEvent } from "react";
 import { FiSearch } from "react-icons/fi";
-import { Link } from "react-router-dom"; // <-- IMPORTANTE
+import { Link } from "react-router-dom";
 
 export type ClienteTabla = {
+  id: number;
   nombre: string;
   cantidad: number;
   importe: number;
@@ -85,7 +86,7 @@ export const ClientesTable = ({
           <tbody>
             {clientesAMostrar.map((cliente, idx) => (
               <tr
-                key={cliente.nombre + idx}
+                key={cliente.id + "_" + idx}
                 className="border-b last:border-b-0 hover:bg-gray-50"
               >
                 <td className="py-2 px-3">{cliente.nombre}</td>
@@ -98,8 +99,8 @@ export const ClientesTable = ({
                   })}
                 </td>
                 <td className="py-2 px-3 text-center">
-                  <Link to="/admin/ClientesEstadistica">
-                    <button className="bg-tertiary cursor hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1">
+                  <Link to={`/admin/ClientesEstadistica/${cliente.id}`}>
+                    <button className="bg-tertiary cursor-pointer hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1">
                       Pedidos
                     </button>
                   </Link>

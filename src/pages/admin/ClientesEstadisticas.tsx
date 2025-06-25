@@ -2,62 +2,170 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
 
-// Tipo de pedido: ajusta los campos según tu backend
-type PedidoCliente = {
-  id: string | number;
-  fecha: string;
-  numeroPedido: string | number;
-  importeTotal: number;
-  estado?: string;
-  direccionEntrega?: string;
-  productos?: { nombre: string; cantidad: number; precio: number }[];
+// --- Tipos ---
+type ProductoPedido = {
+  nombre: string;
+  cantidad: number;
+  precio: number;
 };
 
+type PedidoCliente = {
+  id: number;
+  fecha: string;
+  hora?: string;
+  numeroPedido: string;
+  importeTotal: number;
+  estado?: string;
+  tipoEnvio?: string;
+  formaPago?: string;
+  direccionEntrega?: string;
+  productos?: ProductoPedido[];
+  costoEnvio?: number;
+};
+
+// --- Utilidades ---
 const PEDIDOS_POR_PAGINA = 10;
+const API_BASE = "http://localhost:8080";
 
-// Temporal: datos de ejemplo. Luego cambia por fetch real.
-const pedidosEjemplo: PedidoCliente[] = [
-  {
-    id: 1,
-    fecha: "2025-06-01",
-    numeroPedido: "1001",
-    importeTotal: 165000,
-    estado: "Entregado",
-    direccionEntrega: "Av. Principal 123",
-    productos: [
-      { nombre: "Producto A", cantidad: 2, precio: 50000 },
-      { nombre: "Producto B", cantidad: 1, precio: 65000 },
-    ],
-  },
-  {
-    id: 2,
-    fecha: "2025-06-05",
-    numeroPedido: "1002",
-    importeTotal: 80000,
-    estado: "Entregado",
-    direccionEntrega: "Av. Principal 123",
-    productos: [
-      { nombre: "Producto C", cantidad: 1, precio: 80000 },
-    ],
-  },
-  // ...más pedidos
-];
+const parseDateTime = (fecha: string, hora?: string) => {
+  return new Date(`${fecha}T${hora ?? "00:00:00"}`);
+};
 
+function formatFecha(fecha: string) {
+  const [y, m, d] = fecha.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function formatPrecio(n: number) {
+  return n?.toLocaleString("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 2 });
+}
+
+// --- Modal para un solo pedido (detalle individual) ---
+type PedidoDetalleModalProps = {
+  pedido: PedidoCliente;
+  onClose: () => void;
+};
+const PedidoDetalleModal = ({ pedido, onClose }: PedidoDetalleModalProps) => {
+  const subtotalProductos = (pedido.productos || []).reduce((acc, prod) => acc + (prod.precio || 0), 0);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-20 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-lg p-6 min-w-[320px] max-w-md relative" onClick={e => e.stopPropagation()}>
+        <button className="absolute top-3 right-3 text-xl text-gray-400 hover:text-tertiary" onClick={onClose}>
+          &times;
+        </button>
+        <h2 className="text-xl font-bold mb-4 text-secondary">Detalle del Pedido</h2>
+        <div className="mb-2"><b>Fecha:</b> {pedido.fecha}</div>
+        {pedido.hora && <div className="mb-2"><b>Hora:</b> {pedido.hora}</div>}
+        <div className="mb-2"><b>N° Pedido:</b> {pedido.numeroPedido}</div>
+        <div className="mb-2"><b>Importe Total:</b> {formatPrecio(pedido.importeTotal)}</div>
+        {pedido.estado && <div className="mb-2"><b>Estado:</b> {pedido.estado}</div>}
+        {pedido.direccionEntrega && <div className="mb-2"><b>Dirección de Entrega:</b> {pedido.direccionEntrega}</div>}
+        <div className="mb-2"><b>Productos:</b></div>
+        <ul className="list-disc ml-5 mt-1">
+          {(pedido.productos || []).map((prod, i) => (
+            <li key={i}>
+              {prod.nombre} x{prod.cantidad} - {formatPrecio(prod.precio)}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 border-t pt-2 text-sm text-gray-600">
+          <div><b>Subtotal productos:</b> {formatPrecio(subtotalProductos)}</div>
+          {pedido.costoEnvio ? <div><b>Costo de envío:</b> {formatPrecio(pedido.costoEnvio)}</div> : null}
+          <div><b>Total del pedido:</b> {formatPrecio(pedido.importeTotal)}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Página principal ---
 const ClientesEstadisticas = () => {
-  const { clienteNombre } = useParams();
+  const { clienteId } = useParams<{ clienteId: string }>();
   const [paginaActual, setPaginaActual] = useState(1);
   const [pedidos, setPedidos] = useState<PedidoCliente[]>([]);
+  const [clienteNombre, setClienteNombre] = useState<string>("");
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoCliente | null>(null);
 
-  useEffect(() => {
-    // Aquí deberías hacer un fetch real usando clienteNombre
-    // Por ejemplo:
-    // fetch(`/api/pedidos/por-cliente?nombre=${encodeURIComponent(clienteNombre || "")}`)
-    //   .then(res => res.json()).then(data => setPedidos(data));
-    setPedidos(pedidosEjemplo); // Simulación para pruebas
-  }, [clienteNombre]);
+  // Filtros
+  const [fechaDesde, setFechaDesde] = useState<string>("");
+  const [fechaHasta, setFechaHasta] = useState<string>("");
 
-  const totalPaginas = Math.ceil(pedidos.length / PEDIDOS_POR_PAGINA);
+  useEffect(() => {
+    if (!clienteId) return;
+    // Datos cliente
+    fetch(`${API_BASE}/api/clientes/${clienteId}`)
+      .then(async res => {
+        const text = await res.text();
+        try {
+          const json = JSON.parse(text);
+          setClienteNombre(json.nombreCompleto || json.nombre || "");
+        } catch {
+          setClienteNombre("");
+        }
+      })
+      .catch(() => setClienteNombre(""));
+
+    // Pedidos
+    let pedidosUrl = `${API_BASE}/api/pedidos/cliente/${clienteId}`;
+    const params: string[] = [];
+    if (fechaDesde) params.push(`fechaDesde=${fechaDesde}`);
+    if (fechaHasta) params.push(`fechaHasta=${fechaHasta}`);
+    if (params.length > 0) pedidosUrl += "?" + params.join("&");
+
+    fetch(pedidosUrl)
+      .then(async res => {
+        const text = await res.text();
+        try {
+          const data = JSON.parse(text);
+          if (!Array.isArray(data)) { setPedidos([]); return; }
+          let mapped: PedidoCliente[] = data.map((pedido: any) => ({
+            id: pedido.id,
+            fecha: pedido.fecha,
+            hora: pedido.hora,
+            numeroPedido: pedido.codigo,
+            importeTotal: pedido.totalVenta,
+            estado: pedido.estado,
+            tipoEnvio: pedido.tipoEnvio,
+            formaPago: pedido.formaPago,
+            direccionEntrega: pedido.domicilio
+              ? `${pedido.domicilio.calle} ${pedido.domicilio.numero}, ${pedido.domicilio.localidad}`
+              : "",
+            costoEnvio: pedido.costoEnvio,
+            productos: Array.isArray(pedido.detallePedidos)
+              ? pedido.detallePedidos.map((detalle: any) => ({
+                  nombre: detalle.producto
+                    ? detalle.producto.denominacion
+                    : detalle.insumo
+                    ? detalle.insumo.denominacion
+                    : "Producto/insumo desconocido",
+                  cantidad: detalle.cantidad,
+                  precio: detalle.subTotal ?? (detalle.cantidad * (detalle.producto?.precioVenta || detalle.insumo?.precioVenta || 0)),
+                }))
+              : []
+          }));
+
+          // Filtro frontend extra
+          if (fechaDesde) mapped = mapped.filter(p => p.fecha >= fechaDesde);
+          if (fechaHasta) mapped = mapped.filter(p => p.fecha <= fechaHasta);
+
+          mapped.sort((a, b) => {
+            const dateA = parseDateTime(a.fecha, a.hora);
+            const dateB = parseDateTime(b.fecha, b.hora);
+            return dateB.getTime() - dateA.getTime();
+          });
+
+          setPedidos(mapped);
+        } catch {
+          setPedidos([]);
+        }
+      })
+      .catch(() => setPedidos([]));
+
+    setPaginaActual(1);
+  }, [clienteId, fechaDesde, fechaHasta]);
+
+  const totalPaginas = Math.ceil((pedidos.length || 0) / PEDIDOS_POR_PAGINA);
   const pedidosAMostrar = pedidos.slice(
     (paginaActual - 1) * PEDIDOS_POR_PAGINA,
     paginaActual * PEDIDOS_POR_PAGINA
@@ -73,7 +181,7 @@ const ClientesEstadisticas = () => {
         <div className="bg-white w-full md:w-4/5 rounded-2xl shadow-md p-5">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
             <span className="text-tertiary font-black text-lg text-center flex-1">
-              Pedidos de <b>{clienteNombre}</b>
+              Pedidos de <b>{clienteNombre || clienteId}</b>
             </span>
             <div className="flex items-center gap-2">
               <input
@@ -81,6 +189,9 @@ const ClientesEstadisticas = () => {
                 className="border rounded-lg px-4 py-2 text-sm bg-white"
                 placeholder="dd/mm/aaaa"
                 style={{ minWidth: 140 }}
+                value={fechaDesde}
+                onChange={e => setFechaDesde(e.target.value)}
+                max={fechaHasta || undefined}
               />
               <span>al</span>
               <input
@@ -88,15 +199,11 @@ const ClientesEstadisticas = () => {
                 className="border rounded-lg px-4 py-2 text-sm bg-white"
                 placeholder="dd/mm/aaaa"
                 style={{ minWidth: 140 }}
+                value={fechaHasta}
+                onChange={e => setFechaHasta(e.target.value)}
+                min={fechaDesde || undefined}
               />
             </div>
-            <button
-              className="bg-tertiary text-dark font-bold px-4 py-2 rounded-full shadow flex items-center gap-2"
-              style={{ minWidth: 120 }}
-            >
-              Exportar
-              <img src="https://cdn-icons-png.flaticon.com/512/732/732220.png" alt="Excel" width={22} />
-            </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left rounded-2xl">
@@ -104,25 +211,25 @@ const ClientesEstadisticas = () => {
                 <tr className="text-tertiary font-bold border-b">
                   <th className="py-2 px-3">Fecha</th>
                   <th className="py-2 px-3">N° Pedido</th>
-                  <th className="py-2 px-3 text-center">Importe Total</th>
+                  <th className="py-2 px-3">Envío</th>
+                  <th className="py-2 px-3">Importe Total</th>
+                  <th className="py-2 px-3">F. Pago</th>
                   <th className="py-2 px-3 text-center"></th>
                 </tr>
               </thead>
               <tbody>
-                {pedidosAMostrar.map((pedido, idx) => (
+                {pedidosAMostrar.length > 0 ? pedidosAMostrar.map((pedido, idx) => (
                   <tr
                     key={pedido.id ?? pedido.numeroPedido + "_" + idx}
                     className="border-b last:border-b-0 hover:bg-gray-50"
                   >
-                    <td className="py-2 px-3">{pedido.fecha}</td>
-                    <td className="py-2 px-3">{pedido.numeroPedido}</td>
-                    <td className="py-2 px-3 text-center">
-                      {pedido.importeTotal.toLocaleString("es-AR", {
-                        style: "currency",
-                        currency: "ARS",
-                        maximumFractionDigits: 0,
-                      })}
+                    <td className="py-2 px-3">{formatFecha(pedido.fecha)} {pedido.hora ? <span className="text-xs text-gray-500">{pedido.hora}</span> : ""}</td>
+                    <td className="py-2 px-3">#{pedido.numeroPedido}</td>
+                    <td className="py-2 px-3">{pedido.tipoEnvio ?? "—"}</td>
+                    <td className="py-2 px-3">
+                      {formatPrecio(pedido.importeTotal)}
                     </td>
+                    <td className="py-2 px-3">{pedido.formaPago ?? "—"}</td>
                     <td className="py-2 px-3 text-center">
                       <button
                         className="bg-tertiary hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1"
@@ -132,10 +239,9 @@ const ClientesEstadisticas = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
-                {pedidosAMostrar.length === 0 && (
+                )) : (
                   <tr>
-                    <td colSpan={4} className="text-center text-gray-400 py-4">
+                    <td colSpan={6} className="text-center text-gray-400 py-4">
                       No se encontraron pedidos
                     </td>
                   </tr>
@@ -148,7 +254,7 @@ const ClientesEstadisticas = () => {
               <button
                 onClick={irPaginaAnterior}
                 disabled={paginaActual === 1}
-                className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+                className="cursor-pointer px-3 py-1 rounded text-white font-medium bg-secondary disabled:opacity-50 transition duration-150 hover:scale-105"
               >
                 Anterior
               </button>
@@ -158,55 +264,19 @@ const ClientesEstadisticas = () => {
               <button
                 onClick={irPaginaSiguiente}
                 disabled={paginaActual === totalPaginas}
-                className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
+                className="cursor-pointer px-3 py-1 rounded text-white font-medium bg-secondary disabled:opacity-50 transition duration-150 hover:scale-105"
               >
                 Siguiente
               </button>
             </div>
           )}
-          {pedidoSeleccionado && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-20 backdrop-blur-sm"
-              onClick={() => setPedidoSeleccionado(null)}
-            >
-              <div
-                className="bg-white rounded-2xl shadow-lg p-6 min-w-[320px] max-w-md relative"
-                onClick={e => e.stopPropagation()}
-              >
-                <button
-                  className="absolute top-3 right-3 text-xl text-gray-400 hover:text-tertiary"
-                  onClick={() => setPedidoSeleccionado(null)}
-                >
-                  &times;
-                </button>
-                <h2 className="text-xl font-bold mb-4 text-tertiary">
-                  Detalle del Pedido
-                </h2>
-                <div className="mb-2"><b>Fecha:</b> {pedidoSeleccionado.fecha}</div>
-                <div className="mb-2"><b>N° Pedido:</b> {pedidoSeleccionado.numeroPedido}</div>
-                <div className="mb-2"><b>Importe Total:</b> {pedidoSeleccionado.importeTotal.toLocaleString("es-AR", { style: "currency", currency: "ARS" })}</div>
-                {pedidoSeleccionado.estado && (
-                  <div className="mb-2"><b>Estado:</b> {pedidoSeleccionado.estado}</div>
-                )}
-                {pedidoSeleccionado.direccionEntrega && (
-                  <div className="mb-2"><b>Dirección de Entrega:</b> {pedidoSeleccionado.direccionEntrega}</div>
-                )}
-                {pedidoSeleccionado.productos && pedidoSeleccionado.productos.length > 0 && (
-                  <div className="mb-2">
-                    <b>Productos:</b>
-                    <ul className="list-disc ml-5 mt-1">
-                      {pedidoSeleccionado.productos.map((prod, i) => (
-                        <li key={i}>
-                          {prod.nombre} x{prod.cantidad} - {prod.precio.toLocaleString("es-AR", { style: "currency", currency: "ARS" })}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
+        {pedidoSeleccionado && (
+          <PedidoDetalleModal
+            pedido={pedidoSeleccionado}
+            onClose={() => setPedidoSeleccionado(null)}
+          />
+        )}
       </div>
     </div>
   );

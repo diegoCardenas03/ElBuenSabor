@@ -13,13 +13,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-// IMPORTA TUS DTOs
 import { PedidoResponseDTO } from "../../types/Pedido/PedidoResponseDTO";
 import { ProductoResponseDTO } from "../../types/Producto/ProductoResponseDTO";
 
-// Puedes definir el tipo para la tabla de clientes
 type ClienteTabla = {
+  id: number;
   nombre: string;
   cantidad: number;
   importe: number;
@@ -91,21 +89,24 @@ const Estadistica = () => {
         );
         setGanancias(totalGanancias);
 
-        // Agrupar pedidos por cliente para la tabla
-        const clientesMap: Record<string, { cantidad: number; importe: number }> = {};
+        // Agrupar pedidos por cliente para la tabla - USANDO ID
+        const clientesMap: Record<number, { nombre: string; cantidad: number; importe: number }> = {};
         pedidosFiltrados.forEach((pedido) => {
+          const id = pedido.cliente?.id;
           const nombre = pedido.cliente?.nombreCompleto || "Sin nombre";
-          if (!clientesMap[nombre]) {
-            clientesMap[nombre] = { cantidad: 0, importe: 0 };
+          if (!id) return; // Si no hay id, ignora
+          if (!clientesMap[id]) {
+            clientesMap[id] = { nombre, cantidad: 0, importe: 0 };
           }
-          clientesMap[nombre].cantidad += 1;
-          clientesMap[nombre].importe += pedido.totalVenta || 0;
+          clientesMap[id].cantidad += 1;
+          clientesMap[id].importe += pedido.totalVenta || 0;
         });
 
         // Ordena por el criterio seleccionado (importe o cantidad)
         const clientesTabla = Object.entries(clientesMap)
-          .map(([nombre, datos]) => ({
-            nombre,
+          .map(([id, datos]) => ({
+            id: Number(id),
+            nombre: datos.nombre,
             cantidad: datos.cantidad,
             importe: datos.importe,
           }))
@@ -359,13 +360,11 @@ const Estadistica = () => {
                 <tbody>
                   {clientesAMostrar.map((cliente, idx) => (
                     <tr
-                      key={cliente.nombre + idx}
+                      key={cliente.id + "_" + idx}
                       className="border-b last:border-b-0 hover:bg-gray-50"
                     >
                       <td className="py-2 px-3">{cliente.nombre}</td>
-                      <td className="py-2 px-3 text-center">
-                        {cliente.cantidad}
-                      </td>
+                      <td className="py-2 px-3 text-center">{cliente.cantidad}</td>
                       <td className="py-2 px-3 text-center">
                         {cliente.importe.toLocaleString("es-AR", {
                           style: "currency",
@@ -374,7 +373,7 @@ const Estadistica = () => {
                         })}
                       </td>
                       <td className="py-2 px-3 text-center">
-                        <Link to={`/admin/ClientesEstadistica/${encodeURIComponent(cliente.nombre)}`}>
+                        <Link to={`/admin/ClientesEstadistica/${cliente.id}`}>
                           <button className="bg-tertiary cursor-pointer hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1">
                             Pedidos
                           </button>
