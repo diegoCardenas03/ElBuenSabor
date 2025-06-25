@@ -11,8 +11,9 @@ import { setDataTable } from '../hooks/redux/slices/TableReducer';
 import { Estado } from '../types/enums/Estado';
 import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FaSearch } from "react-icons/fa";
-import { getEstadoTexto, getFormaPagoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
+import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import { updateEstadoPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
+import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -23,10 +24,10 @@ type FiltroState = {
 
 
 const MisPedidos = () => {
-  const [loading, setLoading] = useState<Boolean>(false);
-  const [openModal, setOpenModal] = useState<Boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
-  const [modalFilters, setModalFilters] = useState<Boolean>(false);
+  const [modalFilters, setModalFilters] = useState<boolean>(false);
   const [filtros, setFiltros] = useState<FiltroState>({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "", });
   const [filtroSeleccionado, setFiltroSeleccionado] = useState<FiltroState>({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "", });
   const resetFiltros = () => { setFiltros({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "" }); setFiltroSeleccionado({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "" }); };
@@ -61,7 +62,7 @@ const MisPedidos = () => {
     {
       label: "Total",
       key: "totalVenta",
-       render: (pedido: PedidoResponseDTO) => (<p>${pedido.totalVenta}</p>),
+      render: (pedido: PedidoResponseDTO) => (<p>${pedido.totalVenta}</p>),
       className: "hidden sm:table-cell",
     },
     {
@@ -106,7 +107,7 @@ const MisPedidos = () => {
         return;
       }
 
-      await dispatch(updateEstadoPedidoThunk({pedidoId: pedido.id, nuevoEstado: nuevoEstado}));
+      await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: nuevoEstado }));
 
       getPedidos();
       setPedidoSeleccionado(null);
@@ -160,6 +161,7 @@ const MisPedidos = () => {
         detallePedidos: p.detallePedidos,
         factura: p.factura,
       }));
+      pedidosDTO.sort((a, b) => b.codigo.localeCompare(a.codigo));
       const pedidosFiltrados = filtrarPedidos(pedidosDTO);
       dispatch(setDataTable(pedidosFiltrados));
     } catch (error) {
@@ -246,60 +248,14 @@ const MisPedidos = () => {
           />
         )}
       </div>
-      {openModal && pedidoSeleccionado && (
-        <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50'>
-          <div className='relative bg-white p-5 rounded-[20px] shadow-lg w-[90%] sm:w-[65%] lg:w-[40%]'>
-            <button
-              className="absolute top-3 right-4 cursor-pointer font-bold text-gray-500 hover:text-gray-800 text-2xl"
-              onClick={() => {
-                setOpenModal(false);
-              }}
-            >
-              ✕
-            </button>
 
-            <div className='pl-3 pb-3'>
-              <h2 className='text-secondary text-xl font-bold'><strong>Orden: #{mostrarSoloNumero(pedidoSeleccionado.codigo)}</strong></h2>
-              <p>{pedidoSeleccionado.fecha}</p>
-            </div>
-
-            <ul className='flex flex-col gap-2 pl-3'>
-              <li className=''>
-                <p><strong> Estado:</strong> {getEstadoTexto(pedidoSeleccionado.estado)}</p>
-                <div className="border-b border-gray-300 mt-2 mb-2"></div>
-                <p><strong>Cliente:</strong> {pedidoSeleccionado.cliente?.nombreCompleto}</p>
-                <div className="border-b border-gray-300 mt-2 mb-2"></div>
-                <strong>Productos:</strong>
-                {pedidoSeleccionado.detallePedidos && pedidoSeleccionado.detallePedidos.length > 0 && (
-                  <ul className='pl-10'>
-                    {pedidoSeleccionado.detallePedidos.map((detalle, index) => (
-                      <li key={index}>
-                        <p>{detalle.cantidad}x - {detalle.producto?.denominacion || detalle.insumo?.denominacion}</p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <div className="border-b border-gray-300 mt-2 mb-2"></div>
-                <p><strong>Forma de pago:</strong> {getFormaPagoTexto(pedidoSeleccionado.formaPago)}</p>
-                <div className="border-b border-gray-300 mt-2 mb-2"></div>
-                <p><strong> Envío:</strong> {getTipoEnvioTexto(pedidoSeleccionado.tipoEnvio)}</p>
-                <div className="border-b border-gray-300 mt-2 mb-2"></div>
-                <strong className='flex justify-between items-center'>
-                  Total <p className='text-secondary pr-3'>${pedidoSeleccionado.totalVenta.toFixed(2)}</p>
-                </strong>
-              </li>
-            </ul>
-            <div className='flex justify-end items-center'>
-              <button
-                className={`${pedidoSeleccionado.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
-                onClick={() => cancelarPedido(pedidoSeleccionado)}
-              >
-                Cancelar pedido
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {openModal && pedidoSeleccionado &&
+        <PedidoDetalleModal
+          pedido={pedidoSeleccionado}
+          open={openModal}
+          onClose={() => { setOpenModal(false); getPedidos(); }}
+        />
+      }
 
       {modalFilters && (
         <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50'>

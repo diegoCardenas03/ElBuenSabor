@@ -7,7 +7,10 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 import Swal from 'sweetalert2';
-import { fetchPedidoByCodigo } from '../../hooks/redux/slices/PedidoReducer';
+import { fetchPedidosByUsuario } from '../../hooks/redux/slices/PedidoReducer';
+import PedidoDetalleModal from '../modals/PedidoDetalleModal';
+import { Estado } from '../../types/enums/Estado';
+import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -31,22 +34,15 @@ export const Header: React.FC<HeaderProps> = ({
 
   const usuarioLogeado = true;
   const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
-  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
+
+   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
+   const clienteId = 1;
 
   useEffect(() => {
-    const raw = localStorage.getItem('pedidoEnCurso');
-    console.log("Valor pedidoEnCurso", raw);
-    let codigo: string | null = null;
-    if (raw && raw !== "undefined" && raw !== "null") {
-      try {
-        codigo = JSON.parse(raw);
-      } catch { }
+    if (clienteId) {
+      dispatch(fetchPedidosByUsuario(clienteId));
     }
-    if (codigo) {
-      dispatch(fetchPedidoByCodigo(codigo));
-    }
-  }, [dispatch]);
-
+  }, [clienteId, dispatch]);
 
   useEffect(() => {
     if (carritoAbierto && carrito.length === 0) {
@@ -90,9 +86,11 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   Ver pedido en curso
                 </span>
-
               </div>
             )}
+            {modalPedidoEnCurso &&
+              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => {setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(clienteId));}}/>
+            }
           </div>
         )}
       </div>
@@ -130,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
               icon: "error",
               title: "El carrito esta vacio",
               showConfirmButton: false,
-              timer: 1500,
+              timer: 1000,
               width: "20em"
             }) : dispatch(abrirCarrito())}
         />

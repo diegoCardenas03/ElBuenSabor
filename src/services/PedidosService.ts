@@ -22,4 +22,10 @@ export class PedidosService extends BackendClient<PedidoDTO, PedidoResponseDTO> 
     if (!response.ok) throw new Error("No se pudo obtener el pedido por código");
     return await response.json();
   };
+
+  async getPedidosByUsuario(clienteId: number): Promise<PedidoResponseDTO[]> {
+    const response = await fetch(`http://localhost:8080/api/pedidos/cliente/${clienteId}`);
+    if (!response.ok) throw new Error("No se pudieron obtener los pedidos del usuario");
+    return await response.json();
+  }
 }

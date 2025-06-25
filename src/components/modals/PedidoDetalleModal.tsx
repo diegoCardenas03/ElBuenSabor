@@ -1,14 +1,18 @@
+import { useAppDispatch } from '../../hooks/redux';
+import { updateEstadoPedidoThunk } from '../../hooks/redux/slices/PedidoReducer';
+import { Estado } from '../../types/enums/Estado';
 import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
 import { getEstadoTexto, getTipoEnvioTexto, getFormaPagoTexto, mostrarSoloNumero } from '../../utils/PedidoUtils';
 
 interface PedidoDetalleModalProps {
-  pedido: PedidoResponseDTO;
+  pedido: PedidoResponseDTO | null;
   open: boolean;
   onClose: () => void;
 }
 
 const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) => {
   if (!open || !pedido) return null;
+  const dispatch = useAppDispatch();
 
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50'>
@@ -51,6 +55,18 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
             </strong>
           </li>
         </ul>
+        <div className='flex justify-end items-center'>
+          <button
+            className={`${pedido.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
+            onClick={async () => {
+              await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: Estado.CANCELADO }));
+              await localStorage.removeItem("pedidoEnCurso");
+              onClose();
+            }}
+          >
+            Cancelar pedido
+          </button>
+        </div>
       </div>
     </div>
   );

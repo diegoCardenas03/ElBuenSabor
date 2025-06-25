@@ -97,18 +97,19 @@ export const PantallaCajero = () => {
       key: "estado",
       render: (pedido: PedidoResponseDTO) => {
         let texto = "";
-        if (pedido.estado === Estado.SOLICITADO) {
-          texto = "Cancelar pedido";
-        } else if (pedido.estado === Estado.TERMINADO) {
+        // if (pedido.estado === Estado.SOLICITADO) {
+        //   texto = "Cancelar pedido";
+        // } else 
+        if (pedido.estado === Estado.TERMINADO) {
           if (pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
             texto = "Entregar"
           }
         }
         return (
-          <button 
+          <button
             {...texto == "" ? { className: "" } : { className: "bg-secondary text-white rounded-full px-1 py-1 w-[70%] cursor-pointer hover:scale-105 transition-transform" }}
             onClick={() => cambiarEstado(pedido)}
-            >
+          >
             {texto}
           </button>
         );
@@ -175,15 +176,16 @@ export const PantallaCajero = () => {
   const cambiarEstado = async (pedido: PedidoResponseDTO) => {
     try {
       let nuevoEstado = pedido.estado;
-      if (pedido.estado === Estado.SOLICITADO) {
-        nuevoEstado = Estado.CANCELADO;
-      } else if (pedido.estado === Estado.TERMINADO && pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
+      // if (pedido.estado === Estado.SOLICITADO) {
+      //   nuevoEstado = Estado.CANCELADO;
+      // } else 
+      if (pedido.estado === Estado.TERMINADO && pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
         nuevoEstado = Estado.ENTREGADO;
       } else {
         return;
       }
 
-      await dispatch(updateEstadoPedidoThunk({pedidoId: pedido.id, nuevoEstado: nuevoEstado}));
+      await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: nuevoEstado }));
 
       getPedidos();
       setPedidoSeleccionado(null);
@@ -242,7 +244,7 @@ export const PantallaCajero = () => {
         <PedidoDetalleModal
           pedido={pedidoSeleccionado}
           open={openModal}
-          onClose={() => setOpenModal(false)}
+          onClose={() => {setOpenModal(false); getPedidos();}}
         />
       )}
     </div>

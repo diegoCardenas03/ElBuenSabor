@@ -7,7 +7,6 @@ import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDirecci
 import { fetchDirecciones } from '../../hooks/redux/slices/DomicilioReducer';
 import { DomicilioResponseDTO } from '../../types/Domicilio/DomicilioResponseDTO';
 import Swal from 'sweetalert2';
-import { PedidosService } from '../../services/PedidosService';
 
 type Props = {
   onClose: () => void;
@@ -22,7 +21,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const direcciones = useAppSelector((state) => state.domicilio.direcciones);
   const tipoEntrega = useAppSelector((state) => state.carrito.tipoEntrega);
   const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
-  const pedidoService = new PedidosService();
+  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
 
   useEffect(() => {
     dispatch(fetchDirecciones())
@@ -36,9 +35,6 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const total = subTotal + envio;
 
   const handleRealizarPedido = async () => {
-    const pedidoEnCursoRaw = localStorage.getItem("pedidoEnCurso");
-    const pedidoEnCurso = pedidoEnCursoRaw && pedidoEnCursoRaw !== "undefined" && pedidoEnCursoRaw !== "null" ? JSON.parse(pedidoEnCursoRaw) : null;
-
     if (pedidoEnCurso) {
       Swal.fire({
         position: "center",
@@ -86,7 +82,6 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     });
     onClose();
   }
-
 
 
   const handleCancelarPedido = () => {

@@ -6,12 +6,14 @@ import { PedidoDTO } from "../../../types/Pedido/PedidoDTO";
 
 interface PedidoState {
   pedidoEnCurso: PedidoResponseDTO | null;
+  pedidosDelUsuario: PedidoResponseDTO[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: PedidoState = {
   pedidoEnCurso: null,
+  pedidosDelUsuario: [],
   loading: false,
   error: null,
 };
@@ -51,17 +53,31 @@ export const enviarPedidoThunk = createAsyncThunk<PedidoResponseDTO, PedidoDTO>(
   }
 );
 
+export const fetchPedidosByUsuario = createAsyncThunk<PedidoResponseDTO[], number>(
+  "pedido/fetchPedidosByUsuario",
+  async (clienteId, { rejectWithValue }) => {
+    try {
+      return await pedidosService.getPedidosByUsuario(clienteId);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+const getPedidoEnCurso = (pedidos: PedidoResponseDTO[]) =>
+  pedidos.find(p =>
+    p.estado !== Estado.ENTREGADO && p.estado !== Estado.CANCELADO
+  ) ?? null;
+
 const PedidoReducer = createSlice({
   name: "pedido",
   initialState,
   reducers: {
     clearPedidoEnCurso(state) {
       state.pedidoEnCurso = null;
-      localStorage.removeItem("pedidoEnCurso");
     },
     setPedidoEnCurso(state, action: PayloadAction<PedidoResponseDTO>) {
       state.pedidoEnCurso = action.payload;
-      localStorage.setItem("pedidoEnCurso", JSON.stringify(action.payload.codigo));
     },
   },
   extraReducers: (builder) => {
@@ -70,25 +86,18 @@ const PedidoReducer = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchPedidoByCodigo.fulfilled,
-        (state, action: PayloadAction<PedidoResponseDTO>) => {
-          state.loading = false;
-          state.error = null;
-          state.pedidoEnCurso = action.payload;
-          if (action.payload.estado !== Estado.ENTREGADO && action.payload.estado !== Estado.CANCELADO) {
-            localStorage.setItem("pedidoEnCurso", JSON.stringify(action.payload.codigo));
-          } else {
-            localStorage.removeItem("pedidoEnCurso");
-            state.pedidoEnCurso = null;
-          }
-        }
-      )
+      .addCase(fetchPedidoByCodigo.fulfilled, (state, action: PayloadAction<PedidoResponseDTO>) => {
+        state.loading = false;
+        state.error = null;
+        state.pedidoEnCurso = (
+          action.payload.estado !== Estado.ENTREGADO &&
+          action.payload.estado !== Estado.CANCELADO
+        ) ? action.payload : null;
+      })
       .addCase(fetchPedidoByCodigo.rejected, (state, action) => {
         state.loading = false;
         state.error = String(action.payload) || "Error al cargar pedido";
         state.pedidoEnCurso = null;
-        localStorage.removeItem("pedidoEnCurso");
       })
 
       .addCase(updateEstadoPedidoThunk.pending, (state) => {
@@ -98,16 +107,10 @@ const PedidoReducer = createSlice({
       .addCase(updateEstadoPedidoThunk.fulfilled, (state, action: PayloadAction<PedidoResponseDTO>) => {
         state.loading = false;
         state.error = null;
-        if (
+        state.pedidoEnCurso = (
           action.payload.estado !== Estado.ENTREGADO &&
           action.payload.estado !== Estado.CANCELADO
-        ) {
-          state.pedidoEnCurso = action.payload;
-          localStorage.setItem("pedidoEnCurso", JSON.stringify(action.payload.codigo));
-        } else {
-          state.pedidoEnCurso = null;
-          localStorage.removeItem("pedidoEnCurso");
-        }
+        ) ? action.payload : null;
       })
       .addCase(updateEstadoPedidoThunk.rejected, (state, action) => {
         state.loading = false;
@@ -121,23 +124,32 @@ const PedidoReducer = createSlice({
       .addCase(enviarPedidoThunk.fulfilled, (state, action: PayloadAction<PedidoResponseDTO>) => {
         state.loading = false;
         state.error = null;
-        state.pedidoEnCurso = action.payload;
-        if (
-          action.payload.codigo !== undefined &&
-          action.payload.codigo !== null &&
+        state.pedidoEnCurso = (
           action.payload.estado !== Estado.ENTREGADO &&
           action.payload.estado !== Estado.CANCELADO
-        ) {
-          localStorage.setItem("pedidoEnCurso", JSON.stringify(action.payload.codigo));
-        } else {
-          localStorage.removeItem("pedidoEnCurso");
-        }
+        ) ? action.payload : null;
       })
       .addCase(enviarPedidoThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = String(action.payload) || "Error al enviar pedido";
       })
 
+      .addCase(fetchPedidosByUsuario.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPedidosByUsuario.fulfilled, (state, action: PayloadAction<PedidoResponseDTO[]>) => {
+        state.loading = false;
+        state.error = null;
+        state.pedidosDelUsuario = action.payload;
+        state.pedidoEnCurso = getPedidoEnCurso(action.payload);
+      })
+      .addCase(fetchPedidosByUsuario.rejected, (state, action) => {
+        state.loading = false;
+        state.error = String(action.payload) || "Error al cargar pedidos del usuario";
+        state.pedidosDelUsuario = [];
+        state.pedidoEnCurso = null;
+      });
   },
 });
 
