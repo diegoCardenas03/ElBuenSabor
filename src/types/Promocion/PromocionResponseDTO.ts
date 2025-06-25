@@ -10,4 +10,5 @@ export interface PromocionResponseDTO {
     precioVenta: number;
     precioCosto: number; 
     detallePromociones: DetallePromocionResponseDTO[];
+    activo: boolean;
 }

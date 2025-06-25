@@ -51,7 +51,8 @@ export const MenuPage: React.FC = () => {
     const promocionService = new PromocionService();
     promocionService.getAll().then((data) => {
       console.log("Promociones recibidas:", data);
-      setPromociones(data);
+      const activas = data.filter((promo: PromocionResponseDTO) => promo.activo);
+      setPromociones(activas);
     });
   }, [dispatch]);
 
