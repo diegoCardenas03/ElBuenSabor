@@ -117,6 +117,7 @@ export const ScreenProducto = () => {
         urlImagen: p.urlImagen,
         activo: p.activo,
         rubroId: p.rubro?.id ?? 0,
+        margenGanancia: p.margenGanancia ?? 0,
         detalleProductos: p.detalleProductos.map((d) => ({
           id: d.id,
           cantidad: d.cantidad,
