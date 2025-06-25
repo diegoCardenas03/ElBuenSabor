@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Header } from '../components/commons/Header'
 import { PedidosService } from '../services/PedidosService';
-import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { useAppDispatch } from '../hooks/redux';
 import { PedidoResponseDTO } from '../types/Pedido/PedidoResponseDTO';
 import { MdRemoveRedEye, MdOutlineFileDownload } from "react-icons/md";
 import { IoFilterSharp } from "react-icons/io5";
@@ -39,7 +39,6 @@ const MisPedidos = () => {
       label: "Orden",
       key: "codigo",
       render: (pedido: PedidoResponseDTO) => mostrarSoloNumero(pedido.codigo),
-      className: "",
     },
     {
       label: "Estado",
@@ -79,7 +78,6 @@ const MisPedidos = () => {
           <MdRemoveRedEye size={23} />
         </button>
       ),
-      className: "",
     },
     {
       label: "Factura",
@@ -94,28 +92,8 @@ const MisPedidos = () => {
           <MdOutlineFileDownload size={23} />
         </button>
       ),
-      className: "",
     },
   ];
-
-  const cancelarPedido = async (pedido: PedidoResponseDTO) => {
-    try {
-      let nuevoEstado = pedido.estado;
-      if (pedido.estado === Estado.SOLICITADO) {
-        nuevoEstado = Estado.CANCELADO;
-      } else {
-        return;
-      }
-
-      await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: nuevoEstado }));
-
-      getPedidos();
-      setPedidoSeleccionado(null);
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const filtrarPedidos = (pedidos: PedidoResponseDTO[]): PedidoResponseDTO[] => {
     let pedidosFiltrados = pedidos;
