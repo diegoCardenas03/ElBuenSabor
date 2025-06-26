@@ -8,9 +8,10 @@ export const usePromocionesPopulares = () => {
   useEffect(() => {
     const promocionService = new PromocionService();
     promocionService.getAll().then((data) => {
-      setPromociones(data.slice(0, 4)); // Solo las primeras 4
+      const activas = data.filter((promo: PromocionResponseDTO) => promo.activo);
+      setPromociones(activas.slice(0, 4)); // Solo las primeras 4
     });
   }, []);
 
   return promociones;
-};
+}
