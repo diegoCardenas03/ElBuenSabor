@@ -1,6 +1,8 @@
 import { useEffect, useState, ChangeEvent } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
+import * as ExcelJS from "exceljs/dist/exceljs.min.js";
+import { saveAs } from "file-saver";
 
 // Tipo para Producto o Insumo
 type ProductoOInsumo = {
@@ -133,9 +135,93 @@ const ProductosEstadistica = () => {
     setPaginaInsumos(1);
   };
 
+  // --- EXPORTAR EXCEL FUNCIONAL ---
+  const handleExportar = async () => {
+    let periodo = "";
+    if (!fechaDesde && !fechaHasta) {
+      const hoy = new Date();
+      const y = hoy.getFullYear();
+      const m = (hoy.getMonth() + 1).toString().padStart(2, "0");
+      periodo = `${m}/${y}`;
+    } else {
+      periodo = `${fechaDesde || "Inicio"} a ${fechaHasta || "Hoy"}`;
+    }
+
+    const wb = new ExcelJS.Workbook();
+
+    // Ranking Productos
+    const wsProductos = wb.addWorksheet("Ranking Productos");
+    const headerProd = ["Orden", "Nombre", "Cantidad de compras", "Importe Total"];
+    wsProductos.addRow(headerProd);
+    productos.forEach((p, idx) => {
+      wsProductos.addRow([
+        idx + 1,
+        p.denominacion,
+        p.cantidadCompras,
+        p.importeTotal
+      ]);
+    });
+
+    // Estilos Productos
+    wsProductos.getRow(1).eachCell(cell => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }}; // mismo color de la 1era página
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.border = { bottom: {style: 'thin'} };
+    });
+    wsProductos.columns = [
+      { width: 10 },
+      { width: 35 },
+      { width: 22 },
+      { width: 22 },
+    ];
+    wsProductos.getColumn(4).numFmt = '"$"#,##0.00;[Red]\\-"$"#,##0.00';
+
+    // Ranking Insumos
+    const wsInsumos = wb.addWorksheet("Ranking Bebidas");
+    const headerInsumos = ["Orden", "Nombre", "Cantidad de compras", "Importe Total"];
+    wsInsumos.addRow(headerInsumos);
+    insumos.forEach((i, idx) => {
+      wsInsumos.addRow([
+        idx + 1,
+        i.denominacion,
+        i.cantidadCompras,
+        i.importeTotal
+      ]);
+    });
+
+    // Fondo igual que productos para uniformidad
+    wsInsumos.getRow(1).eachCell(cell => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }}; // mismo color
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.border = { bottom: {style: 'thin'} };
+    });
+    wsInsumos.columns = [
+      { width: 10 },
+      { width: 35 },
+      { width: 22 },
+      { width: 22 },
+    ];
+    wsInsumos.getColumn(4).numFmt = '"$"#,##0.00;[Red]\\-"$"#,##0.00';
+
+    // Agregar hoja de periodo/filtros
+    const wsInfo = wb.addWorksheet("Filtro");
+    wsInfo.addRow(["Período", periodo]);
+    wsInfo.getRow(1).eachCell(cell => {
+      cell.font = { bold: true };
+      cell.alignment = { vertical: "middle", horizontal: "left" };
+    });
+    wsInfo.columns = [{ width: 14 }, { width: 35 }];
+
+    // Descargar
+    const buffer = await wb.xlsx.writeBuffer();
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `ranking_productos_insumos_${periodo.replace(/\//g,"-")}.xlsx`);
+  };
+
   return (
     <>
-      <AdminHeader showBackButton text="Estadísticas" />
+      <AdminHeader text="Estadísticas" />
       <main className="flex flex-col items-center w-full m-auto pt-10 min-h-screen pb-20 bg-[#fff3e3] font-primary">
         {/* Filtros + Exportar */}
         <div className="flex items-center gap-4 mb-5 w-full max-w-2xl">
@@ -156,7 +242,10 @@ const ProductosEstadistica = () => {
               placeholder="dd/mm/aaaa"
             />
           </div>
-          <button className="cursor-pointer ml-auto flex items-center gap-2 bg-[#ff9c3a] hover:bg-[#ff9c3ac2] text-dark font-black px-4 py-2 rounded-lg shadow">
+          <button
+            className="cursor-pointer ml-auto flex items-center gap-2 bg-[#ff9c3a] hover:bg-[#ff9c3ac2] text-dark font-black px-4 py-2 rounded-lg shadow"
+            onClick={handleExportar}
+          >
             <span>Exportar</span>
             <PiMicrosoftExcelLogo size={24} />
           </button>

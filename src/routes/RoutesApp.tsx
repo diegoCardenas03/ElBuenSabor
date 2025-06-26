@@ -13,7 +13,7 @@ import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
-import { Estadistica } from '../pages/admin/Estadistica';
+import EstadisticaWithBoundary from '../pages/admin/Estadistica';
 import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
@@ -43,7 +43,7 @@ const RoutesApp = () => {
         <Route path="/admin/Empleados" element={<Empleados />} />
         <Route path="/admin/Promociones" element={<ScreenPromocion />} />
         <Route path='/admin/Delivery' element={<Delivery />} />
-        <Route path='/admin/Estadistica' element={<Estadistica />} />
+        <Route path='/admin/Estadistica' element={<EstadisticaWithBoundary />} />
         <Route path="/admin/ProductosEstadistica" element={<ProductosEstadistica />} />
         <Route path="/admin/ClientesEstadistica/:clienteId" element={<ClientesEstadisticas />} />
       </Routes>

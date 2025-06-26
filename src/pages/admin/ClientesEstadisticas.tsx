@@ -1,6 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
+import { PiMicrosoftExcelLogo } from "react-icons/pi";
+import ExcelJS from "exceljs/dist/exceljs.min.js";
+import { saveAs } from "file-saver";
 
 // --- Tipos ---
 type ProductoPedido = {
@@ -174,9 +177,82 @@ const ClientesEstadisticas = () => {
   const irPaginaAnterior = () => setPaginaActual(Math.max(1, paginaActual - 1));
   const irPaginaSiguiente = () => setPaginaActual(Math.min(totalPaginas, paginaActual + 1));
 
+  // --- EXPORTAR EXCEL ---
+  const handleExportarExcel = async () => {
+    const wb = new ExcelJS.Workbook();
+    // Hoja pedidos
+    const ws = wb.addWorksheet("Pedidos del cliente");
+
+    // Encabezado
+    const encabezado = [
+      "N° Pedido", "Fecha", "Hora", "Estado", "Forma de Pago",
+      "Tipo Envío", "Dirección Entrega", "Costo Envío", "Importe Total", "Productos"
+    ];
+    ws.addRow(encabezado);
+
+    // Estilo encabezado
+    ws.getRow(1).eachCell(cell => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.border = { bottom: { style: 'thin' } };
+    });
+
+    ws.columns = [
+      { width: 14 }, // N° Pedido
+      { width: 12 }, // Fecha
+      { width: 8 },  // Hora
+      { width: 14 }, // Estado
+      { width: 18 }, // Forma de Pago
+      { width: 14 }, // Tipo Envío
+      { width: 30 }, // Dirección Entrega
+      { width: 12 }, // Costo Envío
+      { width: 16, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } }, // Importe Total
+      { width: 40 } // Productos
+    ];
+
+    // Agregar pedidos
+    pedidos.forEach(pedido => {
+      const productosStr = (pedido.productos || [])
+        .map(p => `${p.nombre} (x${p.cantidad}) - ${formatPrecio(p.precio)}`)
+        .join("; ");
+      ws.addRow([
+        pedido.numeroPedido,
+        pedido.fecha,
+        pedido.hora || "",
+        pedido.estado || "",
+        pedido.formaPago || "",
+        pedido.tipoEnvio || "",
+        pedido.direccionEntrega || "",
+        pedido.costoEnvio ?? "",
+        pedido.importeTotal,
+        productosStr
+      ]);
+    });
+
+    // Formato moneda para columna "Costo Envío" e "Importe Total"
+    ws.getColumn(8).numFmt = '"$"#,##0.00;[Red]\\-"$"#,##0.00';
+    ws.getColumn(9).numFmt = '"$"#,##0.00;[Red]\\-"$"#,##0.00';
+
+    // Hoja info
+    if (clienteNombre) {
+      const wsInfo = wb.addWorksheet("Info cliente");
+      wsInfo.addRow(["Cliente", clienteNombre]);
+      wsInfo.getRow(1).eachCell(cell => {
+        cell.font = { bold: true };
+        cell.alignment = { vertical: "middle", horizontal: "left" };
+      });
+      wsInfo.columns = [{ width: 12 }, { width: 35 }];
+    }
+
+    // Descargar
+    const buffer = await wb.xlsx.writeBuffer();
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `pedidos_cliente_${clienteNombre || clienteId}.xlsx`);
+  };
+
   return (
     <div className="min-h-screen bg-primary pb-10">
-      <AdminHeader showBackButton text="Estadísticas" />
+      <AdminHeader text="Estadísticas" />
       <div className="w-full flex flex-col items-center mt-8">
         <div className="bg-white w-full md:w-4/5 rounded-2xl shadow-md p-5">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
@@ -203,6 +279,13 @@ const ClientesEstadisticas = () => {
                 onChange={e => setFechaHasta(e.target.value)}
                 min={fechaDesde || undefined}
               />
+              <button
+                className="cursor-pointer ml-3 flex items-center gap-2 bg-[#ff9c3a] hover:bg-[#ff9c3ac2] text-dark font-black px-4 py-2 rounded-lg shadow"
+                onClick={handleExportarExcel}
+              >
+                <span>Exportar</span>
+                <PiMicrosoftExcelLogo size={24} />
+              </button>
             </div>
           </div>
           <div className="overflow-x-auto">

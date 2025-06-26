@@ -1,7 +1,6 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
-import { FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import {
   BarChart,
@@ -15,24 +14,38 @@ import {
 } from "recharts";
 import { PedidoResponseDTO } from "../../types/Pedido/PedidoResponseDTO";
 import { ProductoResponseDTO } from "../../types/Producto/ProductoResponseDTO";
+import { ClientesTable, ClienteTabla } from "../../components/admin/ClientesTable";
+import React from "react";
+import ExcelJS from "exceljs/dist/exceljs.min.js";
+import { saveAs } from "file-saver";
 
-type ClienteTabla = {
-  id: number;
-  nombre: string;
-  cantidad: number;
-  importe: number;
-};
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error?: any}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{color: "red", padding: 24}}>Error: {this.state.error?.message || "Ocurrió un error"}</div>
+    }
+    return this.props.children;
+  }
+}
 
 type IngresosEgresosMensualDTO = {
-  mes: string;
   ingresos: number;
+  fecha: string; // "2025-06-01"
   egresos: number;
+  ganancias: number;
 };
 
 type IngresosEgresosData = {
   ingresos: number;
   egresos: number;
-  gananciaTotal?: number;
+  ganancias: number;
 };
 
 const CLIENTES_POR_PAGINA = 10;
@@ -43,24 +56,26 @@ const Estadistica = () => {
   const [topProductos, setTopProductos] = useState<ProductoResponseDTO[]>([]);
   const [pedidos, setPedidos] = useState<number>(0);
   const [ganancias, setGanancias] = useState<number>(0);
-  const [ingresosEgresos, setIngresosEgresos] = useState<string>("");
-  const [ingresosEgresosData, setIngresosEgresosData] = useState<IngresosEgresosData | null>(null);
+  const [ingresosEgresosData, setIngresosEgresosData] = useState<IngresosEgresosData>({ingresos: 0, egresos: 0, ganancias: 0});
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingTopProductos, setLoadingTopProductos] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Tabla de clientes con cantidad de pedidos e importe total
   const [clientes, setClientes] = useState<ClienteTabla[]>([]);
   const [filtroNombre, setFiltroNombre] = useState<string>("");
-
   const [criterioOrden, setCriterioOrden] = useState<"importe" | "cantidad">("importe");
-  const [evolucionIE, setEvolucionIE] = useState<IngresosEgresosMensualDTO[]>([]);
-  const [loadingEvolucionIE, setLoadingEvolucionIE] = useState<boolean>(true);
-
   const [paginaActual, setPaginaActual] = useState<number>(1);
 
+  const [evolucionIE, setEvolucionIE] = useState<IngresosEgresosMensualDTO[]>([]);
+  const [loadingEvolucionIE, setLoadingEvolucionIE] = useState<boolean>(true);
+  const [errorEvolucionIE, setErrorEvolucionIE] = useState<string | null>(null);
+
   useEffect(() => {
+    let cancelado = false;
     const fetchEstadisticas = async () => {
       setLoading(true);
+      setError(null);
       try {
         const pedidosResponse = await fetch(
           "http://localhost:8080/api/pedidos/estado?estado=ENTREGADO"
@@ -72,12 +87,12 @@ const Estadistica = () => {
         let pedidosFiltrados = pedidosData;
         if (fechaDesde) {
           pedidosFiltrados = pedidosFiltrados.filter(
-            (pedido) => pedido.fecha >= fechaDesde
+            (pedido) => pedido.fecha && pedido.fecha >= fechaDesde
           );
         }
         if (fechaHasta) {
           pedidosFiltrados = pedidosFiltrados.filter(
-            (pedido) => pedido.fecha <= fechaHasta
+            (pedido) => pedido.fecha && pedido.fecha <= fechaHasta
           );
         }
 
@@ -94,7 +109,7 @@ const Estadistica = () => {
         pedidosFiltrados.forEach((pedido) => {
           const id = pedido.cliente?.id;
           const nombre = pedido.cliente?.nombreCompleto || "Sin nombre";
-          if (!id) return; // Si no hay id, ignora
+          if (!id) return;
           if (!clientesMap[id]) {
             clientesMap[id] = { nombre, cantidad: 0, importe: 0 };
           }
@@ -102,7 +117,6 @@ const Estadistica = () => {
           clientesMap[id].importe += pedido.totalVenta || 0;
         });
 
-        // Ordena por el criterio seleccionado (importe o cantidad)
         const clientesTabla = Object.entries(clientesMap)
           .map(([id, datos]) => ({
             id: Number(id),
@@ -117,6 +131,7 @@ const Estadistica = () => {
           );
         setClientes(clientesTabla);
 
+        // Para mostrar totales en los KPIs (usamos el primer elemento, ya que tu endpoint da solo uno o por mes)
         let urlIE = "http://localhost:8080/api/estadisticas/ingresos-egresos";
         if (fechaDesde) urlIE += `?fechaDesde=${fechaDesde}`;
         if (fechaHasta)
@@ -124,18 +139,25 @@ const Estadistica = () => {
         const respIE = await fetch(urlIE);
         if (!respIE.ok)
           throw new Error("Error al consultar ingresos y egresos");
-        const datosIE: IngresosEgresosData = await respIE.json();
-        setIngresosEgresos(
-          `Ingresos: $${Number(datosIE.ingresos).toLocaleString("es-AR", {
-            maximumFractionDigits: 0,
-          }) ?? 0}, ` +
-          `Egresos: $${Number(datosIE.egresos).toLocaleString("es-AR", {
-            maximumFractionDigits: 0,
-          }) ?? 0}`
-        );
-        setIngresosEgresosData(datosIE);
-      } catch (error) {
-        console.error(error);
+        const datosIE: IngresosEgresosMensualDTO[] = await respIE.json();
+        // Sumar todos los ingresos, egresos, ganancias si hay más de un mes
+        let ingresos = 0, egresos = 0, ganancias = 0;
+        if (Array.isArray(datosIE)) {
+          for (const item of datosIE) {
+            ingresos += Number(item.ingresos) || 0;
+            egresos += Number(item.egresos) || 0;
+            ganancias += Number(item.ganancias) || 0;
+          }
+        }
+        if (!cancelado) {
+          setIngresosEgresosData({ingresos, egresos, ganancias});
+        }
+      } catch (error: any) {
+        setError("No se pudieron cargar los datos de la estadística general.");
+        setPedidos(0);
+        setGanancias(0);
+        setClientes([]);
+        setIngresosEgresosData({ ingresos: 0, egresos: 0, ganancias: 0 });
       } finally {
         setLoading(false);
       }
@@ -154,7 +176,6 @@ const Estadistica = () => {
         setTopProductos(productos || []);
       } catch (error) {
         setTopProductos([]);
-        console.error(error);
       } finally {
         setLoadingTopProductos(false);
       }
@@ -162,16 +183,18 @@ const Estadistica = () => {
 
     const fetchEvolucionIE = async () => {
       setLoadingEvolucionIE(true);
+      setErrorEvolucionIE(null);
       try {
-        let url = `http://localhost:8080/api/estadisticas/evolucion-ingresos-egresos-mensual`;
+        let url = "http://localhost:8080/api/estadisticas/ingresos-egresos";
         if (fechaDesde) url += `?fechaDesde=${fechaDesde}`;
         if (fechaHasta) url += (fechaDesde ? `&` : `?`) + `fechaHasta=${fechaHasta}`;
         const resp = await fetch(url);
         if (!resp.ok) throw new Error("Error al consultar evolución ingresos/egresos");
         const data: IngresosEgresosMensualDTO[] = await resp.json();
-        setEvolucionIE(data || []);
+        setEvolucionIE(Array.isArray(data) ? data : []);
       } catch (e) {
         setEvolucionIE([]);
+        setErrorEvolucionIE("No se pudo cargar la evolución de ingresos y egresos.");
       } finally {
         setLoadingEvolucionIE(false);
       }
@@ -180,31 +203,97 @@ const Estadistica = () => {
     fetchEstadisticas();
     fetchTopProductos();
     fetchEvolucionIE();
-    setPaginaActual(1); // Reinicia la página al cambiar filtros u orden
+    setPaginaActual(1);
+    return () => { cancelado = true; };
   }, [fechaDesde, fechaHasta, criterioOrden]);
 
-  // Paginación y filtrado
-  const clientesFiltrados = clientes.filter((cliente) =>
-    cliente.nombre.toLowerCase().includes(filtroNombre.toLowerCase())
-  );
-  const totalPaginas = Math.ceil(clientesFiltrados.length / CLIENTES_POR_PAGINA);
-  const clientesAMostrar = clientesFiltrados.slice(
-    (paginaActual - 1) * CLIENTES_POR_PAGINA,
-    paginaActual * CLIENTES_POR_PAGINA
-  );
-
-  const irPaginaAnterior = () => setPaginaActual((prev) => Math.max(1, prev - 1));
-  const irPaginaSiguiente = () => setPaginaActual((prev) => Math.min(totalPaginas, prev + 1));
   useEffect(() => { setPaginaActual(1); }, [filtroNombre]);
 
   const ingresos = Number(ingresosEgresosData?.ingresos ?? 0);
   const egresos = Number(ingresosEgresosData?.egresos ?? 0);
-  const ganancia = Number(ingresosEgresosData?.gananciaTotal ?? 0);
+  const ganancia = Number(ingresosEgresosData?.ganancias ?? 0);
+
+  // --- EXPORTAR A EXCEL CON ESTILO ---
+  const handleExportExcel = async () => {
+    let periodo = "Mes actual";
+    let desde = fechaDesde;
+    let hasta = fechaHasta;
+    if (!desde && !hasta) {
+      const hoy = new Date();
+      const y = hoy.getFullYear();
+      const m = (hoy.getMonth() + 1).toString().padStart(2, "0");
+      desde = `${y}-${m}-01`;
+      const lastDay = new Date(y, hoy.getMonth() + 1, 0).getDate();
+      hasta = `${y}-${m}-${lastDay}`;
+      periodo = `${m}/${y}`;
+    } else {
+      periodo = `${desde || "Inicio"} a ${hasta || "Hoy"}`;
+    }
+
+    // --- RESUMEN ---
+    const resumenRows = [
+      ["Periodo", "Ingresos", "Egresos", "Ganancias", "Cantidad de Pedidos"],
+      [periodo, ingresos, egresos, ganancia, pedidos]
+    ];
+
+    // --- EVOLUCION ---
+    const detalleEvolucionRows = [
+      ["Mes", "Ingresos", "Egresos", "Ganancias"],
+      ...evolucionIE.map(item => [
+        item.fecha ? item.fecha.slice(0, 7) : "",
+        item.ingresos,
+        item.egresos,
+        item.ganancias
+      ])
+    ];
+
+    const wb = new ExcelJS.Workbook();
+
+    // Hoja Resumen
+    const wsResumen = wb.addWorksheet("Resumen");
+    resumenRows.forEach(row => wsResumen.addRow(row));
+    wsResumen.getRow(1).eachCell(cell => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+      cell.border = { bottom: {style: 'thin'} };
+    });
+    wsResumen.columns = [
+      { width: 18 },
+      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+      { width: 20 }
+    ];
+
+    // Hoja Evolución mensual
+    if (evolucionIE.length > 0) {
+      const wsEvol = wb.addWorksheet("Evolucion mensual");
+      detalleEvolucionRows.forEach(row => wsEvol.addRow(row));
+      wsEvol.getRow(1).eachCell(cell => {
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+        cell.border = { bottom: {style: 'thin'} };
+      });
+      wsEvol.columns = [
+        { width: 10 },
+        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+      ];
+    }
+
+    // Descargar
+    const buffer = await wb.xlsx.writeBuffer();
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `estadisticas_${periodo.replace(/\//g,"-")}.xlsx`);
+  };
+  // --- FIN EXPORTAR A EXCEL ---
 
   return (
     <>
       <AdminHeader text="Estadísticas" />
-      <main className="flex flex-col items-center w-full m-auto pt-10 min-h-screen pb-20 bg-primary font-primary">
+      <main className="flex flex-col items-center w-full m-auto pt-10 min-h-screen pb-20" style={{ backgroundColor: "#fff3e3" }}>
         {/* Filtros */}
         <div className="flex justify-center gap-4 mb-4 w-4/5">
           <div>
@@ -225,11 +314,18 @@ const Estadistica = () => {
               className="border rounded px-2 py-1 bg-white"
             />
           </div>
-          <button className="cursor-pointer bg-tertiary hover:bg-[#ff9c3ac2] text-dark font-black px-4 py-2 rounded shadow flex items-center">
+          <button
+            className="cursor-pointer bg-tertiary hover:bg-[#ff9c3ac2] text-dark font-black px-4 py-2 rounded shadow flex items-center"
+            onClick={handleExportExcel}
+          >
             <span className="ml-2 mr-4">Exportar a excel</span>
             <PiMicrosoftExcelLogo size={25} />
           </button>
         </div>
+
+        {error && (
+          <div className="text-red-600 font-bold my-4">{error}</div>
+        )}
 
         {/* Contenedor principal: Top 5 a la izquierda, KPIs + gráfico a la derecha */}
         <div className="flex flex-col md:flex-row w-full px-2 md:px-20 gap-6 items-start">
@@ -281,9 +377,9 @@ const Estadistica = () => {
                 <h3 className="font-bold text-3xl">
                   {loading
                     ? "..."
-                    : `$${ganancias.toLocaleString("es-AR", {
-                      minimumFractionDigits: 2,
-                    })}`}
+                    : `$${ganancia.toLocaleString("es-AR", {
+                        minimumFractionDigits: 2,
+                      })}`}
                 </h3>
               </div>
             </div>
@@ -295,16 +391,32 @@ const Estadistica = () => {
               <div style={{ width: "100%", height: 220 }}>
                 {loadingEvolucionIE ? (
                   <div className="text-gray-400 text-center pt-10">Cargando...</div>
+                ) : errorEvolucionIE ? (
+                  <div className="text-red-600 text-center pt-10">{errorEvolucionIE}</div>
                 ) : evolucionIE.length === 0 ? (
                   <div className="text-gray-400 text-center pt-10">Sin datos para mostrar</div>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart
-                      data={evolucionIE}
+                      data={evolucionIE.map((item) => ({
+                        ...item,
+                        mes: typeof item.fecha === "string" && item.fecha.length >= 7
+                          ? item.fecha.slice(0, 7)
+                          : "Sin fecha",
+                      }))}
                       margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="mes" />
+                      <XAxis
+                        dataKey="mes"
+                        tickFormatter={(mes) => {
+                          if (!mes || typeof mes !== "string") return mes;
+                          const [year, month] = mes.split("-");
+                          const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                          const idx = parseInt(month, 10) - 1;
+                          return `${meses[idx] ?? month} ${year}`;
+                        }}
+                      />
                       <YAxis />
                       <Tooltip formatter={value => `$${Number(value).toLocaleString("es-AR")}`} />
                       <Legend />
@@ -320,103 +432,27 @@ const Estadistica = () => {
 
         {/* TABLA DE CLIENTES CON MÁS PEDIDOS */}
         <div className="w-full flex flex-col items-center mt-8">
-          <div className="bg-white w-full md:w-4/5 rounded-2xl shadow-md p-5">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Ingrese el nombre"
-                  value={filtroNombre}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setFiltroNombre(e.target.value)}
-                  className="border rounded-lg px-3 py-2 text-sm bg-white"
-                />
-                <FiSearch className="text-gray-400" size={18} />
-              </div>
-              <span className="text-secondary font-black text-lg text-center flex-1">
-                Clientes
-              </span>
-              <div className="flex items-center gap-2">
-                <label className="font-medium text-sm">Ordenar por:</label>
-                <select
-                  value={criterioOrden}
-                  onChange={(e) => setCriterioOrden(e.target.value as "importe" | "cantidad")}
-                  className="border rounded px-2 py-1 bg-white text-sm"
-                >
-                  <option value="importe">Importe Total</option>
-                  <option value="cantidad">Cantidad de Pedidos</option>
-                </select>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left rounded-2xl">
-                <thead>
-                  <tr className="text-secondary font-bold border-b">
-                    <th className="py-2 px-3">Nombre</th>
-                    <th className="py-2 px-3 text-center">Cantidad de pedidos</th>
-                    <th className="py-2 px-3 text-center">Importe Total</th>
-                    <th className="py-2 px-3 text-center"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clientesAMostrar.map((cliente, idx) => (
-                    <tr
-                      key={cliente.id + "_" + idx}
-                      className="border-b last:border-b-0 hover:bg-gray-50"
-                    >
-                      <td className="py-2 px-3">{cliente.nombre}</td>
-                      <td className="py-2 px-3 text-center">{cliente.cantidad}</td>
-                      <td className="py-2 px-3 text-center">
-                        {cliente.importe.toLocaleString("es-AR", {
-                          style: "currency",
-                          currency: "ARS",
-                          maximumFractionDigits: 0,
-                        })}
-                      </td>
-                      <td className="py-2 px-3 text-center">
-                        <Link to={`/admin/ClientesEstadistica/${cliente.id}`}>
-                          <button className="bg-tertiary cursor-pointer hover:bg-[#ff9c3ac2] text-dark font-bold rounded-2xl px-4 py-1">
-                            Pedidos
-                          </button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                  {clientesAMostrar.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="text-center text-gray-400 py-4">
-                        No se encontraron resultados
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            {totalPaginas > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-4">
-                <button
-                  onClick={irPaginaAnterior}
-                  disabled={paginaActual === 1}
-                  className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
-                >
-                  Anterior
-                </button>
-                <span>
-                  Página {paginaActual} de {totalPaginas}
-                </span>
-                <button
-                  onClick={irPaginaSiguiente}
-                  disabled={paginaActual === totalPaginas}
-                  className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
-                >
-                  Siguiente
-                </button>
-              </div>
-            )}
-          </div>
+          <ClientesTable
+            clientes={clientes}
+            filtroNombre={filtroNombre}
+            setFiltroNombre={setFiltroNombre}
+            criterioOrden={criterioOrden}
+            setCriterioOrden={setCriterioOrden}
+            paginaActual={paginaActual}
+            setPaginaActual={setPaginaActual}
+            clientesPorPagina={CLIENTES_POR_PAGINA}
+          />
         </div>
       </main>
     </>
   );
 };
 
-export { Estadistica };
+// Exportar la página envuelta en el ErrorBoundary para atrapar cualquier error de render
+export default function EstadisticaWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <Estadistica />
+    </ErrorBoundary>
+  );
+}
