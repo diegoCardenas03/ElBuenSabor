@@ -14,6 +14,7 @@ import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import { updateEstadoPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
+import Swal from 'sweetalert2'; // <-- Importar SweetAlert
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -21,7 +22,6 @@ type FiltroState = {
   fechaHasta: string;
   searchTerm: string;
 };
-
 
 const MisPedidos = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -85,7 +85,18 @@ const MisPedidos = () => {
       render: (pedido: PedidoResponseDTO) => (
         <button
           className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
-          onClick={() => window.open(`http://localhost:8080/api/facturas/pdf/${pedido.id}`, '_blank')}   
+          onClick={() => {
+            if (pedido.estado === Estado.TERMINADO) {
+              window.open(`http://localhost:8080/api/facturas/pdf/${pedido.id}`, '_blank');
+            } else {
+              Swal.fire({
+                icon: 'info',
+                title: 'Factura no disponible',
+                text: 'La factura estará disponible cuando el pedido esté TERMINADO.',
+                confirmButtonColor: '#FF9D3A'
+              });
+            }
+          }}
         >
           <MdOutlineFileDownload size={23} />
         </button>
