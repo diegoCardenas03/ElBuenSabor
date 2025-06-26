@@ -12,7 +12,6 @@ import { Estado } from '../types/enums/Estado';
 import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
-import { updateEstadoPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
 import Swal from 'sweetalert2'; // <-- Importar SweetAlert
 

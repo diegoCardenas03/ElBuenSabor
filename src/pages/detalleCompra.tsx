@@ -7,14 +7,13 @@ import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { FormaPago } from '../types/enums/FormaPago';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { obtenerId, setComentario, setDireccion, setMetodoPago, vaciarCarrito } from '../hooks/redux/slices/CarritoReducer';
+import { setComentario, setDireccion, setMetodoPago, vaciarCarrito } from '../hooks/redux/slices/CarritoReducer';
 import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 import CheckoutMP from '../services/mercadoPago/CheckoutMP';
 import { PedidoDTO } from '../types/Pedido/PedidoDTO';
 import { DetallePedidoDTO } from '../types/DetallePedido/DetallePedidoDTO';
 import { isInsumo, isProducto } from '../types/ProductoUnificado/ProductoUnificado';
-import { PedidosService } from '../services/PedidosService';
 import { TbCash } from "react-icons/tb";
 import Swal from 'sweetalert2';
 import { isPromocion } from '../utils/isPromocion';
@@ -34,7 +33,6 @@ const DetalleCompra = () => {
     const [mostrarDirecciones, setMostrarDirecciones] = useState<boolean>(false);
     const [agregarComentario, setAgregarComentario] = useState<boolean>(false);
     const carritoAbierto = useAppSelector(state => state.carritoUI.abierto);
-    const pedidoService = new PedidosService();
     const navigate = useNavigate();
     const location = useLocation();
     const { subTotal, envio, total } = location.state || {};
@@ -47,9 +45,7 @@ const DetalleCompra = () => {
         }
     }, [tipoEntregaState, dispatch, direcciones, carritoAbierto]);
 
-
     const formatearDireccion = (d?: DomicilioDTO | null) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
-
 
     const handleDireccionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const temporal = direcciones.find(dir => dir.id === parseInt(e.target.value));

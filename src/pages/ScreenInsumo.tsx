@@ -150,7 +150,7 @@ export const ScreenInsumo = () => {
 >
   
   <button
-    className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
+    className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 my-3 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
     style={{ borderRadius: "9999px" }}
     onClick={() => setOpenModal(true)}
   >
@@ -158,7 +158,7 @@ export const ScreenInsumo = () => {
   </button>
   <button
     onClick={() => setOpenModalCompra(true)}
-    className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
+    className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 my-3 font-primary font-semibold shadow hover:scale-105 transition text-lg cursor-pointer"
   >
     Registrar Compra
   </button>
