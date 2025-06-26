@@ -18,16 +18,23 @@ export const LoginRedirect = () => {
 
     // Si no está autenticado, redirigir al login
     if (!isAuthenticated && authStatus === 'completed') {
-      console.log("[LoginRedirect] No autenticado, redirigiendo a login");
-      Swal.fire({
-        title: "¡Error!",
-        text: "Error al autenticarse, redirigiendo al home...",
-        icon: "error",
-        confirmButtonText: "Aceptar",
-      });
-      clearSession();
-      navigate("/");
-    }
+    // Esperar 3 segundos y volver a chequear antes de mostrar el error
+    const timeout = setTimeout(() => {
+      if (!isAuthenticated) {
+        console.log("[LoginRedirect] No autenticado tras reintento, redirigiendo a login");
+        Swal.fire({
+          title: "¡Error!",
+          text: "Error al autenticarse, redirigiendo al home...",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        });
+        clearSession();
+        navigate("/");
+      }
+    }, 3000); // 3 segundos
+
+    return () => clearTimeout(timeout);
+  }
 
     // Si la autenticación está completa y exitosa
     if (authStatus === 'completed' && isAuthenticated) {

@@ -245,12 +245,9 @@ export const useAuthHandler = () => {
         let response;
         const rolUsuario = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] || "Cliente";
         console.log('Rol detectado para usuario:', rolUsuario);
-        if (rolUsuario === "Cliente") {
+      
           response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
-        } else {
-          response = await interceptorApiClient.get(`/api/empleados/email/${user.email}`);
-          console.log('respuesta empleado: ', response);
-        }
+        
         // console.log("[useAuthHandler] Usuario encontrado en BD:", response.data);
 
         const token = await getAccessTokenSilently();
