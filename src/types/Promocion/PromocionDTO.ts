@@ -8,4 +8,5 @@ export interface PromocionDTO {
     descuento: number;       // Double como number
     
     detallePromociones: DetallePromocionDTO[];
+    activo: boolean;
 }

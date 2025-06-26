@@ -7,17 +7,18 @@ import { Footer } from '../components/commons/Footer';
 import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { FormaPago } from '../types/enums/FormaPago';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { obtenerId, setComentario, setDireccion, setMetodoPago, vaciarCarrito } from '../hooks/redux/slices/CarritoReducer';
+import { setComentario, setDireccion, setMetodoPago, vaciarCarrito } from '../hooks/redux/slices/CarritoReducer';
 import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 import CheckoutMP from '../services/mercadoPago/CheckoutMP';
 import { PedidoDTO } from '../types/Pedido/PedidoDTO';
 import { DetallePedidoDTO } from '../types/DetallePedido/DetallePedidoDTO';
 import { isInsumo, isProducto } from '../types/ProductoUnificado/ProductoUnificado';
-import { PedidosService } from '../services/PedidosService';
 import { TbCash } from "react-icons/tb";
 import Swal from 'sweetalert2';
 import { isPromocion } from '../utils/isPromocion';
+import { enviarPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
+
 const DetalleCompra = () => {
     const dispatch = useAppDispatch();
     const carrito = useAppSelector((state) => state.carrito.items);
@@ -32,7 +33,6 @@ const DetalleCompra = () => {
     const [mostrarDirecciones, setMostrarDirecciones] = useState<boolean>(false);
     const [agregarComentario, setAgregarComentario] = useState<boolean>(false);
     const carritoAbierto = useAppSelector(state => state.carritoUI.abierto);
-    const pedidoService = new PedidosService();
     const navigate = useNavigate();
     const location = useLocation();
     const { subTotal, envio, total } = location.state || {};
@@ -41,14 +41,11 @@ const DetalleCompra = () => {
     useEffect(() => {
         if (carritoAbierto) dispatch(cerrarCarrito());
         if (tipoEntregaState) {
-            // Si es DELIVERY, selecciona Mercado Pago por defecto
             dispatch(setMetodoPago(FormaPago.MERCADO_PAGO));
         }
     }, [tipoEntregaState, dispatch, direcciones, carritoAbierto]);
 
-
     const formatearDireccion = (d?: DomicilioDTO | null) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
-
 
     const handleDireccionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const temporal = direcciones.find(dir => dir.id === parseInt(e.target.value));
@@ -79,9 +76,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Elige donde quieres recibir el pedido",
+                text: "Elige donde quieres recibir el pedido",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -90,9 +87,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Elige un método de pago",
+                text: "Elige un método de pago",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -101,9 +98,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Selecciona una dirección",
+                text: "Selecciona una dirección",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -112,9 +109,9 @@ const DetalleCompra = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "El carrito está vacío",
+                text: "El carrito está vacío",
                 showConfirmButton: false,
-                timer: 1000,
+                timer: 1500,
                 width: "20em"
             });
             return false;
@@ -124,14 +121,14 @@ const DetalleCompra = () => {
 
     const pedidoArmado = (): PedidoDTO => {
         const detallePedidos: DetallePedidoDTO[] = carrito.map(({ item, cant }) => {
+            if (isPromocion(item)) {
+                return { cantidad: cant, promocionId: item.id };
+            }
             if (isProducto(item)) {
                 return { cantidad: cant, productoId: item.id };
             }
             if (isInsumo(item)) {
                 return { cantidad: cant, insumoId: item.id };
-            }
-            if (isPromocion(item)) {
-                return { cantidad: cant, promocionId: item.id };
             }
             throw new Error("Ítem desconocido en el carrito");
         });
@@ -150,11 +147,12 @@ const DetalleCompra = () => {
 
         const pedido = pedidoArmado();
         try {
-            await pedidoService.post(pedido);
+            await dispatch(enviarPedidoThunk(pedido));
+
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "Pedido realizado con exito",
+                text: "Pedido realizado con exito",
                 showConfirmButton: false,
                 timer: 1000,
                 width: "20em"
@@ -162,7 +160,14 @@ const DetalleCompra = () => {
             dispatch(vaciarCarrito());
             navigate('/');
         } catch (error) {
-            alert(error instanceof Error ? error.message : "Error al realizar el pedido");
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                text: "Error al realizar el pedido",
+                showConfirmButton: false,
+                timer: 1500,
+                width: "20em"
+            });
         }
     };
 

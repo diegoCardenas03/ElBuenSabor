@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaRegClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { TipoEnvio } from '../../types/enums/TipoEnvio';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDireccion, setTipoEntrega, vaciarCarrito } from '../../hooks/redux/slices/CarritoReducer';
@@ -21,6 +21,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const direcciones = useAppSelector((state) => state.domicilio.direcciones);
   const tipoEntrega = useAppSelector((state) => state.carrito.tipoEntrega);
   const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
+  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
 
   useEffect(() => {
     dispatch(fetchDirecciones())
@@ -33,39 +34,53 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const envio = tipoEntrega == TipoEnvio.DELIVERY ? 0 : 0;
   const total = subTotal + envio;
 
-  const handleRealizarPedido = () => {
+  const handleRealizarPedido = async () => {
+    if (pedidoEnCurso) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        text: "Ya hay un pedido en curso",
+        showConfirmButton: false,
+        timer: 1500,
+        width: "20em"
+      });
+      return;
+    }
+
     if (tipoEntrega === null) {
       Swal.fire({
         position: "center",
         icon: "error",
-        title: "Elige donde quieres recibir el pedido",
+        text: "Elige donde quieres recibir el pedido",
         showConfirmButton: false,
-        timer: 1000,
+        timer: 1500,
         width: "20em"
       });
-    } else {
-      if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: "Selecciona una dirección",
-          showConfirmButton: false,
-          timer: 1000,
-          width: "20em"
-        });
-      } else {
-        dispatch(setTipoEntrega(tipoEntrega || null));
-        dispatch(setDireccion(direccionSeleccionada || null))
-        navigate('/DetalleCompra', {
-          state: {
-            subTotal,
-            envio,
-            total,
-          }
-        });
-        onClose();
-      }
+      return;
     }
+
+    if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        text: "Selecciona una dirección",
+        showConfirmButton: false,
+        timer: 1500,
+        width: "20em"
+      });
+      return;
+    }
+
+    dispatch(setTipoEntrega(tipoEntrega || null));
+    dispatch(setDireccion(direccionSeleccionada || null))
+    navigate('/DetalleCompra', {
+      state: {
+        subTotal,
+        envio,
+        total,
+      }
+    });
+    onClose();
   }
 
 
@@ -125,13 +140,13 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                   <button onClick={() => dispatch(agregarProducto(item))} className="px-2 py-1 rounded-full cursor-pointer">+</button>
                 </div>
                 <button onClick={() => {
-                  dispatch(quitarProducto(id)); 
+                  dispatch(quitarProducto(id));
                   Swal.fire({
                     position: "center",
                     icon: "success",
-                    title: "Producto eliminado correctamente",
+                    text: "Producto eliminado correctamente",
                     showConfirmButton: false,
-                    timer: 1000,
+                    timer: 1500,
                     width: "20em"
                   });
                 }}

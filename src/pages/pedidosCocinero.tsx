@@ -4,7 +4,9 @@ import { Estado } from '../types/enums/Estado';
 import { TablePagination } from '@mui/material';
 import { AdminHeader } from '../components/admin/AdminHeader';
 import { PedidosService } from '../services/PedidosService';
-
+import { getEstadoTexto } from '../utils/PedidoUtils';
+import { useAppDispatch } from '../hooks/redux';
+import { updateEstadoPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
 
 const PedidosCocinero: React.FC = () => {
     const [pedidos, setPedidos] = useState<PedidoResponseDTO[]>([]);
@@ -17,6 +19,7 @@ const PedidosCocinero: React.FC = () => {
     const [pagePreparacion, setPagePreparacion] = useState(0);
     const [rowsPerPagePreparacion, setRowsPerPagePreparacion] = useState(10);
     const pedidosService = new PedidosService();
+    const dispatch = useAppDispatch();
 
     const handleChangePageComandas = (_: unknown, newPage: number) => {
         setPageComandas(newPage);
@@ -70,14 +73,7 @@ const PedidosCocinero: React.FC = () => {
                 return;
             }
 
-            const response = await fetch(
-                `http://localhost:8080/api/pedidos/actualizar-estado/${pedido.id}?estado=${nuevoEstado}`,
-                { method: 'PUT' }
-            );
-
-            if (!response.ok) {
-                throw new Error('Error al actualizar el estado');
-            }
+            await dispatch(updateEstadoPedidoThunk({pedidoId: pedido.id, nuevoEstado: nuevoEstado}));
 
             obtenerPedidos();
             setPedidoSeleccionado(null);
@@ -87,15 +83,6 @@ const PedidosCocinero: React.FC = () => {
         } catch (error) {
             console.error(error);
         }
-
-        // const pedidoActualizado: PedidoResponseDTO = { ...pedido, estado: nuevoEstado };
-
-        // setComandas(prev => prev.filter(p => p.id !== pedido.id));
-        // setEnPreparacion(prev => prev.filter(p => p.id !== pedido.id));
-
-        // if (nuevoEstado === Estado.EN_PREPARACION) {
-        //     setEnPreparacion(prev => [...prev, pedidoActualizado]);
-        // }
     };
 
     return (
@@ -196,7 +183,7 @@ const PedidosCocinero: React.FC = () => {
                         <h2 className="text-secondary font-primary font-bold pb-8 text-[20px] flex justify-center items-center">Orden N° {mostrarNumeroPedido(pedidoSeleccionado.codigo)}</h2>
 
                         <p><b>Hora:</b> {pedidoSeleccionado.hora}</p>
-                        <p><b>Estado:</b> {pedidoSeleccionado.estado}</p>
+                        <p><b>Estado:</b> {getEstadoTexto(pedidoSeleccionado.estado)}</p>
                         <div className="max-h-[50vh] overflow-y-auto">
                             {pedidoSeleccionado.detallePedidos.map((detalle, idx) => (
                                 <React.Fragment key={idx}>
@@ -216,12 +203,15 @@ const PedidosCocinero: React.FC = () => {
                             ))}
                         </div>
                         {pedidoSeleccionado.estado !== Estado.TERMINADO && (
-                            <button
-                                onClick={() => cambiarEstadoPedido(pedidoSeleccionado)}
-                                className="mt-5 bg-secondary hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-full w-full"
-                            >
-                                {pedidoSeleccionado.estado === Estado.SOLICITADO ? 'Preparar' : 'Completado'}
-                            </button>
+                            <div className='flex justify-center items-center'>
+                                <button
+                                    onClick={() => cambiarEstadoPedido(pedidoSeleccionado)}
+                                    className="mt-5 bg-secondary text-white font-bold py-2 px-4 rounded-full w-[50%] hover:bg-yellow-600 hover:scale-105 transition-transform"
+                                >
+                                    {pedidoSeleccionado.estado === Estado.SOLICITADO ? 'Preparar' : 'Completado'}
+                                </button>
+                            </div>
+
                         )}
 
                     </div>

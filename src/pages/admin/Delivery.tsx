@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
-// import { Rol } from '../../types/Rol/RolDTO;
 import { TfiAngleUp } from "react-icons/tfi";
 
 const Delivery = () => {

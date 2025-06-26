@@ -9,5 +9,6 @@ export interface ProductoDTO {
     urlImagen: string;
     activo: boolean;
     rubroId: number;
+    margenGanancia: number;
     detalleProductos: DetalleProductoDTO[];
 }

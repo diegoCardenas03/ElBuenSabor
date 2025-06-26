@@ -1,7 +1,7 @@
 import { DetallePromocionResponseDTO } from '../DetallePromocion/DetallePromocionResponseDTO';
 
 export interface PromocionResponseDTO {
-    id?: number;
+    id: number;
     denominacion: string;
     urlImagen: string;
     fechaDesde: string;      // LocalDate como string
@@ -10,4 +10,5 @@ export interface PromocionResponseDTO {
     precioVenta: number;
     precioCosto: number; 
     detallePromociones: DetallePromocionResponseDTO[];
+    activo: boolean;
 }
