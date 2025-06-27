@@ -7,6 +7,7 @@ import { Loader } from "../components/commons/Loader";
 import axios from "axios";
 import { UsuarioResponseDTO } from "../types/Usuario/UsuarioResponseDTO";
 import Swal from "sweetalert2";
+import { PaginaNoExiste } from "../pages/PaginaNoExiste";
 
 interface Props {
   children: ReactNode;
@@ -42,6 +43,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
         icon: "error",
         confirmButtonText: "Aceptar",
       })
+      clearSession();
       logout();
       <Navigate to="/" replace />;
 
@@ -95,6 +97,11 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   //   icon: "error",
   //   confirmButtonText: "Aceptar",
   // })
+
+  if (isAuthenticated && !hasAllowedRole) {
+    console.log('[ProtectedRoute] Autenticado pero sin roles');
+    return <PaginaNoExiste />;
+  }
 
   if (userDataState.roles[0].nombre === 'Cliente')
     return <Navigate to="/" replace />;

@@ -194,7 +194,14 @@ export const useAuthHandler = () => {
       const userName = getFromSession('user_name');
       if (!userName) {
         // console.log("[useAuthHandler] Usuario salió del modal, usando email como nombre fallback");
-        saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
+        if (user?.sub?.startsWith("google-oauth2")) {
+          saveToSession('user_name', user?.name || "Usuario");
+        }
+        else {
+          saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
+        }
+
+
         saveToSession('auth_completed', 'true');
       }
       dispatch(setToken(savedToken));
@@ -245,9 +252,9 @@ export const useAuthHandler = () => {
         let response;
         const rolUsuario = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] || "Cliente";
         console.log('Rol detectado para usuario:', rolUsuario);
-      
-          response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
-        
+
+        response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
+
         // console.log("[useAuthHandler] Usuario encontrado en BD:", response.data);
 
         const token = await getAccessTokenSilently();

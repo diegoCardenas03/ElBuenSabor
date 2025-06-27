@@ -49,7 +49,7 @@ export const ModalEmpleado = ({
                 try {
                     const service = new RolService();
                     const roles = await service.getAll();
-                    
+
                     setRolesDisponibles(roles.filter((rol) => rol.nombre !== 'Cliente'));
                 } catch {
                     setRolesDisponibles([]);
@@ -114,9 +114,9 @@ export const ModalEmpleado = ({
     const validationSchema = Yup.object({
         nombreCompleto: Yup.string().required("El nombre es obligatorio"),
         telefono: Yup.string()
-        .required("El teléfono es obligatorio")
-        .min(10, "El teléfono debe tener 10 caracteres")
-        .max(10, "El teléfono no puede tener más de 10 caracteres"),
+            .required("El teléfono es obligatorio")
+            .min(10, "El teléfono debe tener 10 caracteres")
+            .max(10, "El teléfono no puede tener más de 10 caracteres"),
         usuario: Yup.object({
             email: Yup.string().email("Email inválido").required("El email es obligatorio"),
             contrasenia: empleado
@@ -215,7 +215,13 @@ export const ModalEmpleado = ({
                                         type="email"
                                         className="form-control input-formulario"
                                         placeholder="Email"
-                                        style={{ marginBottom: 8 }}
+                                        style={{
+                                            marginBottom: 8,
+                                            backgroundColor: empleado ? "#e0e0e0" : undefined, 
+                                            color: empleado ? "#555" : undefined,             
+                                            cursor: empleado ? "not-allowed" : undefined       
+                                        }}
+                                        disabled={!!empleado}
                                     />
                                     <ErrorMessage name="usuario.email" component="div" className="error" />
 
