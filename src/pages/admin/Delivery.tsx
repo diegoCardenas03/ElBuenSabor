@@ -65,12 +65,12 @@ const Delivery = () => {
   // useEffect para cargar pedidos cuando cambia la opción principal
   useEffect(() => {
     fetchPedidos();
-    // eslint-disable-next-line
+    // eslint-disable-next-line+++
   }, [opcionPrincipal]);
 
   return (
     <>
-      <AdminHeader text="Delivery" />
+      <AdminHeader  text="Delivery" />
       <main className="flex flex-col items-center w-full m-auto pt-10 min-h-screen pb-20 bg-primary font-primary">
         <div className='flex justify-around w-4/5 gap-5 mb-10'>
           <button className={`text-tertiary font-bold text-lg cursor-pointer w-[200px] py-2 rounded-4xl ${opcionPrincipal === "Retirar" ? 'bg-white shadow-lg' : ''}`} onClick={() => elegirOpcionPrincipal("Retirar")} > Retirar </button>

@@ -7,6 +7,10 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 import Swal from 'sweetalert2';
+import { fetchPedidosByUsuario } from '../../hooks/redux/slices/PedidoReducer';
+import PedidoDetalleModal from '../modals/PedidoDetalleModal';
+import { Estado } from '../../types/enums/Estado';
+import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
 import { useAuthHandler } from '../../hooks/useAuthHandler';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -70,6 +74,16 @@ export const Header: React.FC<HeaderProps> = ({
       setNavbarOpen(false);
     }
   }, [isAppLoading]);
+  const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
+
+   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
+   const clienteId = 1;
+
+  useEffect(() => {
+    if (clienteId) {
+      dispatch(fetchPedidosByUsuario(clienteId));
+    }
+  }, [clienteId, dispatch]);
 
   useEffect(() => {
     if (carritoAbierto && carrito.length === 0) {
@@ -135,7 +149,26 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
           </div>
         ) : (
-          <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+          <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+            <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+            {!showBackButton && pedidoEnCurso && (
+              <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+                <div
+                  className={`h-5 border-l flex-shrink-0 text-secondary`}
+                ></div>
+                <span
+                  key={pedidoEnCurso.id}
+                  className="font-secondary text-base cursor-pointer max-w-[120px] truncate text-secondary"
+                  onClick={() => setModalPedidoEnCurso(true)}
+                >
+                  Ver pedido en curso
+                </span>
+              </div>
+            )}
+            {modalPedidoEnCurso &&
+              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => {setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(clienteId));}}/>
+            }
+          </div>
         )}
       </div>
 
@@ -206,6 +239,6 @@ export const Header: React.FC<HeaderProps> = ({
         emailUsuario={emailUsuario}
         whiteUserBar={navbarOpen ? true : whiteUserBar}
       />
-    </header>
+    </header >
   );
 };

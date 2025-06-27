@@ -108,7 +108,7 @@ export const ScreenPromocion = () => {
           }}
         >
           <button
-            className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold 
+            className="rounded-3xl bg-[#BD1E22] text-white px-4 py-2 my-3 font-primary font-semibold 
             shadow hover:scale-105 transition text-lg cursor-pointer"
             style={{ borderRadius: "9999px" }}
             onClick={() => setOpenModal(true)}

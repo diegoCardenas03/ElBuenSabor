@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from '../auth/ProtectedRoute';
 import DetalleCompra from '../pages/detalleCompra';
-import Landing from "../pages/Landing"
+import Landing from "../pages/Landing";
 import Menu from '../pages/MenuPage';
 import MiPerfilUsuarioPage from '../pages/MiPerfilUsuarioPage';
 import PedidosCocinero from '../pages/pedidosCocinero';
@@ -13,12 +13,16 @@ import MisDirecciones from '../pages/misDirecciones';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
+import EstadisticaWithBoundary from '../pages/admin/Estadistica';
+import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
 import { Estadistica } from '../pages/admin/Estadistica';
 
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 import Clientes from '../pages/admin/Clientes';
 import Empleados from '../pages/admin/Empleados';
+import ClientesEstadisticas from '../pages/admin/ClientesEstadisticas';
+
 import { CallbackPage } from '../pages/CallBackPage';
 import { LoginRedirect } from '../pages/LoginWithRedirect';
 import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
@@ -180,9 +184,9 @@ const RoutesApp = () => {
     /*  
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />}/> 
-        <Route path="/DetalleCompra" element={<DetalleCompra />} /> 
-        <Route path="/MisDirecciones" element={<MisDirecciones />} /> 
+        <Route path="/" element={<Landing />}/>
+        <Route path="/DetalleCompra" element={<DetalleCompra />} />
+        <Route path="/MisDirecciones" element={<MisDirecciones />} />
         <Route path="/Menu" element={<Menu />} />
         <Route path='/MisPedidos' element={<MisPedidos />} />
         <Route path='/Success' element={<SuccessMP/>}/>
@@ -197,9 +201,10 @@ const RoutesApp = () => {
         <Route path="/admin/Clientes" element={<Clientes />} />
         <Route path="/admin/Empleados" element={<Empleados />} />
         <Route path="/admin/Promociones" element={<ScreenPromocion />} />
-        
         <Route path='/admin/Delivery' element={<Delivery />} />
-        <Route path='/admin/Estadistica' element={<Estadistica />} />
+        <Route path='/admin/Estadistica' element={<EstadisticaWithBoundary />} />
+        <Route path="/admin/ProductosEstadistica" element={<ProductosEstadistica />} />
+        <Route path="/admin/ClientesEstadistica/:clienteId" element={<ClientesEstadisticas />} />
       </Routes>
     </BrowserRouter>
     */
