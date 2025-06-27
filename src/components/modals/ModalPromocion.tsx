@@ -107,8 +107,20 @@ export const ModalPromocion = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            fechaDesde: Yup.string().required("Campo requerido"),
-            fechaHasta: Yup.string().required("Campo requerido"),
+            fechaDesde: Yup.date()
+              .required("Campo requerido")
+              .min(
+                new Date().toISOString().split("T")[0],
+                "La fecha de inicio no puede ser anterior a hoy"
+              )
+              .typeError("Fecha inválida"),
+            fechaHasta: Yup.date()
+              .required("Campo requerido")
+              .min(
+                Yup.ref("fechaDesde"),
+                "La fecha de fin debe ser igual o posterior a la fecha de inicio"
+              )
+              .typeError("Fecha inválida"),
             descuento: Yup.number()
               .min(0, "Debe ser positivo")
               .required("Campo requerido"),
@@ -148,7 +160,6 @@ export const ModalPromocion = ({
                 imageUrl = data.secure_url;
               }
 
-              // ------- FIX DETALLE PROMOCIONES -------
               const detallePromociones = values.detallePromociones
                 .map((detalle: any) => {
                   let productoId =
@@ -264,7 +275,7 @@ export const ModalPromocion = ({
                       <select
                         value={productoId}
                         onChange={(e) => setProductoId(Number(e.target.value))}
-                        disabled={!!insumoId}
+                        disabled={!!insumoId} // Se deshabilita si hay insumo seleccionado
                         className="form-control input-formulario"
                         style={{ width: "15em" }}
                       >
@@ -278,6 +289,7 @@ export const ModalPromocion = ({
                       <select
                         value={insumoId}
                         onChange={(e) => setInsumoId(Number(e.target.value))}
+                        disabled={!!productoId} // Se deshabilita si hay producto seleccionado
                         className="form-control input-formulario"
                         style={{ width: "15em" }}
                       >
