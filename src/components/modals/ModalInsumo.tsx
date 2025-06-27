@@ -64,7 +64,7 @@ export const ModalInsumo = ({
     fetchRubros();
   }, []);
 
-  
+
   useEffect(() => {
     if (!openModal) {
       setSelectedRubros([]);
@@ -75,7 +75,7 @@ export const ModalInsumo = ({
       return;
     }
 
-   
+
     const findRubroPath = (rubrosList, rubroId, path = []) => {
       for (const rubro of rubrosList) {
         if (rubro.id === rubroId) {
@@ -104,31 +104,31 @@ export const ModalInsumo = ({
   const initialValues: InsumoDTO =
     elementActive && "precioCosto" in elementActive
       ? {
-          id: elementActive.id,
-          denominacion: elementActive.denominacion,
-          urlImagen: elementActive.urlImagen,
-          precioCosto: elementActive.precioCosto,
-          precioVenta: elementActive.precioVenta,
-          stockActual: elementActive.stockActual,
-          stockMinimo: elementActive.stockMinimo,
-          esParaElaborar: elementActive.esParaElaborar,
-          activo: elementActive.activo,
-          unidadMedida: elementActive.unidadMedida,
-          rubroId: elementActive.rubro?.id ?? 0,
-        }
+        id: elementActive.id,
+        denominacion: elementActive.denominacion,
+        urlImagen: elementActive.urlImagen,
+        precioCosto: elementActive.precioCosto,
+        precioVenta: elementActive.precioVenta,
+        stockActual: elementActive.stockActual,
+        stockMinimo: elementActive.stockMinimo,
+        esParaElaborar: elementActive.esParaElaborar,
+        activo: elementActive.activo,
+        unidadMedida: elementActive.unidadMedida,
+        rubroId: elementActive.rubro?.id ?? 0,
+      }
       : {
-          id: 0,
-          denominacion: "",
-          urlImagen: "",
-          precioCosto: 0,
-          precioVenta: 0,
-          stockActual: 0,
-          stockMinimo: 0,
-          esParaElaborar: false,
-          activo: true,
-          unidadMedida: "",
-          rubroId: 0,
-        };
+        id: 0,
+        denominacion: "",
+        urlImagen: "",
+        precioCosto: 0,
+        precioVenta: 0,
+        stockActual: 0,
+        stockMinimo: 0,
+        esParaElaborar: false,
+        activo: true,
+        unidadMedida: "",
+        rubroId: 0,
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -242,7 +242,7 @@ export const ModalInsumo = ({
             handleClose();
           }}
         >
-          {({ isValid, dirty, isSubmitting, values }) => (
+          {({ isValid, dirty, isSubmitting, values, setFieldValue }) => (
             <Form>
               <div className="container_Form_Ingredientes">
                 {/* Columna izquierda */}
@@ -466,15 +466,14 @@ export const ModalInsumo = ({
                     )}
                   </Field>
                   <TextFieldValue
-                    label={`Precio de costo${
-                      values.unidadMedida === "GRAMOS"
-                        ? " (Por 100 Gramos):"
-                        : values.unidadMedida === "MILILITROS"
+                    label={`Precio de costo${values.unidadMedida === "GRAMOS"
+                      ? " (Por 100 Gramos):"
+                      : values.unidadMedida === "MILILITROS"
                         ? " (Por 100 Mililitros):"
                         : values.unidadMedida
-                        ? ` (Por ${values.unidadMedida.toLowerCase()}):`
-                        : " (Por unidad de medida):"
-                    }`}
+                          ? ` (Por ${values.unidadMedida.toLowerCase()}):`
+                          : " (Por unidad de medida):"
+                      }`}
                     name="precioCosto"
                     id="precioCosto"
                     type="number"
@@ -496,22 +495,29 @@ export const ModalInsumo = ({
               <div style={{ display: "flex", gap: "30px", padding: "20px" }}>
                 <FormControlLabel
                   control={
-                    <Field
+                    <Switch
                       type="checkbox"
                       name="esParaElaborar"
-                      as={Switch}
+                      checked={values.esParaElaborar}
                       color="warning"
+                      onChange={(e) => {
+                        setFieldValue("esParaElaborar", e.target.checked);
+                        if (e.target.checked) {
+                          setFieldValue("precioVenta", 0.00);
+                        }
+                      }}
                     />
                   }
                   label="¿Es para elaborar?"
                 />
                 <FormControlLabel
                   control={
-                    <Field
+                    <Switch
                       type="checkbox"
                       name="activo"
-                      as={Switch}
+                      checked={values.activo}
                       color="error"
+                      onChange={(e) => setFieldValue("activo", e.target.checked)}
                     />
                   }
                   label="Activo"
