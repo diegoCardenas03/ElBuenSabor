@@ -119,7 +119,7 @@ const Delivery = () => {
                     </button>
                   ) : (
                     <button className="self-end mr-2 w-30 font-medium py-1 bg-secondary text-white rounded-2xl hover:bg-red-500"
-                            onClick={() => actualizarEstadoPedido(pedido.id, "TERMINADO")}>
+                            onClick={() => actualizarEstadoPedido(pedido.id, "ENTREGADO")}>
                       Entregado
                     </button>
                   )}
