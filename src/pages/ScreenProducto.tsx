@@ -113,15 +113,18 @@ export const ScreenProducto = () => {
         denominacion: p.denominacion,
         descripcion: p.descripcion,
         tiempoEstimadoPreparacion: p.tiempoEstimadoPreparacion,
+        precioCosto: p.precioCosto,
         precioVenta: p.precioVenta,
         urlImagen: p.urlImagen,
         activo: p.activo,
         rubroId: p.rubro?.id ?? 0,
+        rubro: p.rubro,
         margenGanancia: p.margenGanancia ?? 0,
         detalleProductos: p.detalleProductos.map((d) => ({
           id: d.id,
           cantidad: d.cantidad,
           insumoId: d.insumo?.id ?? 0,
+          insumo: d.insumo,      
         })),
       }));
       dispatch(setDataTable(productosDTO));

@@ -3,7 +3,6 @@ import Pizza from '../assets/img/pizzaBanco.png'
 import { FaPen, FaTrashAlt, FaMapMarkerAlt } from "react-icons/fa";
 import { Header } from '../components/commons/Header';
 import { Footer } from '../components/commons/Footer';
-import { DomicilioDTO } from '../types/Domicilio/DomicilioDTO';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { crearDireccion, editarDireccion, eliminarDireccion, fetchDirecciones } from '../hooks/redux/slices/DomicilioReducer';
 import { DomicilioResponseDTO } from '../types/Domicilio/DomicilioResponseDTO';

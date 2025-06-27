@@ -99,7 +99,7 @@ const Categorias = () => {
       const data = await rubroProductoClient.getAll();
       setRubrosProductos(
         data.map(dto => ({
-          id: dto.id,
+          id: Number(dto.id),
           denominacion: dto.denominacion,
           activo: dto.activo,
           tipo: "Producto"

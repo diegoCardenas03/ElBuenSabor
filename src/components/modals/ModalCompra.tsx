@@ -71,7 +71,7 @@ export const ModalCompra = ({
           esParaElaborar: insumo.esParaElaborar,
           activo: insumo.activo,
           unidadMedida: insumo.unidadMedida,
-          rubroId: insumo.rubro.id,
+          rubroId: Number(insumo.rubro.id),
         });
       }
       Swal.fire("¡Compra registrada!", "El stock fue actualizado.", "success");
