@@ -4,5 +4,7 @@ export interface DomicilioResponseDTO {
     numero: number;
     localidad: string;
     codigoPostal: number;
+    latitud: number;
+    longitud: number;
     activo: boolean;
 }

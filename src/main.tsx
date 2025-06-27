@@ -4,6 +4,7 @@ import './index.css'
 import RoutesApp from './routes/RoutesApp'
 import { Provider } from 'react-redux'
 import { store } from './hooks/redux/store'
+import 'leaflet/dist/leaflet.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
