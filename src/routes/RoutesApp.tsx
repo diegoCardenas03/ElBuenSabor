@@ -15,7 +15,7 @@ import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
 import EstadisticaWithBoundary from '../pages/admin/Estadistica';
 import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
-import { Estadistica } from '../pages/admin/Estadistica';
+import  Estadistica  from '../pages/admin/Estadistica';
 
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';

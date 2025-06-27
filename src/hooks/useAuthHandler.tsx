@@ -236,7 +236,16 @@ export const useAuthHandler = () => {
         saveToSession('auth_completed', 'true');
         saveToSession('user_email', user?.email || "");
         saveToSession('user_picture', user?.picture || "");
-        saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
+
+        try {
+          const response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
+          const nombreCompleto = response.data?.nombreCompleto || user?.email?.split('@')[0] || "Usuario";
+          saveToSession('user_name', nombreCompleto);
+        } catch (e) {
+          // Si falla, usar el email como fallback
+          saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
+        }
+        
         processedUserRef.current = user.sub;
         setAuthStatus('completed');
         // console.log("[useAuthHandler] Rol desde Auth0, acceso directo");
