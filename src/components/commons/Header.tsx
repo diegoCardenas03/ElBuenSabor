@@ -9,7 +9,6 @@ import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarri
 import Swal from 'sweetalert2';
 import { fetchPedidosByUsuario } from '../../hooks/redux/slices/PedidoReducer';
 import PedidoDetalleModal from '../modals/PedidoDetalleModal';
-import { Estado } from '../../types/enums/Estado';
 import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
 import { useAuthHandler } from '../../hooks/useAuthHandler';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -76,12 +75,12 @@ export const Header: React.FC<HeaderProps> = ({
   }, [isAppLoading]);
   const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
 
-   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
-   const clienteId = 1;
+  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
+  const clienteId = useAppSelector(state => state.auth.rol === "Cliente" ? state.auth.userId : null);
 
   useEffect(() => {
     if (clienteId) {
-      dispatch(fetchPedidosByUsuario(clienteId));
+      dispatch(fetchPedidosByUsuario(Number(clienteId)));
     }
   }, [clienteId, dispatch]);
 
@@ -166,7 +165,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
             {modalPedidoEnCurso &&
-              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => {setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(clienteId));}}/>
+              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => { setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(Number(clienteId))); }} />
             }
           </div>
         )}
@@ -197,13 +196,13 @@ export const Header: React.FC<HeaderProps> = ({
           INGRESAR
         </span>}
 
-           <div
-            className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"}`}
-          >
-          </div>
+        <div
+          className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"}`}
+        >
+        </div>
 
-        {isAuthenticated && 
-         
+        {isAuthenticated &&
+
           <FaShoppingCart
             className="flex-shrink-0 cursor-pointer"
             fill={whiteUserBar ? "white" : ""}
@@ -217,7 +216,7 @@ export const Header: React.FC<HeaderProps> = ({
                 timer: 1000,
                 width: "20em"
               }) : dispatch(abrirCarrito())}
-          /> }
+          />}
 
         {carritoAbierto && (
           <div className="fixed inset-0 z-50">
