@@ -19,6 +19,7 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
   const [clienteData, setClienteData] = useState<any>(null);
   const { user } = useAuth0();
   const isGoogleAcount = user?.sub?.startsWith('google');
+  const [telefonoError, setTelefonoError] = useState("");
 
   // ✅ Importar función para completar sessionStorage
   const { completeSessionData } = useAuthHandler();
@@ -198,12 +199,23 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
           />)}
           <input
             type="tel"
-            placeholder="Por ejemplo: 2619587586"
+            placeholder="Número de telefono"
             className="mb-4 border-b border-secondary outline-none bg-transparent"
             value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setTelefono(value);
+              if (value && value.length !== 10) {
+                setTelefonoError("El teléfono debe tener exactamente 10 números.");
+              } else {
+                setTelefonoError("");
+              }
+            }}
             required
           />
+          {telefonoError && (
+            <span style={{ color: "red", fontSize: "0.9em" }}>{telefonoError}</span>
+          )}
           <button
             type="submit"
             className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded font-semibold mt-2 cursor-pointer"
