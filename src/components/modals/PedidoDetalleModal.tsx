@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { useAppDispatch } from '../../hooks/redux';
 import { updateEstadoPedidoThunk } from '../../hooks/redux/slices/PedidoReducer';
 import { Estado } from '../../types/enums/Estado';
@@ -74,8 +75,21 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
           <button
             className={`${pedido.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
             onClick={async () => {
-              await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: Estado.CANCELADO }));
-              onClose();
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Una vez cancelado, no podrás recuperar este pedido.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FF9D3A',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cancelar pedido',
+                cancelButtonText: 'No, mantener pedido'
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: Estado.CANCELADO }));
+                  onClose();
+                }
+              });
             }}
           >
             Cancelar pedido

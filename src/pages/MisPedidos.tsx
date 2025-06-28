@@ -13,7 +13,7 @@ import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
-import Swal from 'sweetalert2'; // <-- Importar SweetAlert
+import Swal from 'sweetalert2'; 
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -85,7 +85,7 @@ const MisPedidos = () => {
         <button
           className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
           onClick={() => {
-            if (pedido.estado === Estado.TERMINADO) {
+            if (pedido.estado === Estado.TERMINADO || pedido.estado === Estado.ENTREGADO) {
               window.open(`http://localhost:8080/api/facturas/pdf/${pedido.id}`, '_blank');
             } else {
               Swal.fire({
