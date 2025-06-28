@@ -71,6 +71,7 @@ export const ModalPromocion = ({
           fechaHasta: "",
           descuento: 0,
           detallePromociones: [],
+          descripcion: "",
         };
 
   const handleClose = () => {
@@ -140,6 +141,10 @@ export const ModalPromocion = ({
                     .required(),
                 })
               ),
+              descripcion: Yup.string()
+                .required("Campo requerido")
+                .max(500, "La descripción no puede exceder los 500 caracteres"),
+
           })}
           enableReinitialize
           onSubmit={async (values, { setSubmitting, setStatus }) => {
@@ -255,7 +260,14 @@ export const ModalPromocion = ({
                     type="number"
                     placeholder="0"
                   />
+                  <TextFieldValue
+                    label="Descripción:"
+                    name="descripcion"
+                    type="text"
+                    placeholder="Ingrese una descripción"
+                  />
                 </div>
+                
 
                 {/* Columna derecha */}
                 <div className="input-col">

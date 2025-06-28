@@ -53,6 +53,7 @@ export const ScreenPromocion = () => {
         </span>
       ),
     },
+    { label: "Estado", key: "activo", render: (promo: PromocionResponseDTO) => (promo.activo ? "Activo" : "Inactivo") },
     {
       label: "Acciones",
       key: "acciones",

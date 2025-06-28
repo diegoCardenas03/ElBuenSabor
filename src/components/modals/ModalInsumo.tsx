@@ -24,6 +24,7 @@ import "./ModalInsumo.css";
 import { FaTimes } from "react-icons/fa";
 import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
 import Swal from "sweetalert2";
+import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
 
 interface IModalInsumo {
   getInsumos: () => void;
@@ -101,23 +102,13 @@ export const ModalInsumo = ({
     label: value,
   }));
 
-  const initialValues: InsumoDTO =
-    elementActive && "precioCosto" in elementActive
-      ? {
-        id: elementActive.id,
-        denominacion: elementActive.denominacion,
-        urlImagen: elementActive.urlImagen,
-        precioCosto: elementActive.precioCosto,
-        precioVenta: elementActive.precioVenta,
-        stockActual: elementActive.stockActual,
-        stockMinimo: elementActive.stockMinimo,
-        esParaElaborar: elementActive.esParaElaborar,
-        activo: elementActive.activo,
-        unidadMedida: elementActive.unidadMedida,
-        rubroId: elementActive.rubro?.id ?? 0,
-      }
-      : {
-        id: 0,
+  function isInsumo(obj: any): obj is InsumoResponseDTO {
+  return obj && "precioCosto" in obj && "descripcion" in obj;
+}
+const initialValues: InsumoResponseDTO =
+  elementActive && isInsumo(elementActive)
+    ? (elementActive as InsumoResponseDTO)
+    : {
         denominacion: "",
         urlImagen: "",
         precioCosto: 0,
@@ -128,7 +119,10 @@ export const ModalInsumo = ({
         activo: true,
         unidadMedida: "",
         rubroId: 0,
+        descripcion: "",
       };
+
+ 
 
   const handleClose = () => {
     setOpenModal(false);
@@ -197,6 +191,7 @@ export const ModalInsumo = ({
             unidadMedida: Yup.string()
               .required("Campo requerido")
               .required("Campo requerido"),
+            descripcion: Yup.string().required("Campo requerido"),
           })}
           enableReinitialize
           onSubmit={async (values) => {
@@ -329,6 +324,13 @@ export const ModalInsumo = ({
                     id="stockActual"
                     type="number"
                     placeholder="Ingrese el stock actual"
+                  />
+                  <TextFieldValue
+                    label="Descripción:"
+                    name="descripcion"
+                    id="descripcion"
+                    type="text"
+                    placeholder="Ingrese una descripción"
                   />
                 </div>
 
