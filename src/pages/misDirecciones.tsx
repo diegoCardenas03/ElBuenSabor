@@ -96,6 +96,29 @@ const MisDirecciones = () => {
 
     const formatearDireccion = (d: DomicilioResponseDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
 
+    async function reverseGeocode(lat: number, lon: number) {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
+        );
+        if (!response.ok) return null;
+        return await response.json();
+    }
+
+    async function geocodeDireccion({ calle, numero, localidad, codigoPostal }: DomicilioDTO) {
+        const direccion = `${calle} ${numero}, ${localidad}, ${codigoPostal}`;
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}`
+        );
+        const data = await response.json();
+        if (data && data.length > 0) {
+            return {
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon),
+            };
+        }
+        return null;
+    }
+
     return (
         <>
             <Header />
@@ -111,7 +134,7 @@ const MisDirecciones = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-10 justify-center place-items-center sm:px-5 lg:px-25">
                     {direcciones.map((d: DomicilioResponseDTO) => (
-                        <div className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px]" key={d.id}>
+                        <div className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-secondary rounded-lg shadow-lg p-4 w-[335px] h-[350px] flex flex-col justify-center" key={d.id}>
                             <div className='flex text-primary'>
                                 <FaMapMarkerAlt className='relative top-[3px] w-5 h-5 mt-2' />
                                 <h2 className="text-primary text-xl font-semibold pt-1 pb-3 pl-1">{formatearDireccion(d)}</h2>
@@ -122,7 +145,7 @@ const MisDirecciones = () => {
                                 zoom={15}
                                 scrollWheelZoom={false}
                                 dragging={false}
-                                style={{ height: "180px", width: "100%", borderRadius: "10px", marginBottom: "1rem" }}
+                                style={{ height: "200px", width: "100%", borderRadius: "10px", marginBottom: "1rem" }}
                             >
                                 <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -159,7 +182,7 @@ const MisDirecciones = () => {
                 </div>
 
                 {mostrarModal && (
-                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999]">
                         <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative flex flex-col justify-center items-center">
                             <button
                                 className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-800"
@@ -169,6 +192,8 @@ const MisDirecciones = () => {
                             <h2 className="text-secondary font-primary font-bold pb-4 text-[20px]">
                                 {modoEditar ? 'Editar dirección' : 'Agregar nueva dirección'}
                             </h2>
+
+
                             <input
                                 type="text"
                                 className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
@@ -198,20 +223,48 @@ const MisDirecciones = () => {
                                 onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value === "" ? 0 : parseInt(e.target.value, 10) })}
                             />
 
+                            <button
+                                className="bg-secondary px-3 py-1 rounded-full mb-4 text-white"
+                                onClick={async () => {
+                                    const coords = await geocodeDireccion(direccionNueva);
+                                    if (coords) {
+                                        setDireccionNueva(prev => ({
+                                            ...prev,
+                                            latitud: coords.lat,
+                                            longitud: coords.lng,
+                                        }));
+                                    } else {
+                                        Swal.fire("No se encontró la dirección", "Verifica los datos ingresados.", "warning");
+                                    }
+                                }}
+                            >
+                                Buscar en el mapa
+                            </button>
+
                             {/* Mapa para elegir ubicación */}
                             <MapContainer
                                 center={[direccionNueva.latitud, direccionNueva.longitud]}
                                 zoom={13}
-                                style={{ height: "250px", width: "100%", marginBottom: "1rem", borderRadius: "10px" }}
+                                style={{ height: "200px", width: "100%", marginBottom: "1rem", borderRadius: "10px" }}
                             >
                                 <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
                                 <LocationSelector
-                                    onChange={({ lat, lng }) =>
-                                        setDireccionNueva({ ...direccionNueva, latitud: lat, longitud: lng })
-                                    }
+                                    onChange={async ({ lat, lng }) => {
+                                        setDireccionNueva((prev) => ({ ...prev, latitud: lat, longitud: lng }));
+                                        const data = await reverseGeocode(lat, lng);
+                                        if (data && data.address) {
+                                            setDireccionNueva((prev) => ({
+                                                ...prev,
+                                                calle: data.address.road || prev.calle,
+                                                numero: data.address.house_number ? parseInt(data.address.house_number, 10) : prev.numero,
+                                                localidad: data.address.city || data.address.town || data.address.village || prev.localidad,
+                                                codigoPostal: data.address.postcode ? parseInt(data.address.postcode, 10) : prev.codigoPostal,
+                                            }));
+                                        }
+                                    }}
                                 />
                                 <Marker
                                     position={[direccionNueva.latitud, direccionNueva.longitud]}
@@ -221,7 +274,7 @@ const MisDirecciones = () => {
 
                             <div className="flex justify-center items-center space-x-4">
                                 <button
-                                    className="cursor-pointer bg-tertiary px-5 py-2 rounded-full hover:scale-102 transition-transform duration-200"
+                                    className="cursor-pointer bg-tertiary px-5 py-1 rounded-full hover:scale-102 transition-transform duration-200"
                                     onClick={handleGuardar}>
                                     Guardar
                                 </button>

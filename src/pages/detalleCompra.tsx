@@ -135,7 +135,7 @@ const DetalleCompra = () => {
         return {
             tipoEnvio: tipoEntrega!,
             formaPago: metodoPago!,
-            clienteId: 1,
+            clienteId: Number(sessionStorage.getItem('user_id_db')),
             domicilioId: tipoEntrega === TipoEnvio.DELIVERY ? direccionSeleccionada!.id : undefined,
             comentario: comentario || "",
             detallePedidos,

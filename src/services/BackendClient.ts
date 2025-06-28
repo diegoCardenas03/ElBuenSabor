@@ -20,6 +20,15 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     return data as ResponseType;
   }
 
+  async getByEmail(email: string): Promise<ResponseType | null> {
+    const response = await fetch(`${this.baseUrl}/email/${email}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data as ResponseType;
+  }
+
   async getByAuth0Id(id: string): Promise<ResponseType | null> {
     const response = await fetch(`${this.baseUrl}/auth0/${id}`);
     if (!response.ok) {
@@ -30,7 +39,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
   }
 
   async post(data: RequestType): Promise<ResponseType> {
-     const response = await fetch(`${this.baseUrl}/save`, {
+    const response = await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,14 +56,14 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
   }
 
   async patch(id: number | string, data: RequestType): Promise<ResponseType> {
-    const response = 
-    await fetch(`${this.baseUrl}/update/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const response =
+      await fetch(`${this.baseUrl}/update/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Error al guardar empleado: ${errorText}`);
@@ -102,7 +111,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     });
     if (!response.ok) {
       throw new Error(`Error al actualizar el estado del elemento con ID ${id}`);
-      
+
     }
   }
 

@@ -24,7 +24,9 @@ export const fetchPedidoByCodigo = createAsyncThunk<PedidoResponseDTO, string>(
   "pedido/fetchPedidoByCodigo",
   async (codigo, { rejectWithValue }) => {
     try {
-      return await pedidosService.getPedidoByCodigo(codigo);
+      const pedidoPorCodigo = await pedidosService.getPedidoByCodigo(codigo);
+      console.log("Pedidos codigo:", pedidoPorCodigo);
+      return pedidoPorCodigo;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -57,7 +59,9 @@ export const fetchPedidosByUsuario = createAsyncThunk<PedidoResponseDTO[], numbe
   "pedido/fetchPedidosByUsuario",
   async (clienteId, { rejectWithValue }) => {
     try {
-      return await pedidosService.getPedidosByUsuario(clienteId);
+      const pedidoPorId = await pedidosService.getPedidosByUsuario(clienteId);
+      console.log("Pedidos del usuario:", pedidoPorId);
+      return pedidoPorId;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

@@ -51,6 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   const sessionName = sessionStorage.getItem('user_name'); // <-- NUEVO
   const sessionEmail = sessionStorage.getItem('user_email');
   const sessionPicture = sessionStorage.getItem('user_picture');
+  const sessionId = sessionStorage.getItem('user_id_db');
   const hasSessionData = sessionCompleted && sessionRole && sessionToken;
 
   // ✅ NUEVO: Determinar estado del usuario dinámicamente
@@ -74,15 +75,15 @@ export const Header: React.FC<HeaderProps> = ({
     }
   }, [isAppLoading]);
   const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
-
   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
-  const clienteId = useAppSelector(state => state.auth.rol === "Cliente" ? state.auth.userId : null);
+  console.log("Pedido en curso:", pedidoEnCurso);
+
 
   useEffect(() => {
-    if (clienteId) {
-      dispatch(fetchPedidosByUsuario(Number(clienteId)));
+    if (sessionId) {
+      dispatch(fetchPedidosByUsuario(Number(sessionId)));
     }
-  }, [clienteId, dispatch]);
+  }, [sessionId, dispatch]);
 
   useEffect(() => {
     if (carritoAbierto && carrito.length === 0) {
@@ -153,19 +154,19 @@ export const Header: React.FC<HeaderProps> = ({
             {!showBackButton && pedidoEnCurso && (
               <div className="flex-shrink-0 flex items-center space-x-3 z-10">
                 <div
-                  className={`h-5 border-l flex-shrink-0 text-secondary`}
+                  className={`h-5 border-l flex-shrink-0 text-secondary hidden md:block`}
                 ></div>
                 <span
                   key={pedidoEnCurso.id}
                   className="font-secondary text-base cursor-pointer max-w-[120px] truncate text-secondary"
                   onClick={() => setModalPedidoEnCurso(true)}
                 >
-                  Ver pedido en curso
+                  Ver pedido
                 </span>
               </div>
             )}
             {modalPedidoEnCurso &&
-              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => { setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(Number(clienteId))); }} />
+              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => { setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(Number(sessionId))); }} />
             }
           </div>
         )}
