@@ -304,7 +304,7 @@ export const useAuthHandler = () => {
             nombreCompleto: user.name || user.email,
             telefono: user.phone_number || "",
             auth0Id: user.sub,
-            isGoogleUser: true
+            isGoogleUser: user.sub?.startsWith("google-oauth2")
           });
           // console.log("[useAuthHandler] Usuario creado");
           return;
