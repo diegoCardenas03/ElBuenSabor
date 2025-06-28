@@ -38,6 +38,7 @@ export const clearSession = () => {
     sessionStorage.removeItem('auth_completed');
     sessionStorage.removeItem('user_telefono');
     sessionStorage.removeItem('user_needs_extra_data');
+    sessionStorage.removeItem('user_id_db');
     // console.log("[useAuthHandler] clearSession ejecutado");
   } catch (e) {
     // console.error("[useAuthHandler] Error limpiando sessionStorage", e);
@@ -137,7 +138,7 @@ export const useAuthHandler = () => {
 
       const createResponse = await interceptorApiClient.post("/api/clientes/save", clienteDTO);
 
-      // console.log("[useAuthHandler] Respuesta del backend al crear usuario:", createResponse.data);
+      console.log("[useAuthHandler] Respuesta del backend al crear usuario:", createResponse.data);
 
       let token: string;
 
@@ -154,6 +155,7 @@ export const useAuthHandler = () => {
       saveToSession('user_role', 'Cliente');
       saveToSession('user_email', userData.email || user?.email || "");
       saveToSession('user_picture', user?.picture || "");
+      console.log('[UseAuthHandler] createResponse Id: ', createResponse.data.id);
       saveToSession('user_id_db', createResponse.data.id || "");
 
       // ✅ CONDICIONAL: Si es nuevo usuario de Google y no tiene teléfono, marcar para datos extra
@@ -241,9 +243,11 @@ export const useAuthHandler = () => {
           const response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
           const nombreCompleto = response.data?.nombreCompleto || user?.email?.split('@')[0] || "Usuario";
           saveToSession('user_name', nombreCompleto);
+          saveToSession('user_id_db', response.data?.id);
         } catch (e) {
           // Si falla, usar el email como fallback
           saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
+          
         }
         
         processedUserRef.current = user.sub;
