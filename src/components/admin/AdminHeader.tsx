@@ -68,6 +68,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/estadistica', label: 'Estadísticas' },
       { path: '/admin/configuracion', label: 'Configuración' },
       { path: '/admin/delivery', label: 'Delivery' },
+      { path: '/admin/promociones', label: 'Promociones' },
+      { path: '/admin/pantallaCajero', label: 'Cajero' }
     ]
 ,
     Admin: [
@@ -79,16 +81,21 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/estadistica', label: 'Estadísticas' },
       { path: '/admin/configuracion', label: 'Configuración' },
       { path: '/admin/delivery', label: 'Delivery' },
+      { path: '/admin/promociones', label: 'Promociones' },
+      { path: '/admin/pantallaCajero', label: 'Cajero' }
+
     ],
     Cocinero: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/insumos', label: 'Insumos' },
       { path: '/admin/productos', label: 'Productos' },
-      { path: '/admin/pedidosCocinero', label: 'Pedidos' }
+      { path: '/admin/pedidosCocinero', label: 'Pedidos' },
+      { path: '/admin/promociones', label: 'Promociones' }
     ],
     Cajero: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
-      { path: '/admin/pedidosCocinero', label: 'Pedidos' }
+      { path: '/admin/pedidosCocinero', label: 'Pedidos' },
+      { path: '/admin/pantallaCajero', label: 'Cajero' }
     ],
     Delivery: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
