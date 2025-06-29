@@ -6,12 +6,15 @@ import { PedidoResponseDTO } from "../../types/Pedido/PedidoResponseDTO";
 import { useAppDispatch } from "../../hooks/redux";
 import { setDataTable } from "../../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
-import { PedidoService } from "../../services/PedidoService";
+import { PedidosService } from "../../services/PedidosService";
 import { TabsPedidos } from "../../components/TabsPedidos";
 import { AiOutlinePlus, AiOutlineEye } from "react-icons/ai";
 import { Estado } from "../../types/enums/Estado";
 import PedidoDetalleModal from "../../components/modals/PedidoDetalleModal"
 import { usePedidosSocket } from "../../hooks/usePedidoSocket";
+import { mostrarSoloNumero } from "../../utils/PedidoUtils";
+import { TipoEnvio } from "../../types/enums/TipoEnvio";
+import { updateEstadoPedidoThunk } from "../../hooks/redux/slices/PedidoReducer";
 
 const estadosTabs = [
   { label: "Solicitado", value: Estado.SOLICITADO },
@@ -30,11 +33,15 @@ export const PantallaCajero = () => {
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoResponseDTO | null>(null);
   const [search, setSearch] = useState("");
 
-  const pedidoService = new PedidoService();
+  const pedidoService = new PedidosService();
   const dispatch = useAppDispatch();
 
-  const ColumnsTablePedido = [
-    { label: "Orden", key: "codigo" },
+    const ColumnsTablePedido = [
+    {
+      label: "Orden",
+      key: "codigo",
+      render: (pedido: PedidoResponseDTO) => mostrarSoloNumero(pedido.codigo),
+    },
     {
       label: "Envío",
       key: "tipoEnvio",
@@ -47,10 +54,10 @@ export const PantallaCajero = () => {
     {
       label: "Hora estimada finalización",
       key: "horaEstimadaFin",
-      render: (pedido: PedidoResponseDTO) => pedido.horaEstimadaFin || "Sin dato",
+      render: (pedido: PedidoResponseDTO) => estadoActual == Estado.CANCELADO ? "---" : pedido.horaEstimadaFin,
     },
     {
-      label: "Agregar tiempo",
+      label: estadoActual == Estado.ENTREGADO || estadoActual == Estado.CANCELADO ? "" : "Agregar tiempo",
       key: "agregarTiempo",
       render: (pedido: PedidoResponseDTO) =>
         pedido.estado === Estado.ENTREGADO || pedido.estado === Estado.CANCELADO ? (
@@ -58,11 +65,18 @@ export const PantallaCajero = () => {
         ) : (
           <div className="flex justify-center items-center">
             <AiOutlinePlus
-              className="text-red-600 text-xl cursor-pointer hover:scale-110 transition"
-              onClick={() => agregarTiempo(pedido)}
+              className={`${pedido.estado == Estado.TERMINADO && pedido.tipoEnvio == TipoEnvio.RETIRO_LOCAL ? "disabled" : "text-red-600 text-xl cursor-pointer hover:scale-110 transition"}`}
+              onClick={() => { pedido.estado == Estado.TERMINADO && pedido.tipoEnvio == TipoEnvio.RETIRO_LOCAL ? '' : agregarTiempo(pedido) }}
             />
           </div>
         ),
+    },
+    {
+      label: "Total venta",
+      key: "totalVenta",
+      render: (pedido: PedidoResponseDTO) => `$${pedido.totalVenta.toFixed(2)}`,
+
+
     },
     {
       label: "Detalle",
@@ -78,6 +92,29 @@ export const PantallaCajero = () => {
           />
         </div>
       ),
+    },
+    {
+      label: estadoActual == Estado.TERMINADO ? "Siguiente estado" : "",
+      key: "estado",
+      render: (pedido: PedidoResponseDTO) => {
+        let texto = "";
+        // if (pedido.estado === Estado.SOLICITADO) {
+        //   texto = "Cancelar pedido";
+        // } else 
+        if (pedido.estado === Estado.TERMINADO) {
+          if (pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
+            texto = "Entregar"
+          }
+        }
+        return (
+          <button
+            {...texto == "" ? { className: "" } : { className: "bg-secondary text-white rounded-full px-1 py-1 w-[70%] cursor-pointer hover:scale-105 transition-transform" }}
+            onClick={() => cambiarEstado(pedido)}
+          >
+            {texto}
+          </button>
+        );
+      }
     },
   ];
 
@@ -136,6 +173,27 @@ export const PantallaCajero = () => {
       }
     });
   };
+    const cambiarEstado = async (pedido: PedidoResponseDTO) => {
+    try {
+      let nuevoEstado = pedido.estado;
+      // if (pedido.estado === Estado.SOLICITADO) {
+      //   nuevoEstado = Estado.CANCELADO;
+      // } else 
+      if (pedido.estado === Estado.TERMINADO && pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
+        nuevoEstado = Estado.ENTREGADO;
+      } else {
+        return;
+      }
+
+      await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: nuevoEstado }));
+
+      getPedidos();
+      setPedidoSeleccionado(null);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     getPedidos();
@@ -189,7 +247,7 @@ export const PantallaCajero = () => {
         <PedidoDetalleModal
           pedido={pedidoSeleccionado}
           open={openModal}
-          onClose={() => setOpenModal(false)}
+          onClose={() => {setOpenModal(false); getPedidos();}}
         />
       )}
     </div>

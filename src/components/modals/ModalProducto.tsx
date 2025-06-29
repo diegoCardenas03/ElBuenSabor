@@ -23,6 +23,8 @@ import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
 import Swal from "sweetalert2";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
+import { ProductoResponseDTO } from "../../types/Producto/ProductoResponseDTO";
+import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
 
 interface IModalProducto {
   getProductos: () => void;
@@ -40,9 +42,11 @@ export const ModalProducto = ({
     (state) => state.tablaReducer.elementActive
   );
 
+  console.log("elementActive", elementActive);
+
   const apiProducto = new ProductoService();
   const [rubros, setRubros] = useState<RubroProductoResponseDTO[]>([]);
-  const [insumos, setInsumos] = useState<any[]>([]);
+  const [insumos, setInsumos] = useState<InsumoResponseDTO[]>([]);
   const [insumoId, setInsumoId] = useState<number>(0);
   const [cantidad, setCantidad] = useState<number>(1);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -82,18 +86,30 @@ export const ModalProducto = ({
 
   const initialValues: ProductoDTO =
     elementActive && "descripcion" in elementActive
-      ? (elementActive as ProductoDTO)
+      ? {
+          id: elementActive.id,
+          denominacion: elementActive.denominacion,
+          descripcion: elementActive.descripcion,
+          tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
+          precioVenta: elementActive.precioVenta,
+          urlImagen: elementActive.urlImagen,
+          activo: elementActive.activo,
+          rubroId: elementActive.rubro?.id ?? 0, // mapeo correcto
+          margenGanancia: elementActive.margenGanancia ?? 0, // mapeo correcto
+          detalleProductos: elementActive.detalleProductos ?? [],
+        }
       : {
-        id: 0,
-        denominacion: "",
-        urlImagen: "",
-        descripcion: "",
-        tiempoEstimadoPreparacion: 0,
-        precioVenta: 0,
-        activo: true,
-        detalleProductos: [],
-        rubroId: 0,
-      };
+          id: 0,
+          denominacion: "",
+          descripcion: "",
+          tiempoEstimadoPreparacion: 0,
+          precioVenta: 0,
+          urlImagen: "",
+          activo: true,
+          rubroId: 0,
+          margenGanancia: 0,
+          detalleProductos: [],
+        };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -105,7 +121,7 @@ export const ModalProducto = ({
   return (
     <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
       <DialogTitle>
-        <button onClick={handleClose} className="absolute top-7 right-4 text-gray-500 hover:text-red-600" >
+        <button onClick={handleClose} className="absolute top-7 right-4 text-gray-500 hover:text-red-600">
           <FaTimes className="text-secondary h-6 w-6 cursor-pointer" />
         </button>
         <p
@@ -126,8 +142,9 @@ export const ModalProducto = ({
           initialValues={initialValues}
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
-            precioVenta: Yup.number()
-              .min(0.01, "Debe ser mayor a 0")
+            margenGanancia: Yup.number()
+              .min(0, "Debe ser 0 o mayor")
+              .max(100, "Máximo 100")
               .required("Campo requerido"),
             rubroId: Yup.number()
               .min(1, "Seleccione una categoría")
@@ -176,7 +193,7 @@ export const ModalProducto = ({
               const payload = {
                 ...values,
                 urlImagen: imageUrl,
-                detalleProductos
+                detalleProductos,
               };
 
               if (elementActive?.id) {
@@ -238,7 +255,6 @@ export const ModalProducto = ({
                           {rubroproducto.denominacion}
                         </option>
                       ))}
-
                   </Field>
                   <ErrorMessage
                     name="rubroId"
@@ -254,10 +270,10 @@ export const ModalProducto = ({
                   />
 
                   <TextFieldValue
-                    label="Precio de venta:"
-                    name="precioVenta"
+                    label="Margen de ganancia (%):"
+                    name="margenGanancia"
                     type="number"
-                    placeholder="0.00"
+                    placeholder="0"
                   />
 
                   <FormControlLabel
@@ -398,7 +414,7 @@ export const ModalProducto = ({
                                   setFieldValue(
                                     "detalleProductos",
                                     values.detalleProductos.filter(
-                                      (_: any, i: number) => i !== idx
+                                      (_: DetalleProductoDTO, i: number) => i !== idx
                                     )
                                   );
                                 }}

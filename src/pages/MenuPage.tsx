@@ -10,10 +10,11 @@ import { fetchProducts, fetchInsumosVendibles, setSearchTerm, setFilters } from 
 import { fetchRubrosProductos, fetchRubrosInsumos } from '../hooks/redux/slices/RubroReducer';
 import { ProductoUnificado } from '../types/ProductoUnificado/ProductoUnificado';
 import CarritoLateral from '../components/commons/CarritoLateral';
-import { abrirCarrito, cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
+import { cerrarCarrito } from '../hooks/redux/slices/AbrirCarritoReducer';
 import { agregarProducto } from '../hooks/redux/slices/CarritoReducer';
 import Swal from 'sweetalert2';
-
+import { PromocionResponseDTO } from '../types/Promocion/PromocionResponseDTO';
+import {PromocionService} from '../services/PromocionService';
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const {
@@ -36,6 +37,7 @@ export const MenuPage: React.FC = () => {
   // Estados locales
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductoUnificado | null>(null);
+  const [promociones, setPromociones] = useState<PromocionResponseDTO[]>([]);
 
   // Cargar datos al montar
   useEffect(() => {
@@ -43,10 +45,15 @@ export const MenuPage: React.FC = () => {
     dispatch(fetchInsumosVendibles());
     dispatch(fetchRubrosProductos());
     dispatch(fetchRubrosInsumos());
+
+    // Cargar promociones
+    const promocionService = new PromocionService();
+    promocionService.getAll().then((data) => {
+      console.log("Promociones recibidas:", data);
+      const activas = data.filter((promo: PromocionResponseDTO) => promo.activo);
+      setPromociones(activas);
+    });
   }, [dispatch]);
-
-  // Debug logs
-
 
   // Función para abrir modal
   const handleCardClick = (product: ProductoUnificado) => {
@@ -61,7 +68,7 @@ export const MenuPage: React.FC = () => {
       Swal.fire({
         position: "bottom-end",
         icon: "success",
-        title: "Producto agregado correctamente",
+        text: "Producto agregado correctamente",
         showConfirmButton: false,
         timer: 1000,
         width: "20em"
@@ -70,7 +77,7 @@ export const MenuPage: React.FC = () => {
       Swal.fire({
         position: "bottom-end",
         icon: "error",
-        title: "El producto no se pudo agregar al carrito",
+        text: "El producto no se pudo agregar al carrito",
         showConfirmButton: false,
         timer: 1000,
         width: "20em"
@@ -88,6 +95,7 @@ export const MenuPage: React.FC = () => {
     );
   }
 
+  
   return (
     <>
       {carritoAbierto && (
@@ -98,6 +106,14 @@ export const MenuPage: React.FC = () => {
         onFiltersChange={(f) => dispatch(setFilters(f))}
       >
         <div className="flex flex-col items-center">
+          <h3 className='text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase'>Promociones Vigentes</h3>
+          <ProductCards
+            products={promociones}
+            onCardClick={handleCardClick}
+            showBadges={true}
+          />
+        </div>
+        <div className="flex flex-col items-center mt-8">
           {/* Categorías */}
           <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
             Explorar categorías
@@ -137,4 +153,4 @@ export const MenuPage: React.FC = () => {
   );
 };
 
-export default MenuPage;
+export default MenuPage; 

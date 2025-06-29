@@ -13,4 +13,5 @@ export interface InsumoResponseDTO {
     activo: boolean;
     unidadMedida: UnidadMedida;
     rubro: RubroInsumoResponseDTO;
+    descripcion: string;
 }

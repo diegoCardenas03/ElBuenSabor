@@ -6,19 +6,9 @@ interface LoaderProps {
 
 export const Loader: React.FC<LoaderProps> = ({ message = "Cargando..." }) => {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        width: "100%",
-        gap: "2vh",
-        height: "50vh",
-      }}
-    >
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-primary z-[9999] gap-4">
       <CircularProgress color="secondary" />
-      <h2>{message}</h2>
+      <h2 className="text-center m-0 text-black">{message}</h2>
     </div>
   );
 };

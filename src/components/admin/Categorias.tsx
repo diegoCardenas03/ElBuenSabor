@@ -99,7 +99,7 @@ const Categorias = () => {
       const data = await rubroProductoClient.getAll();
       setRubrosProductos(
         data.map(dto => ({
-          id: dto.id,
+          id: Number(dto.id),
           denominacion: dto.denominacion,
           activo: dto.activo,
           tipo: "Producto"
@@ -128,7 +128,7 @@ const Categorias = () => {
     setAbiertos(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleEliminar = async (rubro: Rubro) => {
+  /*const handleEliminar = async (rubro: Rubro) => {
     try {
       if (rubro.tipo === "Insumo") {
         await rubroInsumoClient.delete(rubro.id);
@@ -156,7 +156,7 @@ const Categorias = () => {
       });
       console.error("Error al eliminar rubro", error);
     }
-  };
+  };*/
 
   // ACTIVAR/DESACTIVAR rubro usando updateEstado del service
   const handleActivarDesactivar = async (rubro: Rubro) => {
@@ -239,7 +239,7 @@ const Categorias = () => {
     setEditando(false);
     setRubroEditando(null);
     setNombreRubro("");
-    setTipoRubro("Insumo");
+    setTipoRubro(opcionFiltrar === "Producto" ? "Producto" : "Insumo");
     setRubroPadreSeleccionado("");
   };
 

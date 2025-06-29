@@ -20,29 +20,54 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     return data as ResponseType;
   }
 
+  async getByEmail(email: string): Promise<ResponseType | null> {
+    const response = await fetch(`${this.baseUrl}/email/${email}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data as ResponseType;
+  }
+
+  async getByAuth0Id(id: string): Promise<ResponseType | null> {
+    const response = await fetch(`${this.baseUrl}/auth0/${id}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    return data as ResponseType;
+  }
+
   async post(data: RequestType): Promise<ResponseType> {
-    //  const response = 
-     await fetch(`${this.baseUrl}/save`, {
+    const response = await fetch(`${this.baseUrl}/save`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al guardar empleado: ${errorText}`);
+    }
     // const newData = await response.json();
     // return newData as ResponseType;
     return "objeto creado" as ResponseType;
   }
 
   async patch(id: number | string, data: RequestType): Promise<ResponseType> {
-    // const response = 
-    await fetch(`${this.baseUrl}/update/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const response =
+      await fetch(`${this.baseUrl}/update/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al guardar empleado: ${errorText}`);
+    }
     // const newData = await response.json();
     return "objeto actualizado" as ResponseType;
   }
@@ -55,6 +80,26 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
       },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al guardar empleado: ${errorText}`);
+    }
+    const newData = await response.json();
+    return newData as ResponseType;
+  }
+
+  async putByAuth0Id(id: string, data: RequestType): Promise<ResponseType> {
+    const response = await fetch(`${this.baseUrl}/update/auth0/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al guardar empleado: ${errorText}`);
+    }
     const newData = await response.json();
     return newData as ResponseType;
   }
@@ -66,6 +111,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     });
     if (!response.ok) {
       throw new Error(`Error al actualizar el estado del elemento con ID ${id}`);
+
     }
   }
 
@@ -78,4 +124,23 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
       throw new Error(`Error al eliminar el elemento con ID ${id}`);
     }
   }
+
+  async deletePhysical(id: number): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/delete/physical/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error(`Error al eliminar el elemento con ID ${id}`);
+    }
+  }
+
+  async deletePhysicalByAuth0Id(id: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/delete/physical/auth0/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error(`Error al eliminar el elemento con ID ${id}`);
+    }
+  }
+
 }

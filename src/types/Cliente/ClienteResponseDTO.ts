@@ -2,7 +2,7 @@ import { DetalleDomicilioResponseDTO } from "../DetalleDomicilio/DetalleDomicili
 import { UsuarioResponseDTO } from "../Usuario/UsuarioResponseDTO";
 
 export interface ClienteResponseDTO{
-    id?: number;
+    id: number;
     nombreCompleto: string;
     telefono: string;
     activo: boolean;

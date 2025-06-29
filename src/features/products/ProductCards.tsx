@@ -1,60 +1,94 @@
 import { ProductoUnificado, isInsumo } from '../../types/ProductoUnificado/ProductoUnificado';
-import { useAppDispatch } from '../../hooks/redux';
-import { agregarProducto } from '../../hooks/redux/slices/CarritoReducer';
-import { abrirCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
+import { useDispatch } from "react-redux";
+import { agregarProducto } from "../../hooks/redux/slices/CarritoReducer";
+import { PromocionResponseDTO } from '../../types/Promocion/PromocionResponseDTO';
 import Swal from 'sweetalert2';
 
+ 
 interface ProductCardsProps {
   products: ProductoUnificado[];
   onCardClick?: (product: ProductoUnificado) => void;
   showBadges?: boolean;
 }
 
-export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick, showBadges }) => {
-  const dispatch = useAppDispatch();
+export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick}) => {
+  const dispatch = useDispatch();
 
-  const handleAgregar = (product: ProductoUnificado) => {
-    if (dispatch(agregarProducto(product))) {
-      Swal.fire({
-        position: "bottom-end",
-        icon: "success",
-        title: "Producto agregado correctamente",
-        showConfirmButton: false,
-        timer: 1000,
-        width: "20em"
-      });
-    } else {
-      Swal.fire({
-        position: "bottom-end",
-        icon: "error",
-        title: "El producto no se pudo agregar al carrito",
-        showConfirmButton: false,
-        timer: 1000,
-        width: "20em"
-      });
-    }
-  };
+ const handleAgregar = (product: ProductoUnificado) => {
+  const result = dispatch(agregarProducto(product)); 
+
+  const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
+
+  if (result && isPromo) {
+    Swal.fire({
+      position: "bottom-end",
+      icon: "success",
+      text: "Promoción agregada al carrito",
+      timer: 1000,
+      showConfirmButton: false,
+      width: "20em"
+    });
+    return;
+  }
+
+  if (result) {
+    Swal.fire({
+      position: "bottom-end",
+      icon: "success",
+      text: "Producto agregado correctamente",
+      showConfirmButton: false,
+      timer: 1000,
+      width: "20em"
+    });
+  } else {
+    Swal.fire({
+      position: "bottom-end",
+      icon: "error",
+      text: "El producto no se pudo agregar al carrito",
+      showConfirmButton: false,
+      timer: 1000,
+      width: "20em"
+    });
+  }
+};
+
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-10 justify-center">
       {products.map((product) => {
-        const price = isInsumo(product) ? product.precioVenta : (product.precioVenta || 0);
+        // Detectar si es promoción
+        const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
+        const price = isPromo
+          ? (product as PromocionResponseDTO).precioVenta
+          : isInsumo(product)
+            ? product.precioVenta
+            : (product.precioVenta || 0);
         const imageUrl = product.urlImagen || 'src\\assets\\bebida.png';
-
-        // Crear una key única combinando tipo e ID
-        const uniqueKey = isInsumo(product) ? `insumo-${product.id}` : `producto-${product.id}`;
+        const uniqueKey = isPromo
+          ? `promo-${product.id}`
+          : isInsumo(product)
+            ? `insumo-${product.id}`
+            : `producto-${product.id}`;
 
         return (
-          <div key={uniqueKey} className="relative bg-white p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-55 w-42 cursor-pointer">
-            <div className='flex flex-col items-center' onClick={() => onCardClick && onCardClick(product)}>
-              {/* Imagen del producto */}
-              <img
-                src={imageUrl}
-                alt={product.denominacion}
-                className="h-20 mb-3 object-contain"
-              />
+          <div
+            key={uniqueKey}
+            className="relative bg-white p-4 flex flex-col justify-between items-center shadow hover:shadow-lg transition border-2 border-[#FF9D3A] h-57 w-42 cursor-pointer"
+          >
+            {isPromo && (
+              <span className="absolute mt-1 top-0 bg-[#BD1E22] text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+                ¡Promoción!
+              </span>
+            )}
 
-              {/* Nombre y precio */}
+            <div className='mt-4 flex flex-col items-center w-full' onClick={() => onCardClick && onCardClick(product)}>
+              <div className="relative w-full flex justify-center items-center mb-3">
+                <img
+                  src={imageUrl}
+                  alt={product.denominacion}
+                  className="h-20 object-contain"
+                />
+              </div>
               <h3 className="font-primary text-center font-bold text-sm text-gray-800 line-clamp-2 min-h-[2.5rem]">
                 {product.denominacion}
               </h3>
@@ -62,10 +96,10 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
                 ${price.toFixed(2)}
               </p>
             </div>
-            {/* Botón para agregar al carrito */}
             <button
               className="mt-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer"
-              onClick={() => handleAgregar(product)}>
+              onClick={() => handleAgregar(product)}
+            >
               Añadir
             </button>
           </div>

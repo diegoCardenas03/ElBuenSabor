@@ -12,6 +12,10 @@
     --font-tertiary: "Bowlby One SC", sans-serif;
 }
 
+.swal2-actions button {
+  min-width: 180px; 
+}
+
 
 body {
     font-family: "Poppins", sans-serif;

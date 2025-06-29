@@ -13,10 +13,10 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="w-full bg-primary flex flex-col justify-center items-center gap-5 pt-4 relative ">
+      <footer className="w-full bg-primary flex flex-col justify-center items-center gap-5 pt-5 relative ">
         <div className="bg-transparent flex flex-col justify-center items-center gap-5 mt-4">
           <img src={LogoIcon} alt="" className="w-15 h-15" />
-          <p className="font-semibold">Av Belgrano 671, Mendoza, Argentina</p>
+          <p className="font-semibold">Cnel Rodríguez 273, M5500 Mendoza</p>
           <div className="flex gap-5 justify-center items-center">
             {iconsRedes.map((icon, index) => (
               <img src={icon.icon} key={index} alt={icon.text} className="w-8 h-8 cursor-pointer" />
