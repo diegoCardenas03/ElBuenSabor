@@ -99,7 +99,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     ],
     Delivery: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
-      { path: '/admin/entregas', label: 'Entregas' }
+      { path: '/admin/delivery', label: 'Entregas' }
     ]
   };
 

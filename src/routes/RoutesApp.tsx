@@ -94,7 +94,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/PedidosCocinero"
         element={
-          <ProtectedRoute allowedRoles={['Cocinero', 'Admin', 'SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['Cocinero', 'Admin', 'SuperAdmin', 'Cajero']}>
             <PedidosCocinero />
           </ProtectedRoute>
         }
@@ -142,7 +142,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/Promociones"
         element={
-          <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin']}>
+          <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin', 'Cocinero']}>
             <ScreenPromocion />
           </ProtectedRoute>
         }
