@@ -9,6 +9,7 @@ import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { IoFilterSharp } from "react-icons/io5";
+import { truncar } from "../utils/Utils";
 
 export const ScreenProducto = () => {
   const [loading, setLoading] = useState(false);
@@ -43,10 +44,11 @@ export const ScreenProducto = () => {
     {
       label: "Descripción",
       key: "descripcion",
+      render: (producto: ProductoDTO) => truncar(producto.descripcion, 30),
     },
     {
-      label:"Precio costo",
-      key:"precioCosto"
+      label: "Precio costo",
+      key: "precioCosto"
     },
     {
       label: "Precio Venta",
@@ -132,7 +134,7 @@ export const ScreenProducto = () => {
           id: d.id,
           cantidad: d.cantidad,
           insumoId: d.insumo?.id ?? 0,
-          insumo: d.insumo,      
+          insumo: d.insumo,
         })),
       }));
 
@@ -236,46 +238,46 @@ export const ScreenProducto = () => {
         setOpenModal={setOpenModal}
       />
       {modalFilters && (
-  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
-    <div className="relative bg-white p-5 rounded-[20px] shadow-lg w-[90%] sm:w-[65%] lg:w-[30%] flex flex-col">
-      <button
-        className="absolute top-2 right-3 cursor-pointer font-bold text-gray-500 hover:text-gray-800"
-        onClick={() => setModalFilters(false)}
-      >
-        ✕
-      </button>
-      <h2 className="text-secondary text-base font-bold text-center mb-4">Filtros de Productos</h2>
-      <label className="flex items-center mb-2 gap-2">
-        <input
-          type="checkbox"
-          checked={filtroSeleccionado.soloActivos}
-          onChange={() => setFiltroSeleccionado((prev) => ({ ...prev, soloActivos: !prev.soloActivos }))
-          }
-        />
-        Solo activos
-      </label>
-      <button
-        className="bg-tertiary text-white mt-2 px-2 py-1 rounded-full w-[40%] mx-auto hover:bg-tertiary/80 transition-all duration-300 ease-in-out"
-        onClick={() => {
-          setFiltros(prev => ({ ...prev, ...filtroSeleccionado }));
-          setModalFilters(false);
-        }}
-      >
-        Aplicar
-      </button>
-      <button
-        className="text-secondary mt-2 px-2 py-1 rounded-full w-[40%] mx-auto cursor-pointer hover:underline"
-        onClick={() => {
-          setFiltros({ searchTerm: "", soloActivos: false });
-          setFiltroSeleccionado({ searchTerm: "", soloActivos: false });
-          setModalFilters(false);
-        }}
-      >
-        Borrar filtros
-      </button>
-    </div>
-  </div>
-)}
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+          <div className="relative bg-white p-5 rounded-[20px] shadow-lg w-[90%] sm:w-[65%] lg:w-[30%] flex flex-col">
+            <button
+              className="absolute top-2 right-3 cursor-pointer font-bold text-gray-500 hover:text-gray-800"
+              onClick={() => setModalFilters(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-secondary text-base font-bold text-center mb-4">Filtros de Productos</h2>
+            <label className="flex items-center mb-2 gap-2">
+              <input
+                type="checkbox"
+                checked={filtroSeleccionado.soloActivos}
+                onChange={() => setFiltroSeleccionado((prev) => ({ ...prev, soloActivos: !prev.soloActivos }))
+                }
+              />
+              Solo activos
+            </label>
+            <button
+              className="bg-tertiary text-white mt-2 px-2 py-1 rounded-full w-[40%] mx-auto hover:bg-tertiary/80 transition-all duration-300 ease-in-out"
+              onClick={() => {
+                setFiltros(prev => ({ ...prev, ...filtroSeleccionado }));
+                setModalFilters(false);
+              }}
+            >
+              Aplicar
+            </button>
+            <button
+              className="text-secondary mt-2 px-2 py-1 rounded-full w-[40%] mx-auto cursor-pointer hover:underline"
+              onClick={() => {
+                setFiltros({ searchTerm: "", soloActivos: false });
+                setFiltroSeleccionado({ searchTerm: "", soloActivos: false });
+                setModalFilters(false);
+              }}
+            >
+              Borrar filtros
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -1,10 +1,8 @@
 import { useEffect } from "react";
-import { PedidosService } from "../services/PedidosService";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { vaciarCarrito } from "../hooks/redux/slices/CarritoReducer";
 import { useNavigate } from "react-router-dom";
 import pizzaImg from '../assets/pizza-roja.png';
-import { enviarPedidoThunk } from "../hooks/redux/slices/PedidoReducer";
 import Swal from "sweetalert2";
 
 function SuccessMP() {
