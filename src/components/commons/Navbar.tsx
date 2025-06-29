@@ -39,19 +39,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
   const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
 
-  const { logout, loginWithPopup, loginWithRedirect} = useAuth0();
+  const { logout, loginWithPopup, loginWithRedirect } = useAuth0();
 
   const handleAuthLogin = async () => {
-  try {
-    await loginWithPopup({
-      authorizationParams: {
-        prompt: 'select_account'
-      }
-    });
-  } catch (error) {
-    console.error('Error en login:', error);
-  }
-};
+    try {
+      await loginWithPopup({
+        authorizationParams: {
+          prompt: 'select_account'
+        }
+      });
+    } catch (error) {
+      console.error('Error en login:', error);
+    }
+  };
 
   // ✅ AGREGAR: Función para manejar clics en enlaces
   const handleLinkClick = () => {
@@ -136,52 +136,54 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Si está logeado, muestra el menú lateral completo
   return (
     <>
-      <div className={`z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'} `}>
-        <div className="flex justify-end">
-          <FaTimes stroke='2' color={whiteUserBar ? "white" : "black"} onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar" />
-        </div>
-        <div className="p-4 pt-0 flex flex-row items-center gap-3">
-          <img
-            src={fotoUsuario || usuarioImg}
-            alt="Usuario"
-            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-          />
-          <div className="flex flex-col min-w-0">
-            <p className={`font-tertiary text-tertiary text-sm ${whiteUserBar ? "text-white" : "text-black"} truncate max-w-[120px]`}>
-              {nombreUsuario}
-            </p>
-            <p className={`text-xs ${whiteUserBar ? "text-white" : "text-quaternary"} truncate max-w-[120px]`}>
-              {emailUsuario || "Sin email"}
-            </p>
+      <div className={`flex flex-col justify-between z-20 pt-6 w-60 fixed top-0 right-0 h-full bg-secondary transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'} `}>
+        <div>
+          <div className="flex justify-end">
+            <FaTimes stroke='2' color={whiteUserBar ? "white" : "black"} onClick={onClose} className="w-7 h-7 cursor-pointer mr-4" aria-label="cerrar navbar" />
           </div>
-        </div>
-        <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />
-        <div className="p-4 ml-4 cursor-pointer">
-          {navbarLinks.map((link, index) => (
-            <Link
-              to={link.to}
-              key={index}
-              className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
-              onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
-            >
-              {link.icon}
-              <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
-            </Link>
-          ))}
-        </div>
-        <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />
-        <div className='p-4 ml-4 mb-4 cursor-pointer'>
-          {navbarLinks2.map((link, index) => (
-            <Link
-              to={link.to}
-              key={index}
-              className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
-              onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
-            >
-              {link.icon}
-              <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
-            </Link>
-          ))}
+          <div className="p-4 pt-0 flex flex-row items-center gap-3">
+            <img
+              src={fotoUsuario || usuarioImg}
+              alt="Usuario"
+              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+            />
+            <div className="flex flex-col min-w-0">
+              <p className={`font-tertiary text-tertiary text-sm ${whiteUserBar ? "text-white" : "text-black"} truncate max-w-[120px]`}>
+                {nombreUsuario}
+              </p>
+              <p className={`text-xs ${whiteUserBar ? "text-white" : "text-quaternary"} truncate max-w-[120px]`}>
+                {emailUsuario || "Sin email"}
+              </p>
+            </div>
+          </div>
+          <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />
+          <div className="p-4 ml-4 cursor-pointer">
+            {navbarLinks.map((link, index) => (
+              <Link
+                to={link.to}
+                key={index}
+                className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
+                onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
+              >
+                {link.icon}
+                <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
+              </Link>
+            ))}
+          </div>
+          <hr className={`${whiteUserBar ? "border-white" : "text-quaternary"} w-40 m-auto`} />
+          <div className='p-4 ml-4 mb-4 cursor-pointer'>
+            {navbarLinks2.map((link, index) => (
+              <Link
+                to={link.to}
+                key={index}
+                className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
+                onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
+              >
+                {link.icon}
+                <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
+              </Link>
+            ))}
+          </div>
         </div>
         <div className='p-4 ml-4 mb-4 cursor-pointer'>
           <div

@@ -50,6 +50,21 @@ export const ScreenPromocion = () => {
 
     },
     {
+      label: "Precio Venta S/Desc.",
+      key: "precioVentaSinDescuento",
+      render: (promo: PromocionResponseDTO) => {
+       
+        const sinDescuento = promo.descuento < 100
+          ? promo.precioVenta / (1 - promo.descuento / 100)
+          : 0;
+        return (
+          <span>
+            ${sinDescuento.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        );
+      }
+    },
+    {
       label: "Precio Costo",
       key: "precioCosto",
       render: (promo: PromocionResponseDTO) => (
@@ -62,8 +77,9 @@ export const ScreenPromocion = () => {
     {
       label: "Acciones",
       key: "acciones",
-      // Aquí puedes agregar botones para editar/eliminar si lo deseas
+      
     },
+    
    
   ];
 

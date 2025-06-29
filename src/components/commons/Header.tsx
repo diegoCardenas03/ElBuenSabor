@@ -77,7 +77,6 @@ export const Header: React.FC<HeaderProps> = ({
   const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
   console.log("Pedido en curso:", pedidoEnCurso);
-
   
   useEffect(() => {
     if (sessionId) {
@@ -151,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
         ) : (
           <div className="flex-shrink-0 flex items-center space-x-3 z-[9999]">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
-            {!showBackButton && pedidoEnCurso && (
+            {!showBackButton && pedidoEnCurso  && (
               <div className="flex-shrink-0 flex items-center space-x-3 z-10">
                 <div
                   className={`h-5 border-l flex-shrink-0 text-secondary hidden md:block`}
@@ -165,9 +164,9 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
             )}
-            {modalPedidoEnCurso &&
-              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => { setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(Number(sessionId))); }} />
-            }
+            {modalPedidoEnCurso && pedidoEnCurso &&
+              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => {setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(Number(sessionId)));}} />
+            } 
           </div>
         )}
       </div>
