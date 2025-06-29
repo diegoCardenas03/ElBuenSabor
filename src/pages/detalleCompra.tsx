@@ -158,7 +158,7 @@ const DetalleCompra = () => {
                 timer: 1000,
                 width: "20em"
             }).then(() => {
-                dispatch(cerrarCarrito());
+                dispatch(vaciarCarrito());
                 navigate('/');
             });
             setTimeout(() => {

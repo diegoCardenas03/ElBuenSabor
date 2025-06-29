@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-import SockJS from "sockjs-client";
+
 import { Client } from "@stomp/stompjs";
 import { InsumoResponseDTO } from "../types/Insumo/InsumoResponseDTO";
 
-const WS_URL = "https://6428-38-51-31-203.ngrok-free.app/ws";
+const WS_URL = "https://42f2-38-51-31-203.ngrok-free.app/ws";
 type Callback = (insumo: InsumoResponseDTO) => void;
 
 export function useInsumoSocket(onInsumoActualizado: Callback) {
   useEffect(() => {
     const stompClient = new Client({
-      webSocketFactory: () => new SockJS(WS_URL) as any,
+      webSocketFactory: () => new WebSocket(WS_URL),
       onConnect: () => {
         console.log("📡 Conectado a WebSocket (Insumos)");
         stompClient.subscribe("/topic/insumos", (message) => {

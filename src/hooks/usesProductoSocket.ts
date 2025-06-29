@@ -3,13 +3,13 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { ProductoResponseDTO } from "../types/Producto/ProductoResponseDTO";
 
-const WS_URL = "https://6428-38-51-31-203.ngrok-free.app/ws";
+const WS_URL = "https://42f2-38-51-31-203.ngrok-free.app/ws";
 type Callback = (producto: ProductoResponseDTO) => void;
 
 export function useProductoSocket(onProductoActualizado: Callback) {
   useEffect(() => {
     const stompClient = new Client({
-      webSocketFactory: () => new SockJS(WS_URL) as any,
+      webSocketFactory: () => new WebSocket(WS_URL),
       onConnect: () => {
         console.log("📡 Conectado a WebSocket (Productos)");
         stompClient.subscribe("/topic/productos", (message) => {

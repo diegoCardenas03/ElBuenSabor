@@ -3,13 +3,13 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { PromocionResponseDTO } from "../types/Promocion/PromocionResponseDTO";
 
-const WS_URL = "https://6428-38-51-31-203.ngrok-free.app/ws";
+const WS_URL = "https://42f2-38-51-31-203.ngrok-free.app/ws";
 type Callback = (promocion: PromocionResponseDTO) => void;
 
 export function usePromocionSocket(onPromocionActualizado: Callback) {
   useEffect(() => {
     const stompClient = new Client({
-      webSocketFactory: () => new SockJS(WS_URL) as any,
+      webSocketFactory: () => new WebSocket(WS_URL),
       onConnect: () => {
         console.log("📡 Conectado a WebSocket (Promociones)");
         stompClient.subscribe("/topic/promociones", (message) => {
