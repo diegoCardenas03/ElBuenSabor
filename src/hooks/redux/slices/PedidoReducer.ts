@@ -20,19 +20,6 @@ const initialState: PedidoState = {
 
 const pedidosService = new PedidosService();
 
-export const fetchPedidoByCodigo = createAsyncThunk<PedidoResponseDTO, string>(
-  "pedido/fetchPedidoByCodigo",
-  async (codigo, { rejectWithValue }) => {
-    try {
-      const pedidoPorCodigo = await pedidosService.getPedidoByCodigo(codigo);
-      console.log("Pedidos codigo:", pedidoPorCodigo);
-      return pedidoPorCodigo;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 export const updateEstadoPedidoThunk = createAsyncThunk<PedidoResponseDTO, { pedidoId: number; nuevoEstado: Estado }>(
   "pedido/updateEstadoPedido",
   async ({ pedidoId, nuevoEstado }, { rejectWithValue }) => {
@@ -86,24 +73,6 @@ const PedidoReducer = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchPedidoByCodigo.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchPedidoByCodigo.fulfilled, (state, action: PayloadAction<PedidoResponseDTO>) => {
-        state.loading = false;
-        state.error = null;
-        state.pedidoEnCurso = (
-          action.payload.estado !== Estado.ENTREGADO &&
-          action.payload.estado !== Estado.CANCELADO
-        ) ? action.payload : null;
-      })
-      .addCase(fetchPedidoByCodigo.rejected, (state, action) => {
-        state.loading = false;
-        state.error = String(action.payload) || "Error al cargar pedido";
-        state.pedidoEnCurso = null;
-      })
-
       .addCase(updateEstadoPedidoThunk.pending, (state) => {
         state.loading = true;
         state.error = null;

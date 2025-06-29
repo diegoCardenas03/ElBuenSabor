@@ -132,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50 ${backgroundColor}`}
+      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-[1020] ${backgroundColor}`}
     >
       {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
@@ -149,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
           </div>
         ) : (
-          <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+          <div className="flex-shrink-0 flex items-center space-x-3 z-[1020]">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
             {!showBackButton && pedidoEnCurso && (
               <div className="flex-shrink-0 flex items-center space-x-3 z-10">

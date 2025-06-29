@@ -11,6 +11,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Swal from 'sweetalert2';
+import { DetalleDomicilioDTO } from '../types/DetalleDomicilio/DetalleDomicilioDTO';
 
 const markerIcon = new L.Icon({
     iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -37,8 +38,8 @@ const MisDirecciones = () => {
         numero: 0,
         localidad: '',
         codigoPostal: 0,
-        latitud: -34.6,
-        longitud: -58.4,
+        latitud: -32.8908,
+        longitud: -68.8272,
     });
 
     const { calle, numero, localidad, codigoPostal } = direccionNueva;
@@ -49,7 +50,7 @@ const MisDirecciones = () => {
         setDireccionEditando(null);
         setDireccionNueva({
             calle: "", numero: 0, localidad: '', codigoPostal: 0,
-            latitud: -34.6, longitud: -58.4
+            latitud: -32.8908, longitud: -68.8272,
         });
     }
 
@@ -81,12 +82,24 @@ const MisDirecciones = () => {
     };
 
     const handleGuardar = async () => {
+        if (!calle || !numero || !localidad || !codigoPostal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, completa todos los campos',
+            });
+            return;
+        }
         try {
             if (modoEditar && direccionEditando?.id) {
                 const res = await dispatch(editarDireccion({ id: direccionEditando.id, data: direccionNueva }));
                 if (editarDireccion.fulfilled.match(res)) cerrarModal();
             } else {
-                const res = await dispatch(crearDireccion(direccionNueva));
+                const detalleDireccion: DetalleDomicilioDTO = {
+                    clienteId: Number(sessionStorage.getItem("user_id_db")),
+                    domicilio: direccionNueva
+                };
+                const res = await dispatch(crearDireccion(detalleDireccion));
                 if (crearDireccion.fulfilled.match(res)) cerrarModal();
             }
         } catch (error) {
@@ -101,19 +114,30 @@ const MisDirecciones = () => {
             `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
         );
         if (!response.ok) return null;
-        return await response.json();
+        const data = await response.json();
+        if (
+            data.address &&
+            (data.address.state === "Mendoza" || data.display_name?.toLowerCase().includes("mendoza"))
+        ) {
+            return data;
+        }
+        return null;
     }
 
     async function geocodeDireccion({ calle, numero, localidad, codigoPostal }: DomicilioDTO) {
-        const direccion = `${calle} ${numero}, ${localidad}, ${codigoPostal}`;
+        const direccion = `${calle} ${numero}, ${localidad}, ${codigoPostal}, Mendoza, Argentina`;
         const response = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}`
         );
         const data = await response.json();
-        if (data && data.length > 0) {
+        const mendozaResult = data.find((d: any) =>
+            (d.display_name && d.display_name.toLowerCase().includes("mendoza")) &&
+            (d.display_name && d.display_name.toLowerCase().includes("argentina"))
+        );
+        if (mendozaResult) {
             return {
-                lat: parseFloat(data[0].lat),
-                lng: parseFloat(data[0].lon),
+                lat: parseFloat(mendozaResult.lat),
+                lng: parseFloat(mendozaResult.lon),
             };
         }
         return null;
@@ -145,7 +169,7 @@ const MisDirecciones = () => {
                                 zoom={15}
                                 scrollWheelZoom={false}
                                 dragging={false}
-                                style={{ height: "200px", width: "100%", borderRadius: "10px", marginBottom: "1rem" }}
+                                style={{ height: "130px", width: "100%", borderRadius: "10px", marginBottom: "1rem" }}
                             >
                                 <TileLayer
                                     attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
@@ -182,46 +206,46 @@ const MisDirecciones = () => {
                 </div>
 
                 {mostrarModal && (
-                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999]">
-                        <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative flex flex-col justify-center items-center">
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[1050]">
+                        <div className="bg-primary p-6 rounded-lg shadow-lg w-[260px] md:w-[450px] relative flex flex-col justify-center items-center">
                             <button
                                 className="cursor-pointer absolute top-2 right-2 text-gray-500 hover:text-gray-800"
                                 onClick={cerrarModal}>
                                 ✕
                             </button>
-                            <h2 className="text-secondary font-primary font-bold pb-4 text-[20px]">
+                            <h2 className="text-secondary font-primary font-bold pb-4 text-[16px] md:text-[20px]">
                                 {modoEditar ? 'Editar dirección' : 'Agregar nueva dirección'}
                             </h2>
-
-
-                            <input
-                                type="text"
-                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                placeholder="Calle"
-                                value={calle}
-                                onChange={(e) => setDireccionNueva({ ...direccionNueva, calle: e.target.value })}
-                            />
-                            <input
-                                type="number"
-                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                placeholder="Número"
-                                value={numero === 0 ? "" : numero}
-                                onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value === "" ? 0 : parseInt(e.target.value, 10) })}
-                            />
-                            <input
-                                type="text"
-                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                placeholder="Localidad"
-                                value={localidad}
-                                onChange={(e) => setDireccionNueva({ ...direccionNueva, localidad: e.target.value })}
-                            />
-                            <input
-                                type="number"
-                                className="bg-white w-sm border-none rounded-[50px] p-2 mb-4"
-                                placeholder="Código Postal"
-                                value={codigoPostal === 0 ? "" : codigoPostal}
-                                onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value === "" ? 0 : parseInt(e.target.value, 10) })}
-                            />
+                            <div className='flex flex-col items-center w-[100%]'>
+                                <input
+                                    type="text"
+                                    className="bg-white border-none rounded-[50px] p-2 mb-4 w-[90%]"
+                                    placeholder="Calle"
+                                    value={calle}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, calle: e.target.value })}
+                                />
+                                <input
+                                    type="number"
+                                    className="bg-white border-none rounded-[50px] p-2 mb-4 w-[90%]"
+                                    placeholder="Número"
+                                    value={numero === 0 ? "" : numero}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, numero: e.target.value === "" ? 0 : parseInt(e.target.value, 10) })}
+                                />
+                                <input
+                                    type="text"
+                                    className="bg-white border-none rounded-[50px] p-2 mb-4 w-[90%]"
+                                    placeholder="Localidad"
+                                    value={localidad}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, localidad: e.target.value })}
+                                />
+                                <input
+                                    type="number"
+                                    className="bg-white border-none rounded-[50px] p-2 mb-4 w-[90%]"
+                                    placeholder="Código Postal"
+                                    value={codigoPostal === 0 ? "" : codigoPostal}
+                                    onChange={(e) => setDireccionNueva({ ...direccionNueva, codigoPostal: e.target.value === "" ? 0 : parseInt(e.target.value, 10) })}
+                                />
+                            </div>
 
                             <button
                                 className="bg-secondary px-3 py-1 rounded-full mb-4 text-white"
