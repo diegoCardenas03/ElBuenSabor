@@ -154,12 +154,12 @@ export const ScreenProducto = () => {
         const res = await fetch('http://localhost:8080/api/rubroproductos');
         const data = await res.json();
         setRubrosProductos(
-          data.map((r: any) => ({
+          data.map((r: { id: number; denominacion: string }) => ({
             id: r.id,
             denominacion: r.denominacion
           }))
         );
-      } catch (error) {
+      } catch {
         setRubrosProductos([]);
       }
     };

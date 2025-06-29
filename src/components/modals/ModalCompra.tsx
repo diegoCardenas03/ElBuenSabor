@@ -13,7 +13,7 @@ import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
 import { InsumoService } from "../../services/InsumoService";
 import Swal from "sweetalert2";
 import { FaTimes } from "react-icons/fa";
-import "./ModalInsumo.css"; // Reutiliza los estilos si tienes reglas generales
+import "./ModalInsumo.css"; 
 
 interface CompraItem {
   insumoId: number;
@@ -39,10 +39,10 @@ export const ModalCompra = ({
   ]);
   const api = new InsumoService();
 
-  const handleChange = (index: number, field: keyof CompraItem, value: any) => {
+  const handleChange = (index: number, field: keyof CompraItem, value: string | number) => {
     const nuevos = [...items];
     nuevos[index][field] =
-      field === "insumoId" ? Number(value) : parseFloat(value);
+      field === "insumoId" ? Number(value) : Number(value);
     setItems(nuevos);
   };
 
@@ -72,6 +72,7 @@ export const ModalCompra = ({
           activo: insumo.activo,
           unidadMedida: insumo.unidadMedida,
           rubroId: Number(insumo.rubro.id),
+          descripcion: insumo.descripcion,
         });
       }
       Swal.fire("¡Compra registrada!", "El stock fue actualizado.", "success");
