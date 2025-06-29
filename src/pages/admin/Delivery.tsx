@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
-// import { Rol } from '../../types/enums/Rol';
 import { TfiAngleUp } from "react-icons/tfi";
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';

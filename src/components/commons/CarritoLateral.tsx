@@ -24,13 +24,15 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
 
   useEffect(() => {
-    dispatch(fetchDirecciones())
+    dispatch(fetchDirecciones());
     setLoading(false);
-  }, [dispatch])
+  }, [dispatch]);
 
-  const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0).toFixed(2);
+  const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0);
+  Number(subTotal.toFixed(2));
   const envio = tipoEntrega == TipoEnvio.DELIVERY ? 1500 : 0;
-  const total = Number(subTotal + envio).toFixed(2);
+  const total = subTotal + envio;
+  Number(total.toFixed(2));
 
   const handleRealizarPedido = async () => {
     if (pedidoEnCurso) {
@@ -57,7 +59,21 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       return;
     }
 
-    if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
+    if (direcciones.length === 0) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        text: "No tienes direcciones guardadas, por favor agrega una dirección antes de realizar el pedido.",
+        showConfirmButton: true,
+        confirmButtonColor: "#FF9D3A",
+        width: "30em"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/MisDirecciones');
+          onClose();
+        }
+      });
+    } else if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
       Swal.fire({
         position: "center",
         icon: "error",
@@ -127,7 +143,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                 <div className="flex flex-col">
                   <p className="font-semibold">{item.denominacion}</p>
                   <p className="text-sm text-gray-500">
-                    Subtotal: ${subTotal}
+                    Subtotal: ${item.precioVenta * cant}
                   </p>
                 </div>
               </div>
@@ -178,16 +194,16 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
               <FaMapMarkerAlt stroke='2' className='w-7 h-7' />
               <select
                 className="cursor-pointer border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
-                value={direccionSeleccionada?.id || ''}
+                value={direccionSeleccionada ? direccionSeleccionada.id : ""}
                 onChange={(e) => {
                   const dir = direcciones.find(d => d.id === parseInt(e.target.value));
                   dispatch(setDireccion(dir || null));
                 }}
               >
-                <option disabled>Seleccionar dirección</option>
+                <option value='' disabled>Seleccionar dirección</option>
                 {direcciones.map((dir) => (
                   <option key={dir.id} value={dir.id}>
-                   {truncar(formatearDireccion(dir))}
+                    {truncar(formatearDireccion(dir))}
                   </option>
                 ))}
               </select>
