@@ -2,8 +2,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DomicilioService } from '../../../services/DomicilioService';
 import { DomicilioResponseDTO } from '../../../types/Domicilio/DomicilioResponseDTO';
 import { DomicilioDTO } from '../../../types/Domicilio/DomicilioDTO';
+import { DetalleDomicilioDTO } from '../../../types/DetalleDomicilio/DetalleDomicilioDTO';
+import { DetalleDomicilioService } from '../../../services/DetalleDomicilioService';
 
 const domicilioService = new DomicilioService();
+const detalleDomicilioService = new DetalleDomicilioService();
 
 interface DomicilioState {
     direcciones: DomicilioResponseDTO[];
@@ -23,7 +26,7 @@ export const fetchDirecciones = createAsyncThunk(
     'domicilios/fetchDirecciones',
     async (_, { rejectWithValue }) => {
         try {
-            const todas = await domicilioService.getAll();
+            const todas = await domicilioService.getByClienteId(Number(sessionStorage.getItem('user_id_db')));
             const activas = todas.filter((d: DomicilioResponseDTO) => d.activo === true);
             return activas;
         } catch (error) {
@@ -33,9 +36,9 @@ export const fetchDirecciones = createAsyncThunk(
 );
 export const crearDireccion = createAsyncThunk(
     'domicilios/crearDireccion',
-    async (data: DomicilioDTO, { dispatch, rejectWithValue }) => {
+    async (data: DetalleDomicilioDTO, { dispatch, rejectWithValue }) => {
         try {
-            await domicilioService.post(data);
+            await detalleDomicilioService.post(data);
             dispatch(fetchDirecciones());
         } catch (error) {
             return rejectWithValue('Error al crear dirección');

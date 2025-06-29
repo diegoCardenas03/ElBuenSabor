@@ -1,54 +1,42 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import Swal from "sweetalert2"; 
 
 interface PermisosModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: { nombre: string; permisos: string[]; oculto: boolean }) => void;
-  initialPermisos?: string[];
+  onSave: (data: {
+    nombre: string;
+    descripcion: string;
+  }) => void;
   rolName?: string;
-  initialOculto?: boolean;
+  initialDescripcion?: string;
 }
 
 const PermisosModal: React.FC<PermisosModalProps> = ({
   open,
   onClose,
   onSave,
-  initialPermisos = [],
   rolName = "",
-  initialOculto = false
+  initialDescripcion = ""
 }) => {
-  const [permisos, setPermisos] = useState<string[]>(initialPermisos);
-  const [nuevoPermiso, setNuevoPermiso] = useState("");
   const [nombre, setNombre] = useState(rolName ?? "");
-  const [oculto, setOculto] = useState(initialOculto);
+  const [descripcion, setDescripcion] = useState(initialDescripcion ?? "");
   const [nombreError, setNombreError] = useState(false);
 
   useEffect(() => {
-    setPermisos(initialPermisos);
     setNombre(rolName ?? "");
-    setOculto(initialOculto);
+    setDescripcion(initialDescripcion ?? "");
     setNombreError(false);
-  }, [initialPermisos, rolName, initialOculto, open]);
+  }, [rolName, initialDescripcion, open]);
 
   if (!open) return null;
-
-  const handleAddPermiso = () => {
-    if (nuevoPermiso.trim() && !permisos.includes(nuevoPermiso.trim())) {
-      setPermisos([...permisos, nuevoPermiso.trim()]);
-      setNuevoPermiso("");
-    }
-  };
-
-  const handleRemovePermiso = (permiso: string) => {
-    setPermisos(permisos.filter(p => p !== permiso));
-  };
 
   const handleSave = () => {
     if (!nombre.trim()) {
       setNombreError(true);
       return;
     }
-    onSave({ nombre, permisos, oculto });
+    onSave({ nombre, descripcion });
     onClose();
   };
 
@@ -57,7 +45,7 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
       <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-lg relative">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-secondary text-2xl"
+          className="absolute top-3 right-3 text-gray-400 hover:text-secondary text-2xl cursor-pointer"
         >
           ×
         </button>
@@ -84,62 +72,28 @@ const PermisosModal: React.FC<PermisosModalProps> = ({
               El nombre no puede estar vacío.
             </span>
           )}
-          <label className="flex items-center gap-2 mb-4">
-            <input
-              type="checkbox"
-              checked={oculto}
-              onChange={e => setOculto(e.target.checked)}
-            />
-            Ocultar este rol
+
+          <label className="block text-base font-semibold mb-2" htmlFor="descripcionRol">
+            Descripción
           </label>
-          <div>
-            <label className="block font-semibold mb-1">Permisos</label>
-            <ul className="mb-2">
-              {permisos.map((permiso, idx) => (
-                <li key={idx} className="flex items-center justify-between mb-1">
-                  <span>{permiso}</span>
-                  <button
-                    onClick={() => handleRemovePermiso(permiso)}
-                    className="text-secondary hover:text-secondary px-2 py-1"
-                  >
-                    Quitar
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                className="border rounded px-2 py-1 w-full"
-                value={nuevoPermiso}
-                placeholder="Agregar permiso"
-                onChange={e => setNuevoPermiso(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddPermiso();
-                  }
-                }}
-              />
-              <button
-                className="bg-secondary text-white rounded px-4 py-1 font-bold"
-                onClick={handleAddPermiso}
-                type="button"
-              >
-                +
-              </button>
-            </div>
-          </div>
+          <input
+            id="descripcionRol"
+            type="text"
+            value={descripcion}
+            onChange={e => setDescripcion(e.target.value)}
+            className="border rounded px-2 py-1 w-full mb-2"
+            placeholder="Descripción del rol"
+          />
         </div>
         <div className="flex justify-end gap-2">
           <button
-            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 cursor-pointer"
             onClick={onClose}
           >
             Cancelar
           </button>
           <button
-            className="px-4 py-2 rounded bg-secondary text-white hover:bg-[#bd1e23ce]"
+            className="px-4 py-2 rounded bg-secondary text-white hover:bg-[#bd1e23ce] cursor-pointer"
             onClick={handleSave}
             disabled={!nombre.trim()}
           >

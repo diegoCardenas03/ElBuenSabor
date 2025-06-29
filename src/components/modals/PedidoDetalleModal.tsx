@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { useAppDispatch } from '../../hooks/redux';
 import { updateEstadoPedidoThunk } from '../../hooks/redux/slices/PedidoReducer';
 import { Estado } from '../../types/enums/Estado';
@@ -16,7 +17,7 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
 
   return (
     
-    <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50'>
+    <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[1050]'>
       <div className='relative bg-white p-5 rounded-[20px] shadow-lg w-[90%] sm:w-[65%] lg:w-[40%]'>
         <button
           className="absolute top-3 right-4 cursor-pointer font-bold text-gray-500 hover:text-gray-800 text-2xl"
@@ -74,8 +75,21 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
           <button
             className={`${pedido.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
             onClick={async () => {
-              await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: Estado.CANCELADO }));
-              onClose();
+              Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Una vez cancelado, no podrás recuperar este pedido.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FF9D3A',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, cancelar pedido',
+                cancelButtonText: 'No, mantener pedido'
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  await dispatch(updateEstadoPedidoThunk({ pedidoId: pedido.id, nuevoEstado: Estado.CANCELADO }));
+                  onClose();
+                }
+              });
             }}
           >
             Cancelar pedido

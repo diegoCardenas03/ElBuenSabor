@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from '../auth/ProtectedRoute';
 import DetalleCompra from '../pages/detalleCompra';
 import Landing from "../pages/Landing";
 import Menu from '../pages/MenuPage';
@@ -9,20 +10,178 @@ import Configuracion from '../pages/admin/Configuracion';
 import { ScreenProducto } from '../pages/ScreenProducto';
 import MisPedidos from '../pages/MisPedidos';
 import MisDirecciones from '../pages/misDirecciones';
-import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
 import EstadisticaWithBoundary from '../pages/admin/Estadistica';
 import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
+import  Estadistica  from '../pages/admin/Estadistica';
+
 import { ScreenPromocion } from '../pages/admin/ScreenPromocion';
 import { PantallaCajero } from '../pages/admin/PantallaCajero';
 import Clientes from '../pages/admin/Clientes';
 import Empleados from '../pages/admin/Empleados';
 import ClientesEstadisticas from '../pages/admin/ClientesEstadisticas';
 
+import { CallbackPage } from '../pages/CallBackPage';
+import { LoginRedirect } from '../pages/LoginWithRedirect';
+import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
+import { PublicRoute } from './PublicRoute';
+import { PaginaNoExiste } from '../pages/PaginaNoExiste';
+
 const RoutesApp = () => {
   return (
+    <Routes>
+      <Route path="*" element={<PaginaNoExiste />} />
+      {/* Rutas públicas */}
+      <Route path="/"
+        element={<PublicRoute> <Landing /> </PublicRoute>} />
+      <Route path="/Menu" element={<PublicRoute><Menu /></PublicRoute>} />
+      <Route path="/callback" element={<PublicRoute><CallbackPage /></PublicRoute>} />
+      <Route path="/login-redirect" element={<PublicRoute><LoginRedirect /></PublicRoute>} />
+
+      {/* Rutas privadas para clientes */}
+      <Route
+        path="/DetalleCompra"
+        element={
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+            <DetalleCompra />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/MisDirecciones"
+        element={
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+            <MisDirecciones />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/MisPedidos'
+        element={
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+            <MisPedidos />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/Success'
+        element={
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+            <SuccessMP />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/Failure'
+        element={
+          <ProtectedRoute allowedRoles={['Cliente', 'SuperAdmin']}>
+            <FailureMP />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/MiPerfil"
+        element={
+          <ProtectedRoute allowedRoles={['Cliente']}>
+            <MiPerfilUsuarioPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rutas para empleados/admin */}
+      <Route
+        path="/admin/PedidosCocinero"
+        element={
+          <ProtectedRoute allowedRoles={['Cocinero', 'Admin', 'SuperAdmin', 'Cajero']}>
+            <PedidosCocinero />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Insumos"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin', 'Cocinero']}>
+            <ScreenInsumo />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/productos"
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin', 'Cocinero']}>
+            <ScreenProducto />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/admin/Configuracion'
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'SuperAdmin']}>
+            <Configuracion />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/PantallaCajero"
+        element={
+          <ProtectedRoute allowedRoles={['Cajero', 'Admin', 'SuperAdmin']}>
+            <PantallaCajero />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Delivery"
+        element={
+          <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin']}>
+            <Delivery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Promociones"
+        element={
+          <ProtectedRoute allowedRoles={['Cajero', 'Delivery', 'Admin', 'SuperAdmin', 'Cocinero']}>
+            <ScreenPromocion />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/MiPerfil"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin', 'Cocinero', 'Delivery', 'Cajero']}>
+            <MiPerfilEmpleadoPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Empleados"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
+            <Empleados />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Clientes"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
+            <Clientes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/Estadistica"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
+            <Estadistica />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+
+    /*  
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />}/>
@@ -48,6 +207,7 @@ const RoutesApp = () => {
         <Route path="/admin/ClientesEstadistica/:clienteId" element={<ClientesEstadisticas />} />
       </Routes>
     </BrowserRouter>
+    */
   );
 };
 

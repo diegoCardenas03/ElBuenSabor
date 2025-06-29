@@ -9,40 +9,81 @@ import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarri
 import Swal from 'sweetalert2';
 import { fetchPedidosByUsuario } from '../../hooks/redux/slices/PedidoReducer';
 import PedidoDetalleModal from '../modals/PedidoDetalleModal';
-import { Estado } from '../../types/enums/Estado';
 import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
+import { useAuthHandler } from '../../hooks/useAuthHandler';
+import { useAuth0 } from '@auth0/auth0-react';
 
 interface HeaderProps {
   showBackButton?: boolean;
   onBackClick?: () => void;
   whiteUserBar?: boolean;
-  nombreUsuario?: string;
+
   backgroundColor?: string;
 }
+
 
 export const Header: React.FC<HeaderProps> = ({
   showBackButton = true,
   onBackClick,
   whiteUserBar = false,
-  nombreUsuario = "Tung Tung Sahur",
   backgroundColor = "none",
 }) => {
+
+  const getFirstName = (fullName?: string) => {
+    if (!fullName) return "Usuario";
+    return fullName.split(" ")[0];
+  };
+
+
   const [navbarOpen, setNavbarOpen] = useState(false);
   const carrito = useAppSelector((state) => state.carrito.items);
   const carritoAbierto = useAppSelector((state) => state.carritoUI.abierto);
   const dispatch = useAppDispatch();
 
-  const usuarioLogeado = true;
-  const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
+  // ✅ NUEVO: Auth0 integration
+  const { isAuthenticated, isLoading, user, loginWithRedirect } = useAuth0();
+  const { authStatus } = useAuthHandler();
 
-   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
-   const clienteId = 1;
+  // --- OPTIMIZACIÓN: Leer datos de sessionStorage si existen ---
+  const sessionCompleted = sessionStorage.getItem('auth_completed') === 'true';
+  const sessionRole = sessionStorage.getItem('user_role');
+  const sessionToken = sessionStorage.getItem('auth_token');
+  const sessionName = sessionStorage.getItem('user_name'); // <-- NUEVO
+  const sessionEmail = sessionStorage.getItem('user_email');
+  const sessionPicture = sessionStorage.getItem('user_picture');
+  const sessionId = sessionStorage.getItem('user_id_db');
+  const hasSessionData = sessionCompleted && sessionRole && sessionToken;
+
+  // ✅ NUEVO: Determinar estado del usuario dinámicamente
+  const usuarioLogeado =
+    !!((isAuthenticated && authStatus === 'completed') || hasSessionData);
+
+  const nombreUsuario = usuarioLogeado
+    ? (sessionName || "Usuario")
+    : "Invitado";
+  const emailUsuario = sessionEmail || "Sin email";
+  const fotoUsuario = sessionPicture || "nada";
+
+  // Mostrar loading SOLO si no hay datos en sessionStorage y Auth0 está cargando
+  const isAppLoading =
+    (!hasSessionData && isLoading) ||
+    (isAuthenticated && authStatus === 'checking');
 
   useEffect(() => {
-    if (clienteId) {
-      dispatch(fetchPedidosByUsuario(clienteId));
+    if (isAppLoading) {
+      setNavbarOpen(false);
     }
-  }, [clienteId, dispatch]);
+  }, [isAppLoading]);
+  const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
+  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
+  console.log("Pedido en curso:", pedidoEnCurso);
+
+  
+  useEffect(() => {
+    if (sessionId) {
+      dispatch(fetchPedidosByUsuario(Number(sessionId)));
+    }
+  }, [sessionId, dispatch]);
 
   useEffect(() => {
     if (carritoAbierto && carrito.length === 0) {
@@ -53,9 +94,45 @@ export const Header: React.FC<HeaderProps> = ({
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
 
+  // ✅ CORREGIDO: Usar la variable combinada de loading
+  if (isAppLoading) {
+    return (
+      <header className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50 ${backgroundColor}`}>
+        <div className="flex-shrink-0 flex items-center z-10">
+          {showBackButton ? (
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={onBackClick}>
+              <Link to={"/"} className="flex items-center space-x-2">
+                <div className="bg-orange-400 rounded-full p-1.5">
+                  <FaArrowLeft color="white" />
+                </div>
+                <span className="font-tertiary text-black text-base">VOLVER</span>
+              </Link>
+            </div>
+          ) : (
+            <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+          )}
+        </div>
+
+        <Link to={"/"}>
+          {showBackButton && (
+            <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+              <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
+            </div>
+          )}
+        </Link>
+
+        <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+          <span className={`font-secondary text-base ${whiteUserBar ? "text-white" : "text-black"}`}>
+            Cargando...
+          </span>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header
-      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50 ${backgroundColor}`}
+      className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-[1020] ${backgroundColor}`}
     >
       {/* Izquierda - Contenedor dinámico */}
       <div className="flex-shrink-0 flex items-center z-10">
@@ -72,66 +149,76 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
           </div>
         ) : (
-          <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+          <div className="flex-shrink-0 flex items-center space-x-3 z-[9999]">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
             {!showBackButton && pedidoEnCurso && (
               <div className="flex-shrink-0 flex items-center space-x-3 z-10">
                 <div
-                  className={`h-5 border-l flex-shrink-0 text-secondary`}
+                  className={`h-5 border-l flex-shrink-0 text-secondary hidden md:block`}
                 ></div>
                 <span
                   key={pedidoEnCurso.id}
                   className="font-secondary text-base cursor-pointer max-w-[120px] truncate text-secondary"
                   onClick={() => setModalPedidoEnCurso(true)}
                 >
-                  Ver pedido en curso
+                  Ver pedido
                 </span>
               </div>
             )}
             {modalPedidoEnCurso &&
-              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => {setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(clienteId));}}/>
+              <PedidoDetalleModal pedido={pedidoEnCurso as PedidoResponseDTO} open={modalPedidoEnCurso} onClose={() => { setModalPedidoEnCurso(false); dispatch(fetchPedidosByUsuario(Number(sessionId))); }} />
             }
           </div>
         )}
       </div>
 
       {/* Logo centrado solo cuando hay botón de volver */}
-      <Link to={"/"}>
+      {/* <Link to={"/"}>
         {showBackButton && (
           <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
           </div>
         )}
-      </Link>
+      </Link> */}
 
       {/* Derecha - Usuario y carrito */}
+
       <div className="flex-shrink-0 flex items-center space-x-3 z-10">
-        <span
-          className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"
-            }`}
+        {isAuthenticated ? <span
+          className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
           onClick={handleUserClick}
-          title={nombreUsuario}
+          title={getFirstName(nombreUsuario)}
         >
           {nombreUsuario}
-        </span>
+        </span> : <span
+          className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
+          onClick={() => loginWithRedirect()}
+        >
+          INGRESAR
+        </span>}
+
         <div
-          className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"
-            }`}
-        ></div>
-        <FaShoppingCart
-          className="flex-shrink-0 cursor-pointer"
-          fill={whiteUserBar ? "white" : ""}
-          color={whiteUserBar ? "white" : "black"}
-          onClick={() => carrito.length === 0 ?
-            Swal.fire({
-              position: "center",
-              icon: "error",
-              title: "El carrito esta vacio",
-              showConfirmButton: false,
-              timer: 1000,
-              width: "20em"
-            }) : dispatch(abrirCarrito())}
-        />
+          className={`h-5 border-l flex-shrink-0 ${whiteUserBar ? "border-white" : "border-black"}`}
+        >
+        </div>
+
+        {isAuthenticated &&
+
+          <FaShoppingCart
+            className="flex-shrink-0 cursor-pointer"
+            fill={whiteUserBar ? "white" : ""}
+            color={whiteUserBar ? "white" : "black"}
+            onClick={() => carrito.length === 0 ?
+              Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "El carrito esta vacio",
+                showConfirmButton: false,
+                timer: 1000,
+                width: "20em"
+              }) : dispatch(abrirCarrito())}
+          />}
+
         {carritoAbierto && (
           <div className="fixed inset-0 z-50">
             <div
@@ -148,7 +235,9 @@ export const Header: React.FC<HeaderProps> = ({
         onClose={handleCloseNavbar}
         usuarioLogeado={usuarioLogeado}
         nombreUsuario={nombreUsuario}
-        whiteUserBar={navbarOpen ? true : whiteUserBar} // <- SIEMPRE BLANCO SI ESTÁ ABIERTO
+        fotoUsuario={fotoUsuario}
+        emailUsuario={emailUsuario}
+        whiteUserBar={navbarOpen ? true : whiteUserBar}
       />
     </header >
   );

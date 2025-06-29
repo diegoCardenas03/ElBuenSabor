@@ -9,9 +9,17 @@ export abstract class AbstractBackendClient<RequestType, ResponseType> {
 
   abstract getById(id: number): Promise<ResponseType | null>;
 
+  abstract getByAuth0Id(id: string): Promise<ResponseType | null>;
+
   abstract post(data: RequestType): Promise<ResponseType>;
   abstract put(id: number, data: RequestType): Promise<ResponseType>;
 
+  abstract putByAuth0Id(id: string, data: RequestType): Promise<ResponseType>;
+
   // Método abstracto para eliminar un elemento por su ID
   abstract delete(id: number): Promise<void>;
+
+  abstract deletePhysical(id: number): Promise<void>;
+
+  abstract deletePhysicalByAuth0Id(id: string): Promise<void>;
 }

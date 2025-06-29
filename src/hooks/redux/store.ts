@@ -7,11 +7,13 @@ import TablaReducer from "./slices/TableReducer"; // Importamos el reducer del s
 import domicilioReducer from './slices/DomicilioReducer';
 import abrirCarritoReducer from './slices/AbrirCarritoReducer';
 import pedidoReducer from './slices/PedidoReducer';
+import authReducer from './slices/AuthReducer'; 
 
 // Configuración de la tienda de Redux
 export const store = configureStore({
   reducer: {
     pedido: pedidoReducer,
+    auth: authReducer,
     carritoUI: abrirCarritoReducer,
     domicilio: domicilioReducer,
     carrito: carritoReducer,

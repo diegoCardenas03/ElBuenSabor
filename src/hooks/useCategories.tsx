@@ -7,9 +7,9 @@ export const useCategories = () => {
     const dispatch = useAppDispatch();
     const { selectedCategories, rubrosConInsumosVendibles } = useAppSelector((state) => state.products);
     const { rubros, rubrosInsumos } = useAppSelector((state) => state.rubros);
- console.log('rubros:', rubros);
-    console.log('rubrosInsumos:', rubrosInsumos);
-    console.log('rubrosConInsumosVendibles:', rubrosConInsumosVendibles)
+//  console.log('rubros:', rubros);
+    // console.log('rubrosInsumos:', rubrosInsumos);
+    // console.log('rubrosConInsumosVendibles:', rubrosConInsumosVendibles)
     // Crear categorías únicas para mostrar (sin duplicados por nombre)
     const categories = useMemo(() => {
         const categoryMap = new Map();
@@ -47,7 +47,7 @@ export const useCategories = () => {
 
     // Manejar selección - ahora pasamos el ID compuesto directamente
     const handleSelectCategory = (categoryId: string) => {
-        console.log('Seleccionando categoría:', categoryId);
+        // console.log('Seleccionando categoría:', categoryId);
         dispatch(toggleCategory(categoryId)); // Pasar directamente "producto-2" o "insumo-3"
     };
 

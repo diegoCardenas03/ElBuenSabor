@@ -16,13 +16,11 @@ function SuccessMP() {
         const params = new URLSearchParams(window.location.search);
         const status = params.get("status");
         if (status === "approved" && pedido) {
-            dispatch(enviarPedidoThunk(pedido)).then(() => {
-                localStorage.removeItem("pedidoMP");
-                dispatch(vaciarCarrito());
-                setTimeout(() => {
-                    navigate('/');
-                }, 3000);
-            });
+            localStorage.removeItem("pedidoMP");
+            dispatch(vaciarCarrito());
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
         } else {
             Swal.fire({
                 position: "center",

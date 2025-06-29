@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import imgDireccion from '../assets/icons/imgdireccion.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaAngleRight } from "react-icons/fa";
 import { Header } from '../components/commons/Header';
@@ -18,6 +17,10 @@ import { TbCash } from "react-icons/tb";
 import Swal from 'sweetalert2';
 import { isPromocion } from '../utils/isPromocion';
 import { enviarPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import { markerIcon } from './misDirecciones';
+import { formatearDireccion, truncar } from '../utils/DomicilioUtils';
+import { fetchDirecciones } from '../hooks/redux/slices/DomicilioReducer';
 
 const DetalleCompra = () => {
     const dispatch = useAppDispatch();
@@ -36,16 +39,14 @@ const DetalleCompra = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { subTotal, envio, total } = location.state || {};
-    const tarifaServicio = 0;
 
     useEffect(() => {
         if (carritoAbierto) dispatch(cerrarCarrito());
         if (tipoEntregaState) {
             dispatch(setMetodoPago(FormaPago.MERCADO_PAGO));
         }
+        dispatch(fetchDirecciones());
     }, [tipoEntregaState, dispatch, direcciones, carritoAbierto]);
-
-    const formatearDireccion = (d?: DomicilioDTO | null) => d ? `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}` : '';
 
     const handleDireccionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const temporal = direcciones.find(dir => dir.id === parseInt(e.target.value));
@@ -135,7 +136,7 @@ const DetalleCompra = () => {
         return {
             tipoEnvio: tipoEntrega!,
             formaPago: metodoPago!,
-            clienteId: 1,
+            clienteId: Number(sessionStorage.getItem('user_id_db')),
             domicilioId: tipoEntrega === TipoEnvio.DELIVERY ? direccionSeleccionada!.id : undefined,
             comentario: comentario || "",
             detallePedidos,
@@ -174,17 +175,48 @@ const DetalleCompra = () => {
     return (
         <>
             <Header />
-            <div className='bg-primary h-[100%] py-8 px-10 pt-25 '>
+            <div className='bg-primary h-[100%] py-5 px-10 pt-25 '>
                 <div className='lg:flex justify-between'>
                     <div>
-                        {tipoEntregaState ? (
-                            <div>
-                                <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>ENTREGA A DOMICILIO</h1>
-                                <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
+                        <div>
+                            <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>{tipoEntrega === TipoEnvio.RETIRO_LOCAL ? 'RETIRO EN TIENDA' : 'ENTREGA A DOMICILIO'}</h1>
+                            <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
+                                {tipoEntrega === TipoEnvio.RETIRO_LOCAL ? (
+                                    <div className='flex items-center pb-4'>
+                                        <MapContainer
+                                            center={[-32.8969915, -68.8536561]}
+                                            zoom={15}
+                                            scrollWheelZoom={false}
+                                            dragging={false}
+                                            style={{ height: "100px", width: "200px", borderRadius: "10px" }}
+                                        >
+                                            <TileLayer
+                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                            />
+
+                                            <Marker position={[-32.8969915, -68.8536561]} icon={markerIcon} />
+                                        </MapContainer>
+                                        <p className="font-bold text-[16px] pl-3 md:pl-8">
+                                            Cnel Rodríguez 273, M5500 Mendoza
+                                        </p>
+                                    </div>
+                                ) : (
                                     <div className='flex items-center justify-between pb-4'>
                                         <div className="flex items-center">
-                                            <img src={imgDireccion} alt="Dirección" className="w-20 h-20 mr-4" />
-                                            <p className="font-bold text-[16px]">
+                                            <MapContainer
+                                                center={[Number(direccionSeleccionada?.latitud), Number(direccionSeleccionada?.longitud)]}
+                                                zoom={15}
+                                                scrollWheelZoom={false}
+                                                dragging={false}
+                                                style={{ height: "100px", width: "200px", borderRadius: "10px" }}
+                                            >
+                                                <TileLayer
+                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                />
+
+                                                <Marker position={[Number(direccionSeleccionada?.latitud), Number(direccionSeleccionada?.longitud)]} icon={markerIcon} />
+                                            </MapContainer>
+                                            <p className="font-bold text-[15px] pl-3 md:pl-5">
                                                 {formatearDireccion(direcciones.find(d => d.id === direccionSeleccionada?.id)!)
                                                     || formatearDireccion(direccionSeleccionada)
                                                     || 'Seleccione una dirección'}
@@ -192,58 +224,18 @@ const DetalleCompra = () => {
                                         </div>
                                         <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setMostrarDirecciones(true)} />
                                     </div>
+                                )}
 
-                                    <div className="border-b border-gray-300 mb-4"></div>
+                                <div className="border-b border-gray-300 mb-4"></div>
 
-                                    <div className="flex items-center justify-between pb-4">
-                                        <p className={`${!comentarioState.actual ? 'font-bold' : 'text-gray-500'} text-[16px] pl-2`}>
-                                            {comentarioState.actual || "Agregar comentario"}
-                                        </p>
-                                        <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setAgregarComentario(true)} />
-                                    </div>
-
-                                    <div className="border-b border-gray-300 mb-4"></div>
-
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-bold text-[16px] pl-2">Delivery</p>
-                                        <p className="text-gray-500 pr-10">{ }</p>
-                                    </div>
+                                <div className="flex items-center justify-between">
+                                    <p className={`${!comentarioState.actual ? 'font-bold' : 'text-gray-500'} text-[16px] pl-2`}>
+                                        {truncar(comentarioState.actual) || "Agregar comentario"}
+                                    </p>
+                                    <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setAgregarComentario(true)} />
                                 </div>
                             </div>
-
-                        ) : (
-                            <div>
-                                <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>RETIRO EN TIENDA</h1>
-                                <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
-                                    <div className='flex items-center justify-between pb-4'>
-                                        <div className="flex items-center">
-                                            <img src={imgDireccion} alt="Dirección" className="w-20 h-20 mr-4" />
-                                            <p className="font-bold text-[16px]">
-                                                {"Dirección de la tienda"}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="border-b border-gray-300 mb-4"></div>
-
-                                    <div className="flex items-center justify-between pb-4">
-                                        <p className={`${!comentarioState.actual ? 'font-bold' : 'text-gray-500'} text-[16px] pl-2`}>
-                                            {comentarioState.actual || "Agregar comentario"}
-                                        </p>
-                                        <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setAgregarComentario(true)} />
-                                    </div>
-
-                                    <div className="border-b border-gray-300 mb-4"></div>
-
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-bold text-[16px] pl-2">En tienda</p>
-                                        <p className="text-gray-500 pr-10">{ }</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                        )}
-
+                        </div>
 
                         <div className='pt-10'>
                             <h1 className='font-tertiary text-secondary text-[20px] sm:text-[30px] pl-5 pb-5'>MEDIOS DE PAGO</h1>
@@ -285,28 +277,24 @@ const DetalleCompra = () => {
                     <div className="text-left lg:text-center ">
                         <h1 className="font-tertiary text-secondary text-[20px] sm:text-[30px] mb-5 pt-10 pl-5 lg:pt-0">RESUMEN</h1>
 
-                        <div className="bg-white shadow-md rounded-lg p-6 lg:w-[480px] lg:h-[300px] flex flex-col justify-between">
+                        <div className="bg-white shadow-md rounded-lg p-6 lg:w-[480px] lg:h-[230px] flex flex-col justify-between">
                             <div>
                                 <div className="flex justify-between mb-3">
                                     <p>Productos</p>
                                     <p>${subTotal} </p>
                                 </div>
                                 {tipoEntrega === TipoEnvio.DELIVERY && (
-                                    <div className="flex justify-between mb-3">
+                                    <div className="flex justify-between">
                                         <p>Envío</p>
                                         <p>${envio}</p>
                                     </div>
                                 )}
-                                <div className="flex justify-between mb-3">
-                                    <p>Tarifa de servicio</p>
-                                    <p>${tarifaServicio}</p>
-                                </div>
                             </div>
                             <div>
                                 <div className="border-t border-gray-300 my-2"></div>
                                 <div className="flex justify-between font-bold text-[16px]">
                                     <p>Total</p>
-                                    <p>${total + tarifaServicio}</p>
+                                    <p>${total}</p>
                                 </div>
                             </div>
                         </div>
@@ -332,17 +320,17 @@ const DetalleCompra = () => {
 
 
             {mostrarDirecciones && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative ">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999]">
+                    <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[500px] relative ">
                         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => { setMostrarDirecciones(false); setDireccionTemporal(direccionSeleccionada ?? null); }}>
                             ✕
                         </button>
 
-                        <h2 className="text-secondary font-primary font-bold pb-8 pl-5 text-[20px]">¿Donde querés recibir tu pedido?</h2>
+                        <h2 className="text-secondary font-primary font-bold pb-8 text-[20px] text-center">¿Donde querés recibir tu pedido?</h2>
 
                         <ul className="space-y-2">
                             {direcciones.map(dir => (
-                                <label key={dir.id} className='flex items-center cursor-pointer pl-8'>
+                                <label key={dir.id} className='flex items-center cursor-pointer pl-2'>
                                     <input
                                         type='radio'
                                         name='direccion'
@@ -367,12 +355,12 @@ const DetalleCompra = () => {
             )}
 
             {agregarComentario && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999]">
                     <div className="bg-primary p-6 rounded-lg shadow-lg w-[350px] md:w-[450px] relative">
                         <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 cursor-pointer" onClick={() => { setAgregarComentario(false); setComentarioState({ ...comentarioState, temporal: comentarioState.actual }); }}>
                             ✕
                         </button>
-                        <h2 className="text-secondary font-primary font-bold pb-8 pl-5 text-[20px]">¿Qué comentario querés agregar?</h2>
+                        <h2 className="text-secondary font-primary font-bold pb-8 text-[20px] text-center">¿Qué comentario querés agregar?</h2>
 
                         <textarea
                             className='bg-white w-full h-24 border-none rounded-lg p-4'

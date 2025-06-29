@@ -44,12 +44,10 @@ function CheckoutMP({ pedido }: Props) {
 
     return (
         <>
-            <div className='flex justify-center items-center'>
-                <button onClick={getPreferenceMP} className="flex justify-center items-center bg-[#00AFF0] text-white rounded-full w-100 h-10 text-[18px] md:w-80 hover:scale-102 transition-transform duration-200 cursor-pointer" disabled={carrito.length === 0}>
-                    Pagar
-                    <img src={mpIcon} alt="" className='w-8 ml-3' />
-                </button>
-            </div>
+            <button onClick={getPreferenceMP} className="flex justify-center items-center bg-[#00AFF0] text-white rounded-full w-100 md:w-80 h-10 text-[18px] hover:scale-102 transition-transform duration-200 cursor-pointer" disabled={carrito.length === 0}>
+                Pagar
+                <img src={mpIcon} alt="" className='w-8 ml-3' />
+            </button>
         </>
     );
 }

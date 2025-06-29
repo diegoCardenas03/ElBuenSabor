@@ -191,12 +191,53 @@ const PedidosCocinero: React.FC = () => {
                                         <div className="mt-2 p-2 bg-white rounded">
                                             <p><b>Cantidad:</b> {detalle.cantidad}</p>
                                             <p><b>Producto:</b> {detalle.producto.denominacion}</p>
+                                            <p><b>Receta:</b>
+                                              {detalle.producto.detalleProductos.map((dp, index) => (
+                                                <span key={index}>
+                                                  {dp.insumo.denominacion} x{dp.cantidad} ({dp.insumo.unidadMedida})
+                                                  {index < detalle.producto.detalleProductos.length - 1 ? ', ' : ''}
+                                                </span>
+                                              ))}</p>
                                         </div>
                                     )}
                                     {detalle.insumo && detalle.insumo.esParaElaborar == false && (
                                         <div className="mt-2 p-2 bg-white rounded">
                                             <p><b>Cantidad:</b> {detalle.cantidad}</p>
                                             <p><b>Insumo:</b> {detalle.insumo.denominacion}</p>
+                                        </div>
+                                    )}
+                                    {detalle.promocion && (
+                                        <div className="mt-2 p-2 bg-white rounded">
+                                            <p><b>Cantidad:</b> {detalle.cantidad}</p>
+                                            <p><b>Promocion:</b> {detalle.promocion.denominacion}</p>
+                                            <p><b>Productos incluidos:</b></p>
+                                            <ul className="list-disc pl-5">
+                                                {Array.isArray(detalle.promocion.detallePromociones) &&
+                                                    detalle.promocion.detallePromociones.map((dp, index) => (
+                                                        <li key={index}>
+                                                            {dp.producto
+                                                                ? dp.producto.denominacion
+                                                                : dp.insumo
+                                                                    ? dp.insumo.denominacion
+                                                                    : "Ítem desconocido"}
+                                                            {dp.cantidad ? ` x${dp.cantidad}` : ""}
+                                                        </li>
+                                                    ))}
+                                            </ul>
+                                            <p><b>Receta:</b>
+                                              {detalle.promocion.detallePromociones.map((dp, index) =>
+                                                dp.producto && Array.isArray(dp.producto.detalleProductos)
+                                                  ? dp.producto.detalleProductos.map((detalleProd, idx) => (
+                                                      <span key={idx}>
+                                                        {detalleProd.insumo.denominacion} x{detalleProd.cantidad} ({detalleProd.insumo.unidadMedida})
+                                                        {idx < dp.producto.detalleProductos.length - 1 ? ', ' : ''}
+                                                      </span>
+                                                    ))
+                                                  : dp.insumo
+                                                    ? `${dp.insumo.denominacion} x${dp.cantidad} (${dp.insumo.unidadMedida})`
+                                                    : "Ítem desconocido"
+                                              )}
+                                            </p>
                                         </div>
                                     )}
                                 </React.Fragment>

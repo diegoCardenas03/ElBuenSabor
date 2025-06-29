@@ -13,7 +13,7 @@ import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
-import Swal from 'sweetalert2'; // <-- Importar SweetAlert
+import Swal from 'sweetalert2'; 
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -85,7 +85,7 @@ const MisPedidos = () => {
         <button
           className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
           onClick={() => {
-            if (pedido.estado === Estado.TERMINADO) {
+            if (pedido.estado === Estado.TERMINADO || pedido.estado === Estado.ENTREGADO) {
               window.open(`http://localhost:8080/api/facturas/pdf/${pedido.id}`, '_blank');
             } else {
               Swal.fire({
@@ -129,7 +129,7 @@ const MisPedidos = () => {
 
   const getPedidos = async () => {
     try {
-      const pedidoData = await misPedidosService.getAll();
+      const pedidoData = await misPedidosService.getPedidosByUsuario(Number(sessionStorage.getItem("user_id_db") || 0));
       // Mapeo PedidoResponseDTO a PedidoDTO
       const pedidosDTO = pedidoData.map((p) => ({
         id: p.id,
@@ -165,7 +165,7 @@ const MisPedidos = () => {
   return (
     <>
       <Header />
-      <div className='w-full h-full bg-primary pb-10 pt-20'>
+      <div className='w-full h-screen bg-primary pb-10 pt-20'>
         <h1 className='font-tertiary text-center text-[30px] pt-10'>Mis Pedidos</h1>
         <div className='flex flex-col md:flex-row justify-center items-center mt-5 mb-5'>
           <div className='flex items-center mt-4 mb-2 lg:pl-5 sm:w-[60%] lg:w-[70%] gap-10'>
