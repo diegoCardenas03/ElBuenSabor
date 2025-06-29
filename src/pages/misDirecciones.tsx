@@ -120,8 +120,14 @@ const MisDirecciones = () => {
             (data.address.state === "Mendoza" || data.display_name?.toLowerCase().includes("mendoza"))
         ) {
             return data;
+        }else{
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'La ubicación seleccionada no corresponde a Mendoza, por favor elige otra ubicación',
+            });
+            return null;
         }
-        return null;
     }
 
     async function geocodeDireccion({ calle, numero, localidad, codigoPostal }: DomicilioDTO) {
