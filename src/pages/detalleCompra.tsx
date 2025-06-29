@@ -157,13 +157,9 @@ const DetalleCompra = () => {
                 showConfirmButton: false,
                 timer: 1000,
                 width: "20em"
-            }).then(() => {
-                dispatch(vaciarCarrito());
-                navigate('/');
-            });
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            })
+            dispatch(vaciarCarrito());
+            navigate('/');
         } catch (error) {
             Swal.fire({
                 position: "center",
@@ -206,28 +202,31 @@ const DetalleCompra = () => {
                                     </div>
                                 ) : (
                                     <div className='flex items-center justify-between pb-4'>
-                                        <div className="flex items-center">
-                                            <MapContainer
-                                                center={[Number(direccionSeleccionada?.latitud), Number(direccionSeleccionada?.longitud)]}
-                                                zoom={15}
-                                                scrollWheelZoom={false}
-                                                dragging={false}
-                                                style={{ height: "100px", width: "200px", borderRadius: "10px" }}
-                                            >
-                                                <TileLayer
-                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                />
+                                        {direccionSeleccionada &&
+                                            <div className="flex items-center">
+                                                <MapContainer
+                                                    center={[Number(direccionSeleccionada?.latitud), Number(direccionSeleccionada?.longitud)]}
+                                                    zoom={15}
+                                                    scrollWheelZoom={false}
+                                                    dragging={false}
+                                                    style={{ height: "100px", width: "200px", borderRadius: "10px" }}
+                                                >
+                                                    <TileLayer
+                                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                    />
 
-                                                <Marker position={[Number(direccionSeleccionada?.latitud), Number(direccionSeleccionada?.longitud)]} icon={markerIcon} />
-                                            </MapContainer>
-                                            <p className="font-bold text-[15px] pl-3 md:pl-5">
-                                                {formatearDireccion(direcciones.find(d => d.id === direccionSeleccionada?.id)!)
-                                                    || formatearDireccion(direccionSeleccionada)
-                                                    || 'Seleccione una dirección'}
-                                            </p>
-                                        </div>
+                                                    <Marker position={[Number(direccionSeleccionada?.latitud), Number(direccionSeleccionada?.longitud)]} icon={markerIcon} />
+                                                </MapContainer>
+                                                <p className="font-bold text-[15px] pl-3 md:pl-5">
+                                                    {formatearDireccion(direcciones.find(d => d.id === direccionSeleccionada?.id)!)
+                                                        || formatearDireccion(direccionSeleccionada)
+                                                        || 'Seleccione una dirección'}
+                                                </p>
+                                            </div>
+                                        }
                                         <FaAngleRight stroke='2' className="text-gray-600 cursor-pointer" onClick={() => setMostrarDirecciones(true)} />
                                     </div>
+
                                 )}
 
                                 <div className="border-b border-gray-300 mb-4"></div>

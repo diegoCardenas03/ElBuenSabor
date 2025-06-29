@@ -79,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
   console.log("Pedido en curso:", pedidoEnCurso);
   
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId && user) {
       dispatch(fetchPedidosByUsuario(Number(sessionId)));
     }
   }, [sessionId, dispatch]);

@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Rol } from "../../types/enums/Rol";
 import { UsuarioResponseDTO } from "../../types/Usuario/UsuarioResponseDTO";
 import axios from "axios";
-import { RolResponseDTO } from "../../types/Rol/RolResponseDTO";
 import { useAuth0 } from "@auth0/auth0-react";
 
 interface AdminHeaderProps {
@@ -71,8 +70,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/promociones', label: 'Promociones' },
       { path: '/admin/pantallaCajero', label: 'Cajero' },
       { path: '/admin/pedidosCocinero', label: 'Pedidos' },
-      { path: '/admin/ProductosEstadisticas', label: 'Productos Estadisticas' },
-      { path: '/admin/ClientesEstadisticas/:clienteId', label: 'Cliente Estadisticas' },
     ]
     ,
     Admin: [
@@ -87,8 +84,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/promociones', label: 'Promociones' },
       { path: '/admin/pantallaCajero', label: 'Cajero' },
       { path: '/admin/pedidosCocinero', label: 'Pedidos' },
-      { path: '/admin/ProductosEstadisticas', label: 'Productos Estadisticas' },
-      { path: '/admin/ClientesEstadisticas/:clienteId', label: 'Cliente Estadisticas' },
 
     ],
     Cocinero: [
