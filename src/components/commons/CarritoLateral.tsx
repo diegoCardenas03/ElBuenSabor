@@ -32,7 +32,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
   const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0).toFixed(2);
   const envio = tipoEntrega == TipoEnvio.DELIVERY ? 2000 : 0;
-  const total = subTotal + envio;
+  const total = Number(subTotal + envio).toFixed(2);
 
   const handleRealizarPedido = async () => {
     if (pedidoEnCurso) {
