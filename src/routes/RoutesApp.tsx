@@ -179,6 +179,22 @@ const RoutesApp = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/ProductosEstadistica"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
+            <ProductosEstadistica />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/ClientesEstadistica/:clienteId"
+        element={
+          <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
+            <ClientesEstadisticas/>
+          </ProtectedRoute>
+        }
+      />
     </Routes>
 
     /*  

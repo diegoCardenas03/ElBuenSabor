@@ -69,9 +69,12 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/configuracion', label: 'Configuración' },
       { path: '/admin/delivery', label: 'Delivery' },
       { path: '/admin/promociones', label: 'Promociones' },
-      { path: '/admin/pantallaCajero', label: 'Cajero' }
+      { path: '/admin/pantallaCajero', label: 'Cajero' },
+      { path: '/admin/pedidosCocinero', label: 'Pedidos' },
+      { path: '/admin/ProductosEstadisticas', label: 'Productos Estadisticas' },
+      { path: '/admin/ClientesEstadisticas/:clienteId', label: 'Cliente Estadisticas' },
     ]
-,
+    ,
     Admin: [
       { path: '/admin/MiPerfil', label: 'Mi Perfil' },
       { path: '/admin/insumos', label: 'Insumos' },
@@ -82,7 +85,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       { path: '/admin/configuracion', label: 'Configuración' },
       { path: '/admin/delivery', label: 'Delivery' },
       { path: '/admin/promociones', label: 'Promociones' },
-      { path: '/admin/pantallaCajero', label: 'Cajero' }
+      { path: '/admin/pantallaCajero', label: 'Cajero' },
+      { path: '/admin/pedidosCocinero', label: 'Pedidos' },
+      { path: '/admin/ProductosEstadisticas', label: 'Productos Estadisticas' },
+      { path: '/admin/ClientesEstadisticas/:clienteId', label: 'Cliente Estadisticas' },
 
     ],
     Cocinero: [
