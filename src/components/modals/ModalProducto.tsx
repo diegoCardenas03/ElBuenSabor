@@ -23,7 +23,6 @@ import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
 import Swal from "sweetalert2";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
-import { ProductoResponseDTO } from "../../types/Producto/ProductoResponseDTO";
 import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
 
 interface IModalProducto {

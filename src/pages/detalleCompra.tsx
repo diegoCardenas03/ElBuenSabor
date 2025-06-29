@@ -19,7 +19,7 @@ import { isPromocion } from '../utils/isPromocion';
 import { enviarPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import { markerIcon } from './misDirecciones';
-import { formatearDireccion, truncar } from '../utils/DomicilioUtils';
+import { formatearDireccion, truncar } from '../utils/Utils';
 import { fetchDirecciones } from '../hooks/redux/slices/DomicilioReducer';
 
 const DetalleCompra = () => {

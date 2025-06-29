@@ -90,6 +90,8 @@ export const ModalEmpleado = ({
                 numero: 0,
                 localidad: "",
                 codigoPostal: 0,
+                latitud: 0,
+                longitud: 0,
             },
             activo: true,
         };
@@ -217,9 +219,9 @@ export const ModalEmpleado = ({
                                         placeholder="Email"
                                         style={{
                                             marginBottom: 8,
-                                            backgroundColor: empleado ? "#e0e0e0" : undefined, 
-                                            color: empleado ? "#555" : undefined,             
-                                            cursor: empleado ? "not-allowed" : undefined       
+                                            backgroundColor: empleado ? "#e0e0e0" : undefined,
+                                            color: empleado ? "#555" : undefined,
+                                            cursor: empleado ? "not-allowed" : undefined
                                         }}
                                         disabled={!!empleado}
                                     />

@@ -8,9 +8,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { EmpleadoDTO } from "../types/Empleado/EmpleadoDTO";
 import { EmpleadoResponseDTO } from "../types/Empleado/EmpleadoResponseDTO";
-import { DomicilioResponseDTO } from "../types/Domicilio/DomicilioResponseDTO";
 import { DomicilioDTO } from "../types/Domicilio/DomicilioDTO";
-import { setDireccion } from "../hooks/redux/slices/CarritoReducer";
 
 type PerfilEmpleadoForm = {
   nombre: string;

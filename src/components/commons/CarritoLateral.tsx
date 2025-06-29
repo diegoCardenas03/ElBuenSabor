@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDireccion, setTipoEntrega, vaciarCarrito } from '../../hooks/redux/slices/CarritoReducer';
 import { fetchDirecciones } from '../../hooks/redux/slices/DomicilioReducer';
 import Swal from 'sweetalert2';
-import { formatearDireccion, truncar } from '../../utils/DomicilioUtils';
+import { formatearDireccion, truncar } from '../../utils/Utils';
 
 type Props = {
   onClose: () => void;
