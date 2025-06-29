@@ -36,7 +36,6 @@ const DetalleCompra = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { subTotal, envio, total } = location.state || {};
-    const tarifaServicio = 0;
 
     useEffect(() => {
         if (carritoAbierto) dispatch(cerrarCarrito());
@@ -297,16 +296,12 @@ const DetalleCompra = () => {
                                         <p>${envio}</p>
                                     </div>
                                 )}
-                                <div className="flex justify-between mb-3">
-                                    <p>Tarifa de servicio</p>
-                                    <p>${tarifaServicio}</p>
-                                </div>
                             </div>
                             <div>
                                 <div className="border-t border-gray-300 my-2"></div>
                                 <div className="flex justify-between font-bold text-[16px]">
                                     <p>Total</p>
-                                    <p>${total + tarifaServicio}</p>
+                                    <p>${total}</p>
                                 </div>
                             </div>
                         </div>
