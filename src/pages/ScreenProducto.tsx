@@ -45,6 +45,10 @@ export const ScreenProducto = () => {
       key: "descripcion",
     },
     {
+      label:"Precio costo",
+      key:"precioCosto"
+    },
+    {
       label: "Precio Venta",
       key: "precioVenta",
     },
