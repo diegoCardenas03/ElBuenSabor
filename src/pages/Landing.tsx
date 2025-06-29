@@ -12,6 +12,8 @@ import { useAppDispatch } from "../hooks/redux";
 import { fetchProducts, fetchInsumosVendibles } from "../hooks/redux/slices/ProductReducer";
 import { fetchRubrosProductos, fetchRubrosInsumos } from "../hooks/redux/slices/RubroReducer";
 import { motion } from "framer-motion";
+import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { markerIcon } from "./misDirecciones";
 
 const Landing = () => {
   const dispatch = useAppDispatch();
@@ -188,18 +190,19 @@ const Landing = () => {
             viewport={{ once: true }}
             className="w-full h-80 rounded-xl overflow-hidden shadow-md"
           >
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3360.610138720327!2d-68.84449952496326!3d-32.89049857362564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967e091c2f7b2dcd%3A0x62df92a4f6a3eb96!2sUTN%20Facultad%20Regional%20Mendoza!5e0!3m2!1ses-419!2sar!4v1713465943429"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
-            <p className="text-sm text-center mt-2 font-primary font-bold text-black">
-              Dirección: Av Belgrano 671, Mendoza, Argentina
-            </p>
+            <MapContainer
+              center={[-32.8969915, -68.8536561]}
+              zoom={15}
+              scrollWheelZoom={false}
+              dragging={false}
+              style={{ height: "100%", width: "100%", borderRadius: "10px" }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+
+              <Marker position={[-32.8969915, -68.8536561]} icon={markerIcon} />
+            </MapContainer>
           </motion.div>
         </div>
       </div>

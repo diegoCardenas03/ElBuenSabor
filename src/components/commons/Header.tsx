@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
   console.log("Pedido en curso:", pedidoEnCurso);
 
-
+  
   useEffect(() => {
     if (sessionId) {
       dispatch(fetchPedidosByUsuario(Number(sessionId)));
@@ -149,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
             </Link>
           </div>
         ) : (
-          <div className="flex-shrink-0 flex items-center space-x-3 z-[1020]">
+          <div className="flex-shrink-0 flex items-center space-x-3 z-[9999]">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
             {!showBackButton && pedidoEnCurso && (
               <div className="flex-shrink-0 flex items-center space-x-3 z-10">

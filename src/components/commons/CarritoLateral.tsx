@@ -5,8 +5,8 @@ import { TipoEnvio } from '../../types/enums/TipoEnvio';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDireccion, setTipoEntrega, vaciarCarrito } from '../../hooks/redux/slices/CarritoReducer';
 import { fetchDirecciones } from '../../hooks/redux/slices/DomicilioReducer';
-import { DomicilioResponseDTO } from '../../types/Domicilio/DomicilioResponseDTO';
 import Swal from 'sweetalert2';
+import { formatearDireccion, truncar } from '../../utils/DomicilioUtils';
 
 type Props = {
   onClose: () => void;
@@ -28,10 +28,8 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
     setLoading(false);
   }, [dispatch])
 
-  const formatearDireccion = (d: DomicilioResponseDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
-
   const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0).toFixed(2);
-  const envio = tipoEntrega == TipoEnvio.DELIVERY ? 2000 : 0;
+  const envio = tipoEntrega == TipoEnvio.DELIVERY ? 1500 : 0;
   const total = Number(subTotal + envio).toFixed(2);
 
   const handleRealizarPedido = async () => {
@@ -175,11 +173,6 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
             </button>
           </div>
 
-          {/* <div className="flex items-center space-x-4 mb-4">
-            <FaRegClock stroke='2' className='w-7 h-7' />
-            <p className="text-gray-700">12:00</p>
-          </div> */}
-
           {tipoEntrega === TipoEnvio.DELIVERY && (
             <div className="flex items-center space-x-4 mb-5">
               <FaMapMarkerAlt stroke='2' className='w-7 h-7' />
@@ -191,10 +184,10 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                   dispatch(setDireccion(dir || null));
                 }}
               >
-                <option value="" disabled>Seleccionar dirección</option>
+                <option disabled>Seleccionar dirección</option>
                 {direcciones.map((dir) => (
                   <option key={dir.id} value={dir.id}>
-                    {formatearDireccion(dir)}
+                   {truncar(formatearDireccion(dir))}
                   </option>
                 ))}
               </select>

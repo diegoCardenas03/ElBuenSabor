@@ -13,7 +13,7 @@ import 'leaflet/dist/leaflet.css';
 import Swal from 'sweetalert2';
 import { DetalleDomicilioDTO } from '../types/DetalleDomicilio/DetalleDomicilioDTO';
 
-const markerIcon = new L.Icon({
+export const markerIcon = new L.Icon({
     iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
@@ -147,7 +147,7 @@ const MisDirecciones = () => {
         <>
             <Header />
             <div className="pt-20 bg-primary flex flex-col justify-center align-center">
-                <h1 className="font-tertiary pt-10 text-[40px] flex justify-center">Mis Direcciones</h1>
+                <h1 className="font-tertiary pt-10 text-[35px] md:text-[40px] flex justify-center">Mis Direcciones</h1>
 
                 <div className='flex justify-center pt-8 pb-12'>
                     <button className="cursor-pointer bg-tertiary rounded-full text-md max-w-sm px-5 py-1 hover:scale-102 transition-transform duration-200"
@@ -172,9 +172,9 @@ const MisDirecciones = () => {
                                 style={{ height: "130px", width: "100%", borderRadius: "10px", marginBottom: "1rem" }}
                             >
                                 <TileLayer
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
+                                
                                 <Marker position={[d.latitud, d.longitud]} icon={markerIcon} />
                             </MapContainer>
                             <div className='flex justify-around'>
@@ -272,9 +272,9 @@ const MisDirecciones = () => {
                                 style={{ height: "200px", width: "100%", marginBottom: "1rem", borderRadius: "10px" }}
                             >
                                 <TileLayer
-                                    attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
+                               
                                 <LocationSelector
                                     onChange={async ({ lat, lng }) => {
                                         setDireccionNueva((prev) => ({ ...prev, latitud: lat, longitud: lng }));
