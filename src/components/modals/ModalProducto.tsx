@@ -24,6 +24,8 @@ import Swal from "sweetalert2";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
 import { ProductoResponseDTO } from "../../types/Producto/ProductoResponseDTO";
+import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
+
 interface IModalProducto {
   getProductos: () => void;
   openModal: boolean;
@@ -44,7 +46,7 @@ export const ModalProducto = ({
 
   const apiProducto = new ProductoService();
   const [rubros, setRubros] = useState<RubroProductoResponseDTO[]>([]);
-  const [insumos, setInsumos] = useState<any[]>([]);
+  const [insumos, setInsumos] = useState<InsumoResponseDTO[]>([]);
   const [insumoId, setInsumoId] = useState<number>(0);
   const [cantidad, setCantidad] = useState<number>(1);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -211,7 +213,7 @@ export const ModalProducto = ({
               }
               getProductos();
               handleClose();
-            } catch (error: any) {
+            } catch (error) {
               setStatus(
                 error instanceof Error
                   ? error.message
@@ -412,7 +414,7 @@ export const ModalProducto = ({
                                   setFieldValue(
                                     "detalleProductos",
                                     values.detalleProductos.filter(
-                                      (_: any, i: number) => i !== idx
+                                      (_: DetalleProductoDTO, i: number) => i !== idx
                                     )
                                   );
                                 }}
