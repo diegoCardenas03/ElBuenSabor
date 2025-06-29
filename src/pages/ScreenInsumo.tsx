@@ -55,6 +55,12 @@ export const ScreenInsumo = () => {
     getInsumos();
   }, [filtros]);
 
+  useEffect(() => {
+    if (openModalCompra) {
+      cargarInsumos();
+    }
+  }, [openModalCompra]);
+
   const ColumnsTableInsumo = [
     { label: "Denominación", key: "denominacion" },
     { label: "Precio Costo", key: "precioCosto" },
@@ -182,7 +188,12 @@ export const ScreenInsumo = () => {
       </div>
 
       <ModalInsumo getInsumos={getInsumos} openModal={openModal} setOpenModal={setOpenModal} />
-      <ModalCompra open={openModalCompra} setOpen={setOpenModalCompra} insumos={insumos} onCompraExitosa={cargarInsumos} />
+      <ModalCompra
+        open={openModalCompra}
+        setOpen={setOpenModalCompra}
+        insumos={insumos}
+        onCompraExitosa={cargarInsumos}
+      />
 
       {modalFilters && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
