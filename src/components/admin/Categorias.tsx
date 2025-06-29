@@ -239,7 +239,7 @@ const Categorias = () => {
     setEditando(false);
     setRubroEditando(null);
     setNombreRubro("");
-    setTipoRubro("Insumo");
+    setTipoRubro(opcionFiltrar === "Producto" ? "Producto" : "Insumo");
     setRubroPadreSeleccionado("");
   };
 
