@@ -148,7 +148,7 @@ const DetalleCompra = () => {
 
         const pedido = pedidoArmado();
         try {
-            await dispatch(enviarPedidoThunk(pedido));
+            await dispatch(enviarPedidoThunk(pedido)).unwrap();
 
             Swal.fire({
                 position: "center",
@@ -157,9 +157,13 @@ const DetalleCompra = () => {
                 showConfirmButton: false,
                 timer: 1000,
                 width: "20em"
+            }).then(() => {
+                dispatch(cerrarCarrito());
+                navigate('/');
             });
-            dispatch(vaciarCarrito());
-            navigate('/');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } catch (error) {
             Swal.fire({
                 position: "center",

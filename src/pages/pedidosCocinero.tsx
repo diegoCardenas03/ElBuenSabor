@@ -195,7 +195,7 @@ const PedidosCocinero: React.FC = () => {
                                               {detalle.producto.detalleProductos.map((dp, index) => (
                                                 <span key={index}>
                                                   {dp.insumo.denominacion} x{dp.cantidad} ({dp.insumo.unidadMedida})
-                                                  {index < detalle.producto.detalleProductos.length - 1 ? ', ' : ''}
+                                                  {index < index - 1 ? ', ' : ''} {/*{index < detalle.producto.detalleProductos.length - 1 ? ', ' : ''} */}
                                                 </span>
                                               ))}</p>
                                         </div>

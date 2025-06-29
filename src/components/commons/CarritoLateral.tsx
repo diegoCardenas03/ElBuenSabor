@@ -73,7 +73,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       return;
     }
 
-    if (direcciones.length === 0) {
+    if (tipoEntrega === TipoEnvio.DELIVERY && direcciones.length === 0) {
       Swal.fire({
         position: "center",
         icon: "error",

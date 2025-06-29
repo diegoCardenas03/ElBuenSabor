@@ -8,6 +8,8 @@ export const mostrarSoloNumero = (codigo: string) => {
 
 export const getEstadoTexto = (estado: Estado) => {
   switch (estado) {
+    case Estado.PENDIENTE_FACTURACION:
+      return "Pendiente de facturación";
     case Estado.SOLICITADO:
       return "Solicitado";
     case Estado.EN_PREPARACION:

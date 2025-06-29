@@ -13,7 +13,7 @@ import { TipoEnvio } from '../types/enums/TipoEnvio';
 import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
@@ -42,7 +42,7 @@ const MisPedidos = () => {
     {
       label: "Estado",
       key: "estado",
-      render: (pedido: PedidoResponseDTO) => getEstadoTexto(pedido.estado),
+      render: (pedido: PedidoResponseDTO) => pedido.estado === Estado.CANCELADO ? <p className='text-red-500'>{getEstadoTexto(pedido.estado)}</p> : <p>{getEstadoTexto(pedido.estado)}</p>,
       className: "hidden sm:table-cell",
     },
     {
