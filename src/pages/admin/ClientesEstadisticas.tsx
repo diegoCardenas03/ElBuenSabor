@@ -51,6 +51,27 @@ type PedidoDetalleModalProps = {
 const PedidoDetalleModal = ({ pedido, onClose }: PedidoDetalleModalProps) => {
   const subtotalProductos = (pedido.productos || []).reduce((acc, prod) => acc + (prod.precio || 0), 0);
 
+  const puedeDescargarFactura = pedido.estado === "TERMINADO" || pedido.estado === "ENTREGADO";
+
+  const handleDescargarFactura = async () => {
+    if (!puedeDescargarFactura) {
+      alert("La factura estará disponible cuando el pedido esté TERMINADO.");
+      return;
+    }
+    try {
+      // Ajusta la URL según tu backend, normalmente: /api/facturas/pdf/{pedidoId}
+      const res = await fetch(`${API_BASE}/api/facturas/pdf/${pedido.id}`);
+      if (!res.ok) {
+        alert("No se pudo descargar la factura.");
+        return;
+      }
+      const blob = await res.blob();
+      saveAs(blob, `factura_pedido_${pedido.numeroPedido}.pdf`);
+    } catch (err) {
+      alert("Error al descargar la factura.");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-opacity-20 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-lg p-6 min-w-[320px] max-w-md relative" onClick={e => e.stopPropagation()}>
@@ -76,6 +97,17 @@ const PedidoDetalleModal = ({ pedido, onClose }: PedidoDetalleModalProps) => {
           <div><b>Subtotal productos:</b> {formatPrecio(subtotalProductos)}</div>
           {pedido.costoEnvio ? <div><b>Costo de envío:</b> {formatPrecio(pedido.costoEnvio)}</div> : null}
           <div><b>Total del pedido:</b> {formatPrecio(pedido.importeTotal)}</div>
+        </div>
+        {/* --- BOTÓN DESCARGAR FACTURA --- */}
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={handleDescargarFactura}
+            disabled={!puedeDescargarFactura}
+            className={`bg-secondary hover:bg-secondary/80 text-white font-bold rounded-lg px-4 py-2 shadow ${!puedeDescargarFactura ? "opacity-50 cursor-not-allowed" : ""}`}
+            title={!puedeDescargarFactura ? "La factura estará disponible cuando el pedido esté TERMINADO." : "Descargar factura"}
+          >
+            Descargar Factura
+          </button>
         </div>
       </div>
     </div>
