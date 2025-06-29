@@ -9,7 +9,7 @@ import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { IoFilterSharp } from "react-icons/io5";
-
+import { useProductoSocket } from "../hooks/usesProductoSocket";
 export const ScreenProducto = () => {
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -179,6 +179,10 @@ export const ScreenProducto = () => {
     getProductos();
     // eslint-disable-next-line
   }, [filtros]);
+
+  useProductoSocket(() => {
+    getProductos();
+  });
 
   return (
     <>

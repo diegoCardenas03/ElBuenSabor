@@ -4,9 +4,10 @@ import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { vaciarCarrito } from "../hooks/redux/slices/CarritoReducer";
 import { useNavigate } from "react-router-dom";
 import pizzaImg from '../assets/pizza-roja.png';
+import { enviarPedidoThunk } from "../hooks/redux/slices/PedidoReducer";
+import Swal from "sweetalert2";
 
 function SuccessMP() {
-    const pedidoService = new PedidosService();
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -16,10 +17,19 @@ function SuccessMP() {
         const status = params.get("status");
         if (status === "approved" && pedido) {
             localStorage.removeItem("pedidoMP");
-                dispatch(vaciarCarrito());
-                setTimeout(() => {
-                    navigate('/');
-                }, 3000);
+            dispatch(vaciarCarrito());
+            setTimeout(() => {
+                navigate('/');
+            }, 3000);
+        } else {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                text: "Error al registrar el pedido.",
+                showConfirmButton: false,
+                timer: 1500,
+                width: "20em"
+            });
         }
     }, []);
 

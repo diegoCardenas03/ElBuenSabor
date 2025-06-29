@@ -15,7 +15,6 @@ import { agregarProducto } from '../hooks/redux/slices/CarritoReducer';
 import Swal from 'sweetalert2';
 import { PromocionResponseDTO } from '../types/Promocion/PromocionResponseDTO';
 import {PromocionService} from '../services/PromocionService';
-
 export const MenuPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const {
@@ -96,6 +95,7 @@ export const MenuPage: React.FC = () => {
     );
   }
 
+  
   return (
     <>
       {carritoAbierto && (

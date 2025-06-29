@@ -14,7 +14,7 @@ import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
 import Swal from 'sweetalert2';
-
+import { usePedidosSocket } from '../hooks/usePedidoSocket';
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
   fechaDesde: string;
@@ -161,6 +161,10 @@ const MisPedidos = () => {
     setLoading(true);
     getPedidos();
   }, [filtros]);
+
+  usePedidosSocket(() => {
+    getPedidos();
+  });
 
   return (
     <>

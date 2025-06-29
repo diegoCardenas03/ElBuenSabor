@@ -10,6 +10,7 @@ import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { IoFilterSharp } from "react-icons/io5";
+import { useInsumoSocket } from "../hooks/useInsumoSocket";
 export const ScreenInsumo = () => {
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -60,6 +61,10 @@ export const ScreenInsumo = () => {
       cargarInsumos();
     }
   }, [openModalCompra]);
+
+  useInsumoSocket(() => {
+    getInsumos();
+  });
 
   const ColumnsTableInsumo = [
     { label: "Denominación", key: "denominacion" },

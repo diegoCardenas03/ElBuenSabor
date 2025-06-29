@@ -9,7 +9,7 @@ import { setDataTable } from "../../hooks/redux/slices/TableReducer";
 import { PromocionService } from "../../services/PromocionService";
 import { ModalPromocion } from "../../components/modals/ModalPromocion";
 import { IoFilterSharp } from "react-icons/io5";
-
+import { usePromocionSocket } from "../../hooks/usePromocionSocket";
 
 export const ScreenPromocion = () => {
   const [loading, setLoading] = useState(false);
@@ -130,6 +130,10 @@ export const ScreenPromocion = () => {
     getPromociones();
     // eslint-disable-next-line
   }, [filtros]);
+
+  usePromocionSocket(() => {
+    getPromociones();
+  });
   return (
     <>
       <AdminHeader text="Promociones" />
