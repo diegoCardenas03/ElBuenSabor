@@ -14,4 +14,5 @@ export interface InsumoDTO {
     activo: boolean;
     unidadMedida: UnidadMedida;
     rubroId: number;
+    descripcion: string;
 }

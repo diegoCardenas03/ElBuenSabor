@@ -5,6 +5,7 @@ import PreferenceMP from '../../types/PreferenceMP';
 import { createPreferenceMP } from './mpService';
 import { useAppSelector } from '../../hooks/redux';
 import mpIcon from '../../assets/icons/mpIcon.svg'
+import Swal from 'sweetalert2';
 
 type Props = {
     pedido: PedidoDTO;
@@ -27,10 +28,15 @@ function CheckoutMP({ pedido }: Props) {
                 }
             } catch (error) {
                 console.error('Error al crear la preferencia de Mercado Pago:', error);
-                alert('Hubo un error al procesar el pago con Mercado Pago.');
+                Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    text: "Hubo un error al procesar el pago con Mercado Pago.",
+                    showConfirmButton: false,
+                    timer: 1500,
+                    width: "20em"
+                });
             }
-        } else {
-            alert('Agregue al menos un instrumento al carrito');
         }
     };
 
@@ -38,12 +44,10 @@ function CheckoutMP({ pedido }: Props) {
 
     return (
         <>
-            <div className='flex justify-center items-center'>
-                <button onClick={getPreferenceMP} className="flex justify-center items-center bg-[#00AFF0] text-white rounded-full w-100 h-10 text-[18px] md:w-80 hover:scale-102 transition-transform duration-200 cursor-pointer" disabled={carrito.length === 0}>
-                    Pagar
-                    <img src={mpIcon} alt="" className='w-8 ml-3' />
-                </button>
-            </div>
+            <button onClick={getPreferenceMP} className="flex justify-center items-center bg-[#00AFF0] text-white rounded-full w-100 md:w-80 h-10 text-[18px] hover:scale-102 transition-transform duration-200 cursor-pointer" disabled={carrito.length === 0}>
+                Pagar
+                <img src={mpIcon} alt="" className='w-8 ml-3' />
+            </button>
         </>
     );
 }

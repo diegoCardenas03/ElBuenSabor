@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaRegClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapMarkerAlt } from "react-icons/fa";
 import { TipoEnvio } from '../../types/enums/TipoEnvio';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { agregarProducto, cambiarCantidad, obtenerId, quitarProducto, setDireccion, setTipoEntrega, vaciarCarrito } from '../../hooks/redux/slices/CarritoReducer';
 import { fetchDirecciones } from '../../hooks/redux/slices/DomicilioReducer';
-import { DomicilioResponseDTO } from '../../types/Domicilio/DomicilioResponseDTO';
 import Swal from 'sweetalert2';
+import { formatearDireccion, truncar } from '../../utils/DomicilioUtils';
 
 type Props = {
   onClose: () => void;
@@ -21,53 +21,95 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const direcciones = useAppSelector((state) => state.domicilio.direcciones);
   const tipoEntrega = useAppSelector((state) => state.carrito.tipoEntrega);
   const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
+  const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
 
   useEffect(() => {
-    dispatch(fetchDirecciones())
+    dispatch(fetchDirecciones());
     setLoading(false);
-  }, [dispatch])
-
-  const formatearDireccion = (d: DomicilioResponseDTO) => `${d.calle} ${d.numero}, ${d.localidad}, ${d.codigoPostal}`;
+  }, [dispatch]);
 
   const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0);
-  const envio = tipoEntrega == TipoEnvio.DELIVERY ? 0 : 0;
+  Number(subTotal.toFixed(2));
+  const envio = tipoEntrega == TipoEnvio.DELIVERY ? 1500 : 0;
   const total = subTotal + envio;
+  Number(total.toFixed(2));
 
-  const handleRealizarPedido = () => {
+  const handleRealizarPedido = async () => {
+    // Validar horario local del usuario para cualquier tipo de compra
+    const hora = new Date().getHours();
+    if (hora < 10 || hora >= 23) {
+      Swal.fire({
+        position: "center",
+        icon: "warning",
+        text: "El local está cerrado. Solo puedes pedir entre las 10:00 y las 23:00.",
+        showConfirmButton: false,
+        timer: 2000,
+        width: "22em"
+      });
+      return;
+    }
+
+    if (pedidoEnCurso) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        text: "Ya hay un pedido en curso",
+        showConfirmButton: false,
+        timer: 1500,
+        width: "20em"
+      });
+      return;
+    }
+
     if (tipoEntrega === null) {
       Swal.fire({
         position: "center",
         icon: "error",
-        title: "Elige donde quieres recibir el pedido",
+        text: "Elige donde quieres recibir el pedido",
         showConfirmButton: false,
-        timer: 1000,
+        timer: 1500,
         width: "20em"
       });
-    } else {
-      if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
-        Swal.fire({
-          position: "center",
-          icon: "error",
-          title: "Selecciona una dirección",
-          showConfirmButton: false,
-          timer: 1000,
-          width: "20em"
-        });
-      } else {
-        dispatch(setTipoEntrega(tipoEntrega || null));
-        dispatch(setDireccion(direccionSeleccionada || null))
-        navigate('/DetalleCompra', {
-          state: {
-            subTotal,
-            envio,
-            total,
-          }
-        });
-        onClose();
-      }
+      return;
     }
-  }
 
+    if (tipoEntrega === TipoEnvio.DELIVERY && direcciones.length === 0) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        text: "No tienes direcciones guardadas, por favor agrega una dirección antes de realizar el pedido.",
+        showConfirmButton: true,
+        confirmButtonColor: "#FF9D3A",
+        width: "30em"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/MisDirecciones');
+          onClose();
+        }
+      });
+    } else if (tipoEntrega === TipoEnvio.DELIVERY && !direccionSeleccionada) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        text: "Selecciona una dirección",
+        showConfirmButton: false,
+        timer: 1500,
+        width: "20em"
+      });
+      return;
+    }
+
+    dispatch(setTipoEntrega(tipoEntrega || null));
+    dispatch(setDireccion(direccionSeleccionada || null))
+    navigate('/DetalleCompra', {
+      state: {
+        subTotal,
+        envio,
+        total,
+      }
+    });
+    onClose();
+  }
 
   const handleCancelarPedido = () => {
     Swal.fire({
@@ -114,7 +156,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                 <div className="flex flex-col">
                   <p className="font-semibold">{item.denominacion}</p>
                   <p className="text-sm text-gray-500">
-                    Subtotal: ${(item.precioVenta * cant).toFixed(2)}
+                    Subtotal: ${item.precioVenta * cant}
                   </p>
                 </div>
               </div>
@@ -125,13 +167,13 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                   <button onClick={() => dispatch(agregarProducto(item))} className="px-2 py-1 rounded-full cursor-pointer">+</button>
                 </div>
                 <button onClick={() => {
-                  dispatch(quitarProducto(id)); 
+                  dispatch(quitarProducto(id));
                   Swal.fire({
                     position: "center",
                     icon: "success",
-                    title: "Producto eliminado correctamente",
+                    text: "Producto eliminado correctamente",
                     showConfirmButton: false,
-                    timer: 1000,
+                    timer: 1500,
                     width: "20em"
                   });
                 }}
@@ -160,26 +202,21 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
             </button>
           </div>
 
-          {/* <div className="flex items-center space-x-4 mb-4">
-            <FaRegClock stroke='2' className='w-7 h-7' />
-            <p className="text-gray-700">12:00</p>
-          </div> */}
-
           {tipoEntrega === TipoEnvio.DELIVERY && (
             <div className="flex items-center space-x-4 mb-5">
               <FaMapMarkerAlt stroke='2' className='w-7 h-7' />
               <select
                 className="cursor-pointer border border-gray-300 rounded-full w-full px-3 py-1 text-gray-700 bg-primary focus:outline-none"
-                value={direccionSeleccionada?.id || ''}
+                value={direccionSeleccionada ? direccionSeleccionada.id : ""}
                 onChange={(e) => {
                   const dir = direcciones.find(d => d.id === parseInt(e.target.value));
                   dispatch(setDireccion(dir || null));
                 }}
               >
-                <option value="" disabled>Seleccionar dirección</option>
+                <option value='' disabled>Seleccionar dirección</option>
                 {direcciones.map((dir) => (
                   <option key={dir.id} value={dir.id}>
-                    {formatearDireccion(dir)}
+                    {truncar(formatearDireccion(dir))}
                   </option>
                 ))}
               </select>
@@ -212,8 +249,6 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
     </div>
   )
-
-
 }
 
 export default CarritoLateral;
