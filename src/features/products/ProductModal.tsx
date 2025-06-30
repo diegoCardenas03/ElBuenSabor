@@ -16,7 +16,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
     ? product.total 
     : product.precioVenta; 
 
-  const description = isInsumo(product) ? `${product.denominacion} - Insumo vendible` : product.descripcion;
+  const description = isInsumo(product)
+  ? `${product.denominacion} - Insumo vendible`
+  : 'descripcion' in product && typeof product.descripcion === 'string'
+    ? product.descripcion
+    : "Sin descripción";
   const imageUrl = product.urlImagen || 'src\\assets\\bebida.png';
 
   return (
