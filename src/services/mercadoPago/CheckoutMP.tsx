@@ -18,9 +18,9 @@ function CheckoutMP({ pedido }: Props) {
     const getPreferenceMP = async () => {
         if (carrito.length > 0) {
             try {
-                console.log('Pedido enviado a Mercado Pago:', pedido);
+                // console.log('Pedido enviado a Mercado Pago:', pedido);
                 const response: PreferenceMP = await createPreferenceMP(pedido);
-                console.log('Preference id: ' + response.id);
+                // console.log('Preference id: ' + response.id);
                 if (response) {
                     setIdPreference(response.id);
                     localStorage.setItem("pedidoMP", JSON.stringify(pedido));

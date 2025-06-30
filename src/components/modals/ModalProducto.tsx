@@ -41,7 +41,7 @@ export const ModalProducto = ({
     (state) => state.tablaReducer.elementActive
   );
 
-  console.log("elementActive", elementActive);
+  // console.log("elementActive", elementActive);
 
   const apiProducto = new ProductoService();
   const [rubros, setRubros] = useState<RubroProductoResponseDTO[]>([]);

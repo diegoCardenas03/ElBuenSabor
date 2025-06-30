@@ -138,12 +138,12 @@ export const useAuthHandler = () => {
 
       const createResponse = await interceptorApiClient.post("/api/clientes/save", clienteDTO);
 
-      console.log("[useAuthHandler] Respuesta del backend al crear usuario:", createResponse.data);
+      // console.log("[useAuthHandler] Respuesta del backend al crear usuario:", createResponse.data);
 
       let token: string;
 
       token = await getAccessTokenSilently({ cacheMode: "off" });
-      console.log("[useAuthHandler] Token obtenido con Google:", token);
+      // console.log("[useAuthHandler] Token obtenido con Google:", token);
 
 
       dispatch(setToken(token));
@@ -155,7 +155,7 @@ export const useAuthHandler = () => {
       saveToSession('user_role', 'Cliente');
       saveToSession('user_email', userData.email || user?.email || "");
       saveToSession('user_picture', user?.picture || "");
-      console.log('[UseAuthHandler] createResponse Id: ', createResponse.data.id);
+      // console.log('[UseAuthHandler] createResponse Id: ', createResponse.data.id);
       saveToSession('user_id_db', createResponse.data.id || "");
 
       // ✅ CONDICIONAL: Si es nuevo usuario de Google y no tiene teléfono, marcar para datos extra
@@ -222,10 +222,10 @@ export const useAuthHandler = () => {
 
     try {
       const rol = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0];
-      console.log('user:', user);
-      console.log('VITE_AUTH0_AUDIENCE:', import.meta.env.VITE_AUTH0_AUDIENCE);
-      console.log('roles en user:', user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]);
-      console.log('rolUsuario:', rol);
+      // console.log('user:', user);
+      // console.log('VITE_AUTH0_AUDIENCE:', import.meta.env.VITE_AUTH0_AUDIENCE);
+      // console.log('roles en user:', user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]);
+      // console.log('rolUsuario:', rol);
       // console.log("[useAuthHandler] Rol detectado en user:", rol);
 
 
@@ -264,7 +264,7 @@ export const useAuthHandler = () => {
         // console.log("[useAuthHandler] Buscando usuario en BD por email:", user.email);
         let response;
         const rolUsuario = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] || "Cliente";
-        console.log('Rol detectado para usuario:', rolUsuario);
+        // console.log('Rol detectado para usuario:', rolUsuario);
 
         response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
 

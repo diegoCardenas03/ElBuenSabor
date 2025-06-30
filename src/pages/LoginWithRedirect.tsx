@@ -14,14 +14,14 @@ export const LoginRedirect = () => {
 
 
   useEffect(() => {
-    console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
+    // console.log("[LoginRedirect] Estado actual:", { authStatus, isAuthenticated, isProcessing });
 
     // Si no está autenticado, redirigir al login
     if (!isAuthenticated && authStatus === 'completed') {
     // Esperar 3 segundos y volver a chequear antes de mostrar el error
     const timeout = setTimeout(() => {
       if (!isAuthenticated) {
-        console.log("[LoginRedirect] No autenticado tras reintento, redirigiendo a login");
+        // console.log("[LoginRedirect] No autenticado tras reintento, redirigiendo a login");
         Swal.fire({
           title: "¡Error!",
           text: "Error al autenticarse, redirigiendo al home...",
@@ -38,7 +38,7 @@ export const LoginRedirect = () => {
 
     // Si la autenticación está completa y exitosa
     if (authStatus === 'completed' && isAuthenticated) {
-      console.log("[LoginRedirect] Autenticación completada exitosamente");
+      // console.log("[LoginRedirect] Autenticación completada exitosamente");
 
       // Solo mostrar el modal si el usuario fue recién creado
       const needsExtraData = sessionStorage.getItem('user_needs_extra_data');
@@ -52,7 +52,7 @@ export const LoginRedirect = () => {
   }, [authStatus, isAuthenticated, navigate, userRole]);
 
   const handleExtraDataComplete = () => {
-    console.log("[LoginRedirect] Datos adicionales completados");
+    // console.log("[LoginRedirect] Datos adicionales completados");
     setShowExtraDataModal(false);
     navigate("/");
   };

@@ -78,7 +78,13 @@ export const MiPerfilEmpleadoPage = () => {
           setValue("telefono", response.data.telefono);
         }
       } catch (error) {
-        console.log(`Error en obtenerIdRolAuth0: ${error}`);
+        // console.log(`Error en obtenerIdRolAuth0: ${error}`);
+        Swal.fire({
+          title: "¡Error!",
+          text: "No se pudo obtener la información del empleado.",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        });
       }
     }
     obtenerEmpleado();
@@ -107,7 +113,13 @@ export const MiPerfilEmpleadoPage = () => {
       });
       return response.data.auth0RolId as string;
     } catch (error) {
-      console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      // console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      Swal.fire({
+        title: "¡Error!",
+        text: "No se pudo obtener el ID del rol.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
     }
   }
 
@@ -117,7 +129,7 @@ export const MiPerfilEmpleadoPage = () => {
   // Guardar cambios (ajusta según tu backend)
   const onSubmit = async (data: PerfilEmpleadoForm) => {
     try {
-      console.log('nombre: ', data.nombre + 'telefono: ', data.telefono);
+      // console.log('nombre: ', data.nombre + 'telefono: ', data.telefono);
       const domicilio: DomicilioDTO = empleadoResponseDto!.domicilio;
       const auth0RolId = await obtenerIdRolAuth0Cliente();
       // Construir el objeto ClienteDTO

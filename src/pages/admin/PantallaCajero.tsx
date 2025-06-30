@@ -141,7 +141,6 @@ export const PantallaCajero = () => {
     await pedidoService.getAll().then((pedidoData) => {
       setAllPedidos(pedidoData);
       setLoading(false);
-      // console.log("Pedidos recibidos:", pedidoData);
     });
   };
 

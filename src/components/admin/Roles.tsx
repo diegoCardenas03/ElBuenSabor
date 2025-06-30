@@ -28,7 +28,6 @@ const Roles = () => {
       } catch (error) {
         setError('[Roles.tsx] Error al editar rol');
         Swal.fire("Error", "No se pudo editar el rol.", "error");
-        console.log('[Roles.tsx] Error al editar rol:', error);
       }
     } else {
       // Crear nuevo rol (no enviar id, el backend lo genera)
@@ -47,7 +46,7 @@ const Roles = () => {
         setReloadRoles(prev => prev + 1);
       } catch (error) {
         setError('[Roles.tsx] Error al crear rol');
-        console.log('[Roles.tsx] Error al crear rol:', error);
+        // console.log('[Roles.tsx] Error al crear rol:', error);
       }
     }
   };
@@ -62,7 +61,7 @@ const Roles = () => {
         setError(null);
       } catch (error) {
         setError('[Roles.tsx] Ocurrió un error al traer roles');
-        console.log('[Roles.tsx] Ocurrió un error al traer roles: ', error);
+        // console.log('[Roles.tsx] Ocurrió un error al traer roles: ', error);
       } finally {
         setLoading(false);
       }

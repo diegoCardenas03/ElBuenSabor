@@ -83,7 +83,13 @@ export const MiPerfilUsuarioPage = () => {
           setValue("telefono", response.data.telefono);
         }
       } catch (error) {
-        console.log(`Error en obtenerIdRolAuth0: ${error}`);
+        // console.log(`Error en obtenerIdRolAuth0: ${error}`);
+        Swal.fire({
+          title: "¡Error!",
+          text: "No se pudo obtener la información del cliente.",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+        });
       }
     }
     obtenerCliente();
@@ -105,7 +111,7 @@ export const MiPerfilUsuarioPage = () => {
 
   const obtenerIdRolAuth0Cliente = async () => {
     const rolName = sessionStorage.getItem('user_role');
-    console.log('Rol name: ' + rolName);
+    // console.log('Rol name: ' + rolName);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_SERVER_URL}/api/admin/roles/nombre/${rolName}`, {
         headers: {
@@ -114,7 +120,13 @@ export const MiPerfilUsuarioPage = () => {
       });
       return response.data.auth0RolId as string;
     } catch (error) {
-      console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      // console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      Swal.fire({
+        title: "¡Error!",
+        text: "No se pudo obtener el ID del rol.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
     }
   }
 
