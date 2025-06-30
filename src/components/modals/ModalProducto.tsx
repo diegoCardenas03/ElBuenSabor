@@ -84,7 +84,7 @@ export const ModalProducto = ({
   }, []);
 
   const initialValues: ProductoDTO =
-    elementActive && "descripcion" in elementActive
+    elementActive && "descripcion" in elementActive && "tiempoEstimadoPreparacion" in elementActive
       ? {
           id: elementActive.id,
           denominacion: elementActive.denominacion,
@@ -93,8 +93,8 @@ export const ModalProducto = ({
           precioVenta: elementActive.precioVenta,
           urlImagen: elementActive.urlImagen,
           activo: elementActive.activo,
-          rubroId: elementActive.rubro?.id ?? 0, // mapeo correcto
-          margenGanancia: elementActive.margenGanancia ?? 0, // mapeo correcto
+          rubroId: elementActive.rubro?.id ?? 0,
+          margenGanancia: elementActive.margenGanancia ?? 0, 
           detalleProductos: elementActive.detalleProductos ?? [],
         }
       : {
@@ -184,8 +184,8 @@ export const ModalProducto = ({
                 imageUrl = data.secure_url;
               }
 
-              const detalleProductos = values.detalleProductos.map((detalle: any) => ({
-                insumoId: detalle.insumoId ?? detalle.insumo?.id,
+              const detalleProductos = values.detalleProductos.map((detalle: DetalleProductoDTO) => ({
+                insumoId: detalle.insumoId,
                 cantidad: detalle.cantidad
               }));
 
