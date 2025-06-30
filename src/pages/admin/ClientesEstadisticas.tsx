@@ -165,61 +165,63 @@ const ClientesEstadisticas = () => {
         try {
           const data = JSON.parse(text);
           if (!Array.isArray(data)) { setPedidos([]); return; }
-          let mapped: PedidoCliente[] = data.map((pedido: any) => {
-            const productos: ProductoPedido[] = [];
-            if (Array.isArray(pedido.detallePedidos)) {
-              pedido.detallePedidos.forEach((detalle: any) => {
-                if (detalle.producto) {
-                  productos.push({
-                    nombre: detalle.producto.denominacion,
-                    cantidad: detalle.cantidad,
-                    precio: detalle.subTotal ?? (detalle.cantidad * (detalle.producto?.precioVenta || 0)),
-                  });
-                } else if (detalle.insumo) {
-                  productos.push({
-                    nombre: detalle.insumo.denominacion,
-                    cantidad: detalle.cantidad,
-                    precio: detalle.subTotal ?? (detalle.cantidad * (detalle.insumo?.precioVenta || 0)),
-                  });
-                } else if (detalle.promocion && detalle.promocion.detallePromociones) {
-                  const detallePromo = detalle.promocion.detallePromociones.map((dp: any) =>
-                    dp.producto
-                      ? { nombre: dp.producto.denominacion, cantidad: detalle.cantidad * dp.cantidad }
-                      : dp.insumo
-                      ? { nombre: dp.insumo.denominacion, cantidad: detalle.cantidad * dp.cantidad }
-                      : { nombre: "Producto/insumo desconocido", cantidad: detalle.cantidad }
-                  );
-                  productos.push({
-                    nombre: detalle.promocion.denominacion,
-                    cantidad: detalle.cantidad,
-                    precio: detalle.subTotal ?? 0,
-                    detallePromo,
-                  });
-                } else {
-                  productos.push({
-                    nombre: "Producto/insumo desconocido",
-                    cantidad: detalle.cantidad,
-                    precio: detalle.subTotal ?? 0,
-                  });
-                }
-              });
-            }
-            return {
-              id: pedido.id,
-              fecha: pedido.fecha,
-              hora: pedido.hora,
-              numeroPedido: pedido.codigo,
-              importeTotal: pedido.totalVenta,
-              estado: pedido.estado,
-              tipoEnvio: pedido.tipoEnvio,
-              formaPago: pedido.formaPago,
-              direccionEntrega: pedido.domicilio
-                ? `${pedido.domicilio.calle} ${pedido.domicilio.numero}, ${pedido.domicilio.localidad}`
-                : "",
-              costoEnvio: pedido.costoEnvio,
-              productos
-            };
-          });
+          let mapped: PedidoCliente[] = data
+            .filter((pedido: any) => pedido.estado === "ENTREGADO") // SOLO pedidos ENTREGADO
+            .map((pedido: any) => {
+              const productos: ProductoPedido[] = [];
+              if (Array.isArray(pedido.detallePedidos)) {
+                pedido.detallePedidos.forEach((detalle: any) => {
+                  if (detalle.producto) {
+                    productos.push({
+                      nombre: detalle.producto.denominacion,
+                      cantidad: detalle.cantidad,
+                      precio: detalle.subTotal ?? (detalle.cantidad * (detalle.producto?.precioVenta || 0)),
+                    });
+                  } else if (detalle.insumo) {
+                    productos.push({
+                      nombre: detalle.insumo.denominacion,
+                      cantidad: detalle.cantidad,
+                      precio: detalle.subTotal ?? (detalle.cantidad * (detalle.insumo?.precioVenta || 0)),
+                    });
+                  } else if (detalle.promocion && detalle.promocion.detallePromociones) {
+                    const detallePromo = detalle.promocion.detallePromociones.map((dp: any) =>
+                      dp.producto
+                        ? { nombre: dp.producto.denominacion, cantidad: detalle.cantidad * dp.cantidad }
+                        : dp.insumo
+                        ? { nombre: dp.insumo.denominacion, cantidad: detalle.cantidad * dp.cantidad }
+                        : { nombre: "Producto/insumo desconocido", cantidad: detalle.cantidad }
+                    );
+                    productos.push({
+                      nombre: detalle.promocion.denominacion,
+                      cantidad: detalle.cantidad,
+                      precio: detalle.subTotal ?? 0,
+                      detallePromo,
+                    });
+                  } else {
+                    productos.push({
+                      nombre: "Producto/insumo desconocido",
+                      cantidad: detalle.cantidad,
+                      precio: detalle.subTotal ?? 0,
+                    });
+                  }
+                });
+              }
+              return {
+                id: pedido.id,
+                fecha: pedido.fecha,
+                hora: pedido.hora,
+                numeroPedido: pedido.codigo,
+                importeTotal: pedido.totalVenta,
+                estado: pedido.estado,
+                tipoEnvio: pedido.tipoEnvio,
+                formaPago: pedido.formaPago,
+                direccionEntrega: pedido.domicilio
+                  ? `${pedido.domicilio.calle} ${pedido.domicilio.numero}, ${pedido.domicilio.localidad}`
+                  : "",
+                costoEnvio: pedido.costoEnvio,
+                productos
+              };
+            });
 
           if (fechaDesde) mapped = mapped.filter(p => p.fecha >= fechaDesde);
           if (fechaHasta) mapped = mapped.filter(p => p.fecha <= fechaHasta);
