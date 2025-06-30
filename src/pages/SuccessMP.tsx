@@ -14,9 +14,9 @@ function SuccessMP() {
         const params = new URLSearchParams(window.location.search);
         const status = params.get("status");
         if (status === "approved" && pedido) {
-            localStorage.removeItem("pedidoMP");
             dispatch(vaciarCarrito());
             setTimeout(() => {
+                localStorage.removeItem("pedidoMP");
                 navigate('/');
             }, 3000);
         } else {
