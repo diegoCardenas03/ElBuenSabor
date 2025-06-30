@@ -218,10 +218,10 @@ const Categorias = () => {
     setModalAbierto(true);
 
     if (rubro.tipo === "Insumo") {
-      const buscarPadre = (rubros: RubroInsumo[], id: number, padreId?: number): number | "" => {
+      const buscarPadre = (rubros: RubroInsumo[], id: number): number | "" => {
         for (const rubroItem of rubros) {
           if (rubroItem.subRubros.some(sub => sub.id === id)) return rubroItem.id;
-          const resultado = buscarPadre(rubroItem.subRubros, id, rubroItem.id);
+          const resultado = buscarPadre(rubroItem.subRubros, id);
           if (resultado) return resultado;
         }
         return "";

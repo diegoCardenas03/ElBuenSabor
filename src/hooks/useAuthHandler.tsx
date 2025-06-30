@@ -263,7 +263,7 @@ export const useAuthHandler = () => {
 
         // console.log("[useAuthHandler] Buscando usuario en BD por email:", user.email);
         let response;
-        const rolUsuario = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] || "Cliente";
+        // const rolUsuario = user[`${import.meta.env.VITE_AUTH0_AUDIENCE}/roles`]?.[0] || "Cliente";
         // console.log('Rol detectado para usuario:', rolUsuario);
 
         response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
@@ -335,7 +335,7 @@ export const useAuthHandler = () => {
 
     const hasSessionData = getFromSession('auth_completed') === 'true';
     if (!hasSessionData && authStatus === 'checking') {
-      handleAuthUser().catch((e) => {
+      handleAuthUser().catch(() => {
         // console.error("[useAuthHandler] Error en effect principal:", e?.response?.data || e);
         setAuthStatus('completed');
       });

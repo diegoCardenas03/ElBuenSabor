@@ -1,6 +1,6 @@
 import { useAppDispatch } from "../../hooks/redux";
 import { setElementActive } from "../../hooks/redux/slices/TableReducer";
-import { InsumoDTO } from "../../types/Insumo/InsumoDTO";
+// import { InsumoDTO } from "../../types/Insumo/InsumoDTO";
 import { FaPencilAlt } from "react-icons/fa";
 import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
 // Interfaz para los props del componente

@@ -1,7 +1,7 @@
 import usuarioImg from '../../assets/img/usuarioLogeado.jpg';
-import { useState } from 'react';
-import ModalLogin from '../modals/ModalLogin';
-import ModalRegister from '../modals/ModalRegister';
+// import { useState } from 'react';
+// // import ModalLogin from '../modals/ModalLogin';
+// import ModalRegister from '../modals/ModalRegister';
 import { FaTimes, FaUser, FaClipboardList, FaMapMarkerAlt, FaUtensils, FaSignOutAlt } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -36,22 +36,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   fotoUsuario,
   emailUsuario
 }) => {
-  const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
-  const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
+  // const [abrirModalLogin, setAbrirModalLogin] = useState<boolean>(false);
+  // const [tipoModal, setTipoModal] = useState<'login' | 'register'>('login');
 
-  const { logout, loginWithPopup, loginWithRedirect } = useAuth0();
+  const { logout,  loginWithRedirect } = useAuth0();
 
-  const handleAuthLogin = async () => {
-    try {
-      await loginWithPopup({
-        authorizationParams: {
-          prompt: 'select_account'
-        }
-      });
-    } catch (error) {
-      console.error('Error en login:', error);
-    }
-  };
 
   // ✅ AGREGAR: Función para manejar clics en enlaces
   const handleLinkClick = () => {
@@ -66,30 +55,30 @@ export const Navbar: React.FC<NavbarProps> = ({
     });
   };
 
-  const abrirLogin = () => {
-    setTipoModal('login');
-    setAbrirModalLogin(true);
-  };
+  // const abrirLogin = () => {
+  //   setTipoModal('login');
+  //   setAbrirModalLogin(true);
+  // };
 
-  const abrirRegister = () => {
-    setTipoModal('register');
-    setAbrirModalLogin(true);
-  };
+  // const abrirRegister = () => {
+  //   setTipoModal('register');
+  //   setAbrirModalLogin(true);
+  // };
 
-  const cerrarModal = () => {
-    setAbrirModalLogin(false);
-  };
+  // const cerrarModal = () => {
+  //   setAbrirModalLogin(false);
+  // };
 
-  // ✅ AGREGAR: Funciones para cambiar entre modales
-  const cambiarARegister = () => {
-    // console.log('Cambiando a registro desde navbar');
-    setTipoModal('register');
-  };
+  // // ✅ AGREGAR: Funciones para cambiar entre modales
+  // const cambiarARegister = () => {
+  //   // console.log('Cambiando a registro desde navbar');
+  //   setTipoModal('register');
+  // };
 
-  const cambiarALogin = () => {
-    // console.log('Cambiando a login desde navbar');
-    setTipoModal('login');
-  };
+  // const cambiarALogin = () => {
+  //   // console.log('Cambiando a login desde navbar');
+  //   setTipoModal('login');
+  // };
 
   // Si no está logeado, muestra solo el botón de login
   if (!usuarioLogeado) {
@@ -111,7 +100,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* ✅ CORREGIR: Modal dinámico con funciones de cambio */}
-        {abrirModalLogin && (
+        {/* {abrirModalLogin && (
           <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-30">
             <div className="relative bg-primary p-5 pt-0 rounded-xl shadow-lg overflow-y-auto overflow-x-hidden">
               {tipoModal === 'login' ? (
@@ -128,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <FaTimes stroke='4' onClick={cerrarModal} className="w-6 h-6 absolute top-4 right-4 cursor-pointer" />
             </div>
           </div>
-        )}
+        )} */}
       </>
     );
   }

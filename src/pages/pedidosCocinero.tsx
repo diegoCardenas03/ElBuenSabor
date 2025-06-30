@@ -9,7 +9,7 @@ import { useAppDispatch } from '../hooks/redux';
 import { updateEstadoPedidoThunk } from '../hooks/redux/slices/PedidoReducer';
 
 const PedidosCocinero: React.FC = () => {
-    const [pedidos, setPedidos] = useState<PedidoResponseDTO[]>([]);
+    
     const [enPreparacion, setEnPreparacion] = useState<PedidoResponseDTO[]>([]);
     const [comandas, setComandas] = useState<PedidoResponseDTO[]>([]);
     const [modalDetallePedido, setModalDetallePedido] = useState<Boolean>(false)
@@ -45,7 +45,7 @@ const PedidosCocinero: React.FC = () => {
     const obtenerPedidos = async () => {
         try {
             const data = await pedidosService.getAll();
-            setPedidos(data);
+          
             setComandas(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.SOLICITADO));
             setEnPreparacion(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.EN_PREPARACION));
         } catch (error) {
@@ -225,7 +225,7 @@ const PedidosCocinero: React.FC = () => {
                                                     ))}
                                             </ul>
                                             <p><b>Receta:</b>
-                                              {detalle.promocion.detallePromociones.map((dp, index) =>
+                                              {detalle.promocion.detallePromociones.map((dp) =>
                                                 dp.producto && Array.isArray(dp.producto.detalleProductos)
                                                   ? dp.producto.detalleProductos.map((detalleProd, idx) => (
                                                       <span key={idx}>

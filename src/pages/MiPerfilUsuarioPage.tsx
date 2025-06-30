@@ -7,7 +7,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { ClienteDTO } from "../types/Cliente/ClienteDTO";
-import { ClienteResponseDTO } from "../types/Cliente/ClienteResponseDTO";
+// import { ClienteResponseDTO } from "../types/Cliente/ClienteResponseDTO";
 
 type PerfilForm = {
   nombre: string;
@@ -19,7 +19,7 @@ type PerfilForm = {
 export const MiPerfilUsuarioPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-  const [clienteResponseDto, setClienteResponseDto] = useState<ClienteResponseDTO | null>(null);
+  // const [clienteResponseDto, setClienteResponseDto] = useState<ClienteResponseDTO | null>(null);
   const { user, isAuthenticated } = useAuth0();
   const isGoogleAccount = user?.sub?.startsWith('google');
 
@@ -79,7 +79,7 @@ export const MiPerfilUsuarioPage = () => {
           },
         });
         if (response) {
-          setClienteResponseDto(response.data);
+          // setClienteResponseDto(response.data);
           setValue("telefono", response.data.telefono);
         }
       } catch (error) {

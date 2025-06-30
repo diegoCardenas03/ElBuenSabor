@@ -14,7 +14,7 @@ type Props = {
 
 const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const error = null;
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const carrito = useAppSelector((state) => state.carrito.items);

@@ -252,7 +252,7 @@ const Estadistica = () => {
     // Hoja Resumen
     const wsResumen = wb.addWorksheet("Resumen");
     resumenRows.forEach(row => wsResumen.addRow(row));
-    wsResumen.getRow(1).eachCell(cell => {
+    wsResumen.getRow(1).eachCell((cell: any) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
       cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -270,7 +270,7 @@ const Estadistica = () => {
     if (evolucionIE.length > 0) {
       const wsEvol = wb.addWorksheet("Evolucion mensual");
       detalleEvolucionRows.forEach(row => wsEvol.addRow(row));
-      wsEvol.getRow(1).eachCell(cell => {
+      wsEvol.getRow(1).eachCell((cell: any) => {
         cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
         cell.alignment = { vertical: "middle", horizontal: "center" };

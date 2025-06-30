@@ -13,7 +13,7 @@ import MisDirecciones from '../pages/misDirecciones';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
-import EstadisticaWithBoundary from '../pages/admin/Estadistica';
+// import EstadisticaWithBoundary from '../pages/admin/Estadistica';
 import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
 import  Estadistica  from '../pages/admin/Estadistica';
 

@@ -11,7 +11,7 @@ import { EmpleadoResponseDTO } from "../../types/Empleado/EmpleadoResponseDTO";
 import { EmpleadosService } from "../../services/EmpleadosService";
 import { BiSolidPencil } from "react-icons/bi";
 import { ModalEmpleado } from "../../components/modals/ModalEmpleado";
-import { useAuth0 } from "@auth0/auth0-react";
+// import { useAuth0 } from "@auth0/auth0-react";
 
 type FiltroState = {
     estado: "TODOS" | "ACTIVO" | "INACTIVO";

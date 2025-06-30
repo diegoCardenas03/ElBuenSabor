@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { RubroProductoResponseDTO } from '../../../types/RubroProducto/RubroProductoResponseDTO';
 import { RubroInsumoResponseDTO } from '../../../types/RubroInsumo/RubroInsumoResponseDTO';
 

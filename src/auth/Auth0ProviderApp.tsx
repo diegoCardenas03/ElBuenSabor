@@ -1,4 +1,4 @@
-import { AppState, Auth0Provider } from "@auth0/auth0-react";
+import { Auth0Provider } from "@auth0/auth0-react";
 import { FC } from "react";
 import { useNavigate } from "react-router";
 
@@ -13,7 +13,7 @@ type Props = {
 
 export const Auth0ProviderApp: FC<Props> = ({ children }) => {
   const navigate = useNavigate();
-  const onRedirectCallback = (appState: AppState | undefined) => {
+  const onRedirectCallback = () => {
     navigate("/login-redirect");
   };
 

@@ -31,7 +31,7 @@ const DetalleCompra = () => {
     const comentario = useAppSelector((state) => state.carrito.comentario);
     const metodoPago = useAppSelector((state) => state.carrito.metodoPago || FormaPago.EFECTIVO);
     const [direccionTemporal, setDireccionTemporal] = useState<DomicilioDTO | null>(direccionSeleccionada ?? null);
-    const [tipoEntregaState, setTipoEntregaState] = useState<boolean>(tipoEntrega === 'DELIVERY' ? true : false);
+    const tipoEntregaState = tipoEntrega === 'DELIVERY' ? true : false;
     const [comentarioState, setComentarioState] = useState({ actual: comentario || '', temporal: comentario || '' });
     const [mostrarDirecciones, setMostrarDirecciones] = useState<boolean>(false);
     const [agregarComentario, setAgregarComentario] = useState<boolean>(false);

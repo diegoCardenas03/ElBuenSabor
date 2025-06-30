@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { ProductoResponseDTO } from '../../../types/Producto/ProductoResponseDTO';
 import { InsumoResponseDTO } from '../../../types/Insumo/InsumoResponseDTO';
-import { ProductoUnificado, isInsumo, isProducto } from '../../../types/ProductoUnificado/ProductoUnificado';
+import { ProductoUnificado, isInsumo } from '../../../types/ProductoUnificado/ProductoUnificado';
 
 interface ProductState {
   products: ProductoResponseDTO[];
@@ -131,8 +131,14 @@ const productSlice = createSlice({
           itemPrice = item.precioVenta;
           isActive = item.activo;
           itemType = 'insumo';
+        } else if ('rubro' in item && item.rubro) {
+          itemRubroId = item.rubro.id;
+          itemName = item.denominacion;
+          itemPrice = item.precioVenta;
+          isActive = item.activo;
+          itemType = 'producto';
         } else {
-          itemRubroId = item.rubro?.id;
+          itemRubroId = undefined;
           itemName = item.denominacion;
           itemPrice = item.precioVenta;
           isActive = item.activo;
@@ -141,7 +147,7 @@ const productSlice = createSlice({
 
         // Verificar filtro de categoría con IDs compuestos
         let matchesCategory = state.selectedCategories.length === 0;
-        
+
         if (!matchesCategory && itemRubroId !== undefined) {
           const compositeId = `${itemType}-${itemRubroId}`;
           matchesCategory = state.selectedCategories.includes(compositeId);
@@ -150,12 +156,12 @@ const productSlice = createSlice({
 
         // Verificar filtro de búsqueda
         const matchesSearch = itemName.toLowerCase().includes(state.searchTerm.toLowerCase());
-        
+
         // Verificar filtro de bestseller
         const matchesBestseller = state.filters.bestseller ? isActive : true;
 
         const finalMatch = matchesCategory && matchesSearch && matchesBestseller && isActive;
-        
+
         if (state.selectedCategories.length > 0) {
           // console.log(`Item: ${itemName}, tipo: ${itemType}, rubroId: ${itemRubroId}, matches: ${finalMatch}`);
         }

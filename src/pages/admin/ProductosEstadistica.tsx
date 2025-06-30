@@ -63,9 +63,9 @@ const ProductosEstadistica = () => {
         const productosMap: Record<string, ProductoRanking> = {};
         const insumosMap: Record<string, ProductoRanking> = {};
 
-        pedidosFiltrados.forEach((pedido, pedidoIdx) => {
+        pedidosFiltrados.forEach((pedido) => {
           // console.log(`Analizando pedido #${pedidoIdx} con fecha ${pedido.fecha}:`, pedido);
-          pedido.detallePedidos.forEach((detalle, detalleIdx) => {
+          pedido.detallePedidos.forEach((detalle) => {
             // console.log(`  Detalle #${detalleIdx}:`, detalle);
 
             if (detalle.producto) {
@@ -101,7 +101,7 @@ const ProductosEstadistica = () => {
               // AJUSTE: ahora usamos detallePromociones (plural) según tu JSON
               if (detalle.promocion.detallePromociones) {
                 // console.log("    detallePromociones en promo:", detalle.promocion.detallePromociones);
-                detalle.promocion.detallePromociones.forEach((dp, idxPromo) => {
+                detalle.promocion.detallePromociones.forEach((dp: any) => {
                   // console.log(`      Item en promo #${idxPromo}:`, dp);
                   // Sumar productos
                   if (dp.producto) {
@@ -221,7 +221,7 @@ const ProductosEstadistica = () => {
     });
 
     // Estilos Productos
-    wsProductos.getRow(1).eachCell(cell => {
+    wsProductos.getRow(1).eachCell((cell: any) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
       cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -249,7 +249,7 @@ const ProductosEstadistica = () => {
     });
 
     // Fondo igual que productos para uniformidad
-    wsInsumos.getRow(1).eachCell(cell => {
+    wsInsumos.getRow(1).eachCell((cell: any) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
       cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -266,7 +266,7 @@ const ProductosEstadistica = () => {
     // Agregar hoja de periodo/filtros
     const wsInfo = wb.addWorksheet("Filtro");
     wsInfo.addRow(["Período", periodo]);
-    wsInfo.getRow(1).eachCell(cell => {
+    wsInfo.getRow(1).eachCell((cell: any) => {
       cell.font = { bold: true };
       cell.alignment = { vertical: "middle", horizontal: "left" };
     });

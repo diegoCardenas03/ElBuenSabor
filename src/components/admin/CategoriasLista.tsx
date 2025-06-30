@@ -26,7 +26,7 @@ interface CategoriasListaProps {
 }
 
 // Switch personalizado verde para activo, gris para desactivo
-const GreenGraySwitch = styled(Switch)(({ theme }) => ({
+const GreenGraySwitch = styled(Switch)(() => ({
   '& .MuiSwitch-switchBase.Mui-checked': {
     color: '#22c55e', // verde-500 tailwind
     '&:hover': {

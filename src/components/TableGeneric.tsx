@@ -36,7 +36,7 @@ export const TableGeneric = <T extends { id: any }>({
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [orderBy, setOrderBy] = useState<string>(columns[0]?.key || '');
-  const [filter, setFilter] = useState('');
+  const filter = '';
   const [rows, setRows] = useState<any[]>([]);
   const dataTable = useAppSelector((state) => state.tablaReducer.dataTable);
 

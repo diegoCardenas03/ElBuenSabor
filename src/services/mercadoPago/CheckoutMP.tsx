@@ -1,5 +1,5 @@
 import { initMercadoPago } from '@mercadopago/sdk-react';
-import { useState } from 'react';
+// import { useState } from 'react';
 import { PedidoDTO } from '../../types/Pedido/PedidoDTO';
 import PreferenceMP from '../../types/PreferenceMP';
 import { createPreferenceMP } from './mpService';
@@ -12,7 +12,7 @@ type Props = {
 };
 
 function CheckoutMP({ pedido }: Props) {
-    const [idPreference, setIdPreference] = useState<string>('');
+    
     const carrito = useAppSelector((state) => state.carrito.items);
 
     const getPreferenceMP = async () => {
@@ -22,7 +22,6 @@ function CheckoutMP({ pedido }: Props) {
                 const response: PreferenceMP = await createPreferenceMP(pedido);
                 // console.log('Preference id: ' + response.id);
                 if (response) {
-                    setIdPreference(response.id);
                     localStorage.setItem("pedidoMP", JSON.stringify(pedido));
                     window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${response.id}`;
                 }
