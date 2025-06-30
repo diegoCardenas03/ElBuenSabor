@@ -29,7 +29,7 @@ const DetalleCompra = () => {
     const tipoEntrega = useAppSelector((state) => state.carrito.tipoEntrega);
     const direccionSeleccionada = useAppSelector((state) => state.carrito.direccion);
     const comentario = useAppSelector((state) => state.carrito.comentario);
-    const metodoPago = useAppSelector((state) => state.carrito.metodoPago);
+    const metodoPago = useAppSelector((state) => state.carrito.metodoPago || FormaPago.EFECTIVO);
     const [direccionTemporal, setDireccionTemporal] = useState<DomicilioDTO | null>(direccionSeleccionada ?? null);
     const [tipoEntregaState, setTipoEntregaState] = useState<boolean>(tipoEntrega === 'DELIVERY' ? true : false);
     const [comentarioState, setComentarioState] = useState({ actual: comentario || '', temporal: comentario || '' });
@@ -245,7 +245,7 @@ const DetalleCompra = () => {
                             <div className="bg-white rounded-lg p-5 lg:w-[700px] shadow-md">
                                 {tipoEntrega === TipoEnvio.RETIRO_LOCAL && (
                                     <div>
-                                        <label className='flex items-center'>
+                                        <label className='flex items-center cursor-pointer'>
                                             <input
                                                 type='radio'
                                                 name='metodoPago'
@@ -261,7 +261,7 @@ const DetalleCompra = () => {
 
                                     </div>
                                 )}
-                                <label className='flex items-center'>
+                                <label className='flex items-center cursor-pointer'>
                                     <input
                                         type='radio'
                                         name='metodoPago'
@@ -315,6 +315,7 @@ const DetalleCompra = () => {
                             {metodoPago === 'MERCADO_PAGO' && validaciones() && (
                                 <CheckoutMP pedido={pedidoArmado()} />
                             )}
+                                
                         </div>
                     </div>
                 </div>

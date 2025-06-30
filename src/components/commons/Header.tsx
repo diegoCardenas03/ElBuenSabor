@@ -80,7 +80,6 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     if (sessionId && user) {
       dispatch(fetchPedidosByUsuario(Number(sessionId)));
-      pedidoEnCurso?.cliente.id === Number(sessionId);
     }
   }, [sessionId, dispatch]);
 

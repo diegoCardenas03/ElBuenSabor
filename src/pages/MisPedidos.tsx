@@ -60,7 +60,7 @@ const MisPedidos = () => {
     {
       label: "Total",
       key: "totalVenta",
-      render: (pedido: PedidoResponseDTO) => (<p>${pedido.totalVenta}</p>),
+      render: (pedido: PedidoResponseDTO) => (<p>${pedido.totalVenta.toFixed(2)}</p>),
       className: "hidden sm:table-cell",
     },
     {
