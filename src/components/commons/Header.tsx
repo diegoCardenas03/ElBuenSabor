@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 import Swal from 'sweetalert2';
-import { fetchPedidosByUsuario } from '../../hooks/redux/slices/PedidoReducer';
+import { fetchPedidosByUsuario, setPedidoEnCurso } from '../../hooks/redux/slices/PedidoReducer';
 import PedidoDetalleModal from '../modals/PedidoDetalleModal';
 import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
 import { useAuthHandler } from '../../hooks/useAuthHandler';
@@ -76,7 +76,6 @@ export const Header: React.FC<HeaderProps> = ({
   }, [isAppLoading]);
   const [modalPedidoEnCurso, setModalPedidoEnCurso] = useState(false);
   const pedidoEnCurso = useAppSelector(state => state.pedido.pedidoEnCurso);
-  console.log("Pedido en curso:", pedidoEnCurso);
   
   useEffect(() => {
     if (sessionId && user) {
@@ -150,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
         ) : (
           <div className="flex-shrink-0 flex items-center space-x-3 z-[9999]">
             <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
-            {!showBackButton && pedidoEnCurso  && (
+            {!showBackButton && pedidoEnCurso && (
               <div className="flex-shrink-0 flex items-center space-x-3 z-10">
                 <div
                   className={`h-5 border-l flex-shrink-0 text-secondary hidden md:block`}

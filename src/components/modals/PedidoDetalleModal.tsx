@@ -73,7 +73,7 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
         </ul>
         <div className='flex justify-end items-center'>
           <button
-            className={`${pedido.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
+            className={`${pedido.estado == Estado.SOLICITADO ? "bg-secondary text-white rounded-full px-1 py-1 w-[45%] md:w-[30%] mt-3 mr-3 cursor-pointer hover:scale-105 transition-transform" : "hidden"}`}
             onClick={async () => {
               Swal.fire({
                 title: '¿Estás seguro?',

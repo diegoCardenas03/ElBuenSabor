@@ -284,7 +284,7 @@ const DetalleCompra = () => {
                             <div>
                                 <div className="flex justify-between mb-3">
                                     <p>Productos</p>
-                                    <p>${subTotal} </p>
+                                    <p>${subTotal.toFixed(2)} </p>
                                 </div>
                                 {tipoEntrega === TipoEnvio.DELIVERY && (
                                     <div className="flex justify-between">
@@ -297,7 +297,7 @@ const DetalleCompra = () => {
                                 <div className="border-t border-gray-300 my-2"></div>
                                 <div className="flex justify-between font-bold text-[16px]">
                                     <p>Total</p>
-                                    <p>${total}</p>
+                                    <p>${total.toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>

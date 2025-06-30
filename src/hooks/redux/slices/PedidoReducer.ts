@@ -57,7 +57,9 @@ export const fetchPedidosByUsuario = createAsyncThunk<PedidoResponseDTO[], numbe
 
 const getPedidoEnCurso = (pedidos: PedidoResponseDTO[]) =>
   pedidos.find(p =>
-    p.estado !== Estado.ENTREGADO && p.estado !== Estado.CANCELADO
+    p.estado !== Estado.ENTREGADO &&
+    p.estado !== Estado.CANCELADO &&
+    p.estado !== Estado.PENDIENTE_FACTURACION
   ) ?? null;
 
 const PedidoReducer = createSlice({
@@ -82,7 +84,8 @@ const PedidoReducer = createSlice({
         state.error = null;
         state.pedidoEnCurso = (
           action.payload.estado !== Estado.ENTREGADO &&
-          action.payload.estado !== Estado.CANCELADO
+          action.payload.estado !== Estado.CANCELADO &&
+          action.payload.estado !== Estado.PENDIENTE_FACTURACION
         ) ? action.payload : null;
       })
       .addCase(updateEstadoPedidoThunk.rejected, (state, action) => {
@@ -99,7 +102,8 @@ const PedidoReducer = createSlice({
         state.error = null;
         state.pedidoEnCurso = (
           action.payload.estado !== Estado.ENTREGADO &&
-          action.payload.estado !== Estado.CANCELADO
+          action.payload.estado !== Estado.CANCELADO &&
+          action.payload.estado !== Estado.PENDIENTE_FACTURACION
         ) ? action.payload : null;
       })
       .addCase(enviarPedidoThunk.rejected, (state, action) => {

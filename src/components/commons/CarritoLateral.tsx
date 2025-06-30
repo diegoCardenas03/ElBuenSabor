@@ -29,10 +29,8 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   }, [dispatch]);
 
   const subTotal = carrito.reduce((acum, item) => acum + item.item.precioVenta * item.cant, 0);
-  Number(subTotal.toFixed(2));
   const envio = tipoEntrega == TipoEnvio.DELIVERY ? 1500 : 0;
   const total = subTotal + envio;
-  Number(total.toFixed(2));
 
   const handleRealizarPedido = async () => {
     // Validar horario local del usuario para cualquier tipo de compra
@@ -157,7 +155,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
                 <div className="flex flex-col">
                   <p className="font-semibold">{item.denominacion}</p>
                   <p className="text-sm text-gray-500">
-                    Subtotal: ${item.precioVenta * cant}
+                    Subtotal: ${(item.precioVenta * cant).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -229,7 +227,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
       <div className="space-y-4 border-t pt-4">
         <div className="flex justify-between mb-2">
           <p className="text-gray-700">Subtotal:</p>
-          <p className="text-gray-700">${subTotal}</p>
+          <p className="text-gray-700">${subTotal.toFixed(2)}</p>
         </div>
 
         {tipoEntrega === "DELIVERY" && (
@@ -240,7 +238,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
         <div className="flex justify-between mb-2">
           <p className="font-bold">Total:</p>
-          <p className="font-bold">${total}</p>
+          <p className="font-bold">${total.toFixed(2)}</p>
         </div>
         <div className='flex flex-col gap-2'>
           <button onClick={handleRealizarPedido} className="bg-secondary text-white px-3 py-[5px] rounded-full w-full hover:scale-102 transition-transform duration-200 cursor-pointer">Realizar pedido</button>

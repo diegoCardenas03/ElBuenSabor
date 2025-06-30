@@ -107,7 +107,7 @@ const PedidosCocinero: React.FC = () => {
                                     .map((pedidos, index) => (
                                         <div key={pedidos.id} >
                                             <button
-                                                className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
+                                                className={`cursor-pointer w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
                                                 onClick={() => {
                                                     setPedidoSeleccionado(pedidos);
                                                     setModalDetallePedido(true);
@@ -149,7 +149,7 @@ const PedidosCocinero: React.FC = () => {
                                     .map((pedidos, index) => (
                                         <div key={pedidos.id} >
                                             <button
-                                                className={`w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
+                                                className={`cursor-pointer w-lg rounded-2xl flex items-center justify-between px-4 mb-2 ${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}`}
                                                 onClick={() => {
                                                     setPedidoSeleccionado(pedidos);
                                                     setModalDetallePedido(true);
@@ -195,7 +195,7 @@ const PedidosCocinero: React.FC = () => {
                                               {detalle.producto.detalleProductos.map((dp, index) => (
                                                 <span key={index}>
                                                   {dp.insumo.denominacion} x{dp.cantidad} ({dp.insumo.unidadMedida})
-                                                  {index < index - 1 ? ', ' : ''} {/*{index < detalle.producto.detalleProductos.length - 1 ? ', ' : ''} */}
+                                                  {index < index - 1 ? ', ' : ''} 
                                                 </span>
                                               ))}</p>
                                         </div>
@@ -247,7 +247,7 @@ const PedidosCocinero: React.FC = () => {
                             <div className='flex justify-center items-center'>
                                 <button
                                     onClick={() => cambiarEstadoPedido(pedidoSeleccionado)}
-                                    className="mt-5 bg-secondary text-white font-bold py-2 px-4 rounded-full w-[50%] hover:bg-yellow-600 hover:scale-105 transition-transform"
+                                    className="cursor-pointer mt-5 bg-secondary text-white font-bold py-2 px-4 rounded-full w-[50%] hover:bg-yellow-600 hover:scale-105 transition-transform"
                                 >
                                     {pedidoSeleccionado.estado === Estado.SOLICITADO ? 'Preparar' : 'Completado'}
                                 </button>
