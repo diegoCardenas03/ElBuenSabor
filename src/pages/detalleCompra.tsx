@@ -160,11 +160,23 @@ const DetalleCompra = () => {
             })
             dispatch(vaciarCarrito());
             navigate('/');
-        } catch (error) {
+            
+        } catch (error: any) {
+            let mensaje = "Error al realizar el pedido";
+            if (error && error.mensaje) {
+                mensaje = error.mensaje;
+            }
+            else if (typeof error === "string") {
+                mensaje = error;
+            }
+            else if (error instanceof Error) {
+                mensaje = error.message;
+            }
+
             Swal.fire({
                 position: "center",
                 icon: "error",
-                text: "Error al realizar el pedido",
+                text: mensaje,
                 showConfirmButton: false,
                 timer: 1500,
                 width: "20em"
@@ -315,7 +327,7 @@ const DetalleCompra = () => {
                             {metodoPago === 'MERCADO_PAGO' && validaciones() && (
                                 <CheckoutMP pedido={pedidoArmado()} />
                             )}
-                                
+
                         </div>
                     </div>
                 </div>

@@ -48,7 +48,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     });
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Error al guardar empleado: ${errorText}`);
+      throw new Error(errorText);
     }
     // const newData = await response.json();
     // return newData as ResponseType;
@@ -66,7 +66,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
       });
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Error al guardar empleado: ${errorText}`);
+      throw new Error(errorText);
     }
     // const newData = await response.json();
     return "objeto actualizado" as ResponseType;
@@ -82,7 +82,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     });
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Error al guardar empleado: ${errorText}`);
+      throw new Error(errorText);
     }
     const newData = await response.json();
     return newData as ResponseType;
@@ -98,7 +98,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
     });
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Error al guardar empleado: ${errorText}`);
+      throw new Error(errorText);
     }
     const newData = await response.json();
     return newData as ResponseType;
