@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ProductoDTO } from "../types/Producto/ProductoDTO";
 import { ProductoService } from "../services/ProductoService";
 import { TableGeneric } from "../components/TableGeneric";
 import { CircularProgress, Switch } from "@mui/material";
@@ -10,6 +9,7 @@ import Swal from "sweetalert2";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { IoFilterSharp } from "react-icons/io5";
 import { truncar } from "../utils/Utils";
+import { ProductoResponseDTO } from "../types/Producto/ProductoResponseDTO";
 
 export const ScreenProducto = () => {
   const [loading, setLoading] = useState(false);
@@ -29,7 +29,7 @@ export const ScreenProducto = () => {
     {
       label: "Imagen",
       key: "urlImagen",
-      render: (producto: ProductoDTO) => (
+      render: (producto: ProductoResponseDTO) => (
         <img
           src={producto.urlImagen}
           alt={producto.denominacion}
@@ -44,15 +44,23 @@ export const ScreenProducto = () => {
     {
       label: "Descripción",
       key: "descripcion",
-      render: (producto: ProductoDTO) => truncar(producto.descripcion, 30),
+      render: (producto: ProductoResponseDTO) => truncar(producto.descripcion, 30),
     },
     {
       label: "Precio costo",
-      key: "precioCosto"
+      key: "precioCosto",
+      render: (producto: ProductoResponseDTO) => {
+        const precio = producto.precioCosto.toFixed(2);
+        return `$${precio}`;
+      },
     },
     {
       label: "Precio Venta",
       key: "precioVenta",
+      render: (producto: ProductoResponseDTO) => {
+        const precio = producto.precioVenta.toFixed(2);
+        return `$${precio}`;
+      },
     },
     {
       label: "Tiempo Estimado (min)",
@@ -61,15 +69,15 @@ export const ScreenProducto = () => {
     {
       label: "Rubro",
       key: "rubroId",
-      render: (producto: ProductoDTO) => {
-        const rubro = rubrosProductos.find(r => r.id === producto.rubroId);
+      render: (producto: ProductoResponseDTO) => {
+        const rubro = rubrosProductos.find(r => r.id === producto.rubro.id);
         return rubro ? rubro.denominacion : "-";
       },
     },
     {
       label: "Activo",
       key: "activo",
-      render: (producto: ProductoDTO) => (
+      render: (producto: ProductoResponseDTO) => (
         <Switch
           checked={producto.activo}
           onChange={async () => {
@@ -225,7 +233,7 @@ export const ScreenProducto = () => {
             <h2>Cargando...</h2>
           </div>
         ) : (
-          <TableGeneric<ProductoDTO>
+          <TableGeneric<ProductoResponseDTO>
             handleDelete={handleDelete}
             columns={ColumnsTableProducto}
             setOpenModal={setOpenModal}

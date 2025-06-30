@@ -63,12 +63,15 @@ export const ScreenInsumo = () => {
 
   const ColumnsTableInsumo = [
     { label: "Denominación", key: "denominacion" },
-    { label: "Precio Costo", key: "precioCosto" },
+    {
+      label: "Precio Costo", key: "precioCosto",
+      render: (insumo: InsumoResponseDTO) => '$' + insumo.precioCosto,
+    },
     {
       label: "Precio Venta",
       key: "precioVenta",
       render: (insumo: InsumoResponseDTO) =>
-        insumo.precioVenta ? insumo.precioVenta : "Sin precio venta",
+        insumo.precioVenta ? '$' + insumo.precioVenta : "Sin precio venta",
     },
     { label: "Stock Actual", key: "stockActual" },
     { label: "Stock Mínimo", key: "stockMinimo" },
@@ -135,7 +138,7 @@ export const ScreenInsumo = () => {
     <>
       <AdminHeader text="Insumos" />
       <div className="bg-[#FFF4E0] h-screen">
-<div className="flex flex-wrap justify-center items-center w-full gap-4 p-4">
+        <div className="flex flex-wrap justify-center items-center w-full gap-4 p-4">
 
           <div className="flex gap-4 items-center">
             <input
@@ -149,9 +152,9 @@ export const ScreenInsumo = () => {
               className="rounded-full bg-[#BD1E22] text-white px-4 py-2 font-primary font-semibold shadow hover:scale-105 transition text-lg"
             >
               <IoFilterSharp className="text-2xl" />
-              
+
             </button>
-            
+
           </div>
 
           <div className="flex gap-4">
