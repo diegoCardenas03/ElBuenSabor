@@ -14,12 +14,30 @@ import { FaSearch } from "react-icons/fa";
 import { getEstadoTexto, getTipoEnvioTexto, mostrarSoloNumero } from '../utils/PedidoUtils';
 import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
 import Swal from 'sweetalert2';
-
+import { jsPDF } from "jspdf";
+import { FormaPago } from '../types/enums/FormaPago';
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
   fechaDesde: string;
   fechaHasta: string;
   searchTerm: string;
+
+};
+
+const generarNotaCreditoPDF = (pedido) => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+  doc.text("Nota de Crédito", 20, 20);
+
+  doc.setFontSize(12);
+  doc.text(`Código de pedido: ${pedido.codigo}`, 20, 40);
+  doc.text(`Cliente: ${pedido.cliente?.nombreCompleto ?? "Sin nombre"}`, 20, 50);
+  doc.text(`Total devuelto: $${pedido.totalVenta?.toFixed(2) ?? 0}`, 20, 60);
+  doc.text(`Fecha de cancelación: ${new Date().toLocaleDateString()}`, 20, 70);
+  doc.text(`Motivo: Cancelación de pedido pagado por Mercado Pago`, 20, 80);
+
+  doc.save(`nota-credito-${pedido.codigo}.pdf`);
 };
 
 const MisPedidos = () => {
@@ -101,6 +119,22 @@ const MisPedidos = () => {
         </button>
       ),
     },
+    {
+      label: "Nota de Crédito",
+      key: "notaCredito",
+      render: (pedido: PedidoResponseDTO) => (
+        pedido.estado === Estado.CANCELADO && pedido.formaPago === FormaPago.MERCADO_PAGO ? (
+          <button
+            className='rounded cursor-pointer hover:transform hover:scale-111 transition-all duration-300 ease-in-out'
+            onClick={() => generarNotaCreditoPDF(pedido)}
+            title="Descargar Nota de Crédito"
+            style={{ marginLeft: 10, backgroundColor: '#f44336', color: 'white', padding: '5px 12px', border: 'none', borderRadius: '6px' }}
+          >
+            <MdOutlineFileDownload size={23} />
+          </button>
+        ) : null
+      ),
+    }
   ];
 
   const filtrarPedidos = (pedidos: PedidoResponseDTO[]): PedidoResponseDTO[] => {
