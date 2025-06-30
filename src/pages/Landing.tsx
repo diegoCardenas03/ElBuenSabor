@@ -14,6 +14,8 @@ import { fetchRubrosProductos, fetchRubrosInsumos } from "../hooks/redux/slices/
 import { motion } from "framer-motion";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import { markerIcon } from "./misDirecciones";
+import Swal from "sweetalert2";
+
 
 const Landing = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +39,17 @@ const Landing = () => {
 
 
   useEffect(() => {
+
+    if (localStorage.getItem('userStatus')) {
+      Swal.fire({
+        title: "¡Error!",
+        text: "Su usuario ha sido bloqueado temporalmente",
+        icon: "error",
+        confirmButtonText: "Entendido",
+      });
+      localStorage.removeItem('userStatus');
+    }
+
     const updateSentinel = () => {
       if (redCircleRef.current && sentinelRef.current) {
         sentinelRef.current.style.top = `${redCircleRef.current.offsetTop + redCircleRef.current.offsetHeight}px`;
