@@ -44,7 +44,7 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
               
               <ul className='pl-10'>
                 {pedido.detallePedidos.map((detalle, index) => {
-                  console.log(pedido.detallePedidos);
+                  // console.log(pedido.detallePedidos);
                   const nombre =
                     detalle.producto?.denominacion ||
                     detalle.insumo?.denominacion ||

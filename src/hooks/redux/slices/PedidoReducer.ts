@@ -47,7 +47,7 @@ export const fetchPedidosByUsuario = createAsyncThunk<PedidoResponseDTO[], numbe
   async (clienteId, { rejectWithValue }) => {
     try {
       const pedidoPorId = await pedidosService.getPedidosByUsuario(clienteId);
-      console.log("Pedidos del usuario:", pedidoPorId);
+      // console.log("Pedidos del usuario:", pedidoPorId);
       return pedidoPorId;
     } catch (error: any) {
       return rejectWithValue(error.message);

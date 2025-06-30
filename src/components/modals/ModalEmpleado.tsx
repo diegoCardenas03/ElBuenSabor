@@ -138,7 +138,7 @@ export const ModalEmpleado = ({
         setIsSubmitting(true);
         const empleadosService = new EmpleadosService();
         try {
-            console.log('values: ', values)
+            // console.log('values: ', values)
             if (empleado) {
                 await empleadosService.patch(empleado.id, values);
                 Swal.fire("¡Éxito!", "Empleado actualizado correctamente.", "success");

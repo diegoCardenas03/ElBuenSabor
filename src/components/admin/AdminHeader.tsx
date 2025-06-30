@@ -5,6 +5,8 @@ import { Rol } from "../../types/enums/Rol";
 import { UsuarioResponseDTO } from "../../types/Usuario/UsuarioResponseDTO";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
+import Swal from "sweetalert2";
+import { clearSession } from "../../hooks/useAuthHandler";
 
 interface AdminHeaderProps {
   showBackButton?: boolean;
@@ -37,7 +39,18 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       });
       return response.data as UsuarioResponseDTO;
     } catch (error) {
-      console.log(`[Protected Route] Error al validar token: ${error}`);
+      Swal.fire({
+        title: "¡Error!",
+        text: "Su identidad no ha podido validarse.",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+      clearSession();
+      logout({
+        logoutParams: {
+          returnTo: window.location.origin
+        }
+      });
     }
   }
 
@@ -48,7 +61,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       const data = await userData();
       if (data) {
         setRoles(data.roles.map((rol) => rol.nombre));
-        console.log('Roles: ', roles);
       };
     };
     fetchUserData();

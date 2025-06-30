@@ -82,12 +82,12 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   // ✅ AGREGAR: Funciones para cambiar entre modales
   const cambiarARegister = () => {
-    console.log('Cambiando a registro desde navbar');
+    // console.log('Cambiando a registro desde navbar');
     setTipoModal('register');
   };
 
   const cambiarALogin = () => {
-    console.log('Cambiando a login desde navbar');
+    // console.log('Cambiando a login desde navbar');
     setTipoModal('login');
   };
 

@@ -51,12 +51,12 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
   // Obtener id del rol auth0
   const obtenerIdRolAuth0Cliente = async () => {
     const rolName = sessionStorage.getItem('user_role');
-    console.log('Rol name: ' + rolName);
+    // console.log('Rol name: ' + rolName);
     try {
       const response = await interceptorApiClient.get(`/api/admin/roles/nombre/${rolName}`);
       return response.data.auth0RolId as string;
     } catch (error) {
-      console.log(`Error en obtenerIdRolAuth0: ${error}`);
+      // console.log(`Error en obtenerIdRolAuth0: ${error}`);
       return null;
     }
   };
@@ -123,7 +123,7 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
         usuario: usuarioDTO
       };
 
-      console.log("Enviando clienteDTO:", clienteDTO);
+      // console.log("Enviando clienteDTO:", clienteDTO);
 
       await axios.put(
         `${import.meta.env.VITE_API_SERVER_URL}/api/clientes/update/auth0Id/${user?.sub}`,
@@ -141,7 +141,7 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
         telefono: telefono
       });
 
-      console.log("[ModalExtraData] Datos actualizados y sessionStorage completado");
+      // console.log("[ModalExtraData] Datos actualizados y sessionStorage completado");
 
       Swal.fire({
         icon: "success",

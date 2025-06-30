@@ -50,7 +50,7 @@ export const MenuPage: React.FC = () => {
     // Cargar promociones
     const promocionService = new PromocionService();
     promocionService.getAll().then((data) => {
-      console.log("Promociones recibidas:", data);
+      // console.log("Promociones recibidas:", data);
       const activas = data.filter((promo: PromocionResponseDTO) => promo.activo);
       setPromociones(activas);
     });

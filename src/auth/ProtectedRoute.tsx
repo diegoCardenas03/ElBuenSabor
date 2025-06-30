@@ -36,7 +36,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
       });
       return response.data as UsuarioResponseDTO;
     } catch (error) {
-      console.log(`[Protected Route] Error al validar token: ${error}`);
       Swal.fire({
         title: "¡Error!",
         text: "Su identidad no ha podido validarse. Redirigiendo...",
@@ -53,7 +52,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   useEffect(() => {
     const fetchUserData = async () => {
       const data = await userData();
-      console.log('userDatA: ', data)
       if (data) setUserDataState(data);
     };
     fetchUserData();
@@ -63,17 +61,13 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   const hasAllowedRole =
     userDataState?.roles?.some((rol: any) => allowedRoles.includes(rol.nombre));
 
-  console.log('Has allowed Role, ', hasAllowedRole);
-
   // 1. Loading de Auth0
   if (isLoading) {
-    console.log("[ProtectedRoute] Auth0 loading...");
     return <Loader />;
   }
 
   // 2. No autenticado
   if (!isAuthenticated) {
-    console.log("[ProtectedRoute] No autenticado, redirigiendo al home");
     clearSession();
     return <Navigate to="/" replace />;
   }
@@ -85,12 +79,10 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
 
   // 4. Si está autenticado, es valido el token y cumple con los roles se redirige al hijo
   if (isAuthenticated && hasAllowedRole) {
-    console.log("[ProtectedRoute] Acceso por Redux");
     return <>{children}</>;
   }
 
   // 6. Si terminó el proceso y no tiene permisos, redirige
-  // console.log("[ProtectedRoute] Sin permisos, redirigiendo al home");
   // Swal.fire({
   //   title: "¡Error!",
   //   text: "Ten cuidado amiguito, se donde vives.",
@@ -99,7 +91,6 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
   // })
 
   if (isAuthenticated && !hasAllowedRole) {
-    console.log('[ProtectedRoute] Autenticado pero sin roles');
     return <PaginaNoExiste />;
   }
 
@@ -131,12 +122,10 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props) => {
 //   (hasAllowedRole) &&
 //   (authStatus === 'idle' || authStatus === 'checking' || authStatus === 'creating-user')
 // ) {
-//   console.log("[ProtectedRoute] Esperando datos de sesión o rol...");
 //   return <Loader message="Esperando datos de sesión..." />;
 // }
 
 // // 4. Si hay datos en sessionStorage válidos, permite acceso
 // if (sessionCompleted && hasAllowedRole) {
-//   console.log("[ProtectedRoute] Acceso por sessionStorage");
 //   return <>{children}</>;
 // }
