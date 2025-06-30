@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { abrirCarrito, cerrarCarrito } from '../../hooks/redux/slices/AbrirCarritoReducer';
 import Swal from 'sweetalert2';
-import { fetchPedidosByUsuario, setPedidoEnCurso } from '../../hooks/redux/slices/PedidoReducer';
+import { fetchPedidosByUsuario } from '../../hooks/redux/slices/PedidoReducer';
 import PedidoDetalleModal from '../modals/PedidoDetalleModal';
 import { PedidoResponseDTO } from '../../types/Pedido/PedidoResponseDTO';
 import { useAuthHandler } from '../../hooks/useAuthHandler';
