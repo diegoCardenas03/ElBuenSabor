@@ -94,7 +94,7 @@ const RoutesApp = () => {
       <Route
         path="/admin/PedidosCocinero"
         element={
-          <ProtectedRoute allowedRoles={['Cocinero', 'Admin', 'SuperAdmin', 'Cajero']}>
+          <ProtectedRoute allowedRoles={['Cocinero', 'Admin', 'SuperAdmin']}>
             <PedidosCocinero />
           </ProtectedRoute>
         }
