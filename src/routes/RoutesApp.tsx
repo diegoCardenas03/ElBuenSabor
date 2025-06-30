@@ -179,7 +179,7 @@ const RoutesApp = () => {
           </ProtectedRoute>
         }
       />
-      {/* <Route
+      <Route
         path="/admin/ProductosEstadistica"
         element={
           <ProtectedRoute allowedRoles={['SuperAdmin', 'Admin']}>
@@ -194,7 +194,7 @@ const RoutesApp = () => {
             <ClientesEstadisticas/>
           </ProtectedRoute>
         }
-      /> */}
+      /> 
     </Routes>
 
     /*  
