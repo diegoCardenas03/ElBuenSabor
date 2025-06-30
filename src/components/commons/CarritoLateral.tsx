@@ -34,18 +34,18 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
 
   const handleRealizarPedido = async () => {
     // Validar horario local del usuario para cualquier tipo de compra
-    const hora = new Date().getHours();
-    if (hora < 10 || hora >= 23) {
-      Swal.fire({
-        position: "center",
-        icon: "warning",
-        text: "El local está cerrado. Solo puedes pedir entre las 10:00 y las 23:00.",
-        showConfirmButton: false,
-        timer: 2000,
-        width: "22em"
-      });
-      return;
-    }
+    // const hora = new Date().getHours();
+    // if (hora < 10 || hora >= 23) {
+    //   Swal.fire({
+    //     position: "center",
+    //     icon: "warning",
+    //     text: "El local está cerrado. Solo puedes pedir entre las 10:00 y las 23:00.",
+    //     showConfirmButton: false,
+    //     timer: 2000,
+    //     width: "22em"
+    //   });
+    //   return;
+    // }
 
     if (pedidoEnCurso) {
       Swal.fire({

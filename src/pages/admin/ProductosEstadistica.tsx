@@ -22,6 +22,7 @@ type PedidoResponseDTO = {
     producto?: ProductoOInsumo | null;
     insumo?: ProductoOInsumo | null;
     subTotal: number;
+    promocion?: any; // Para promociones de cualquier estructura
   }[];
   fecha: string;
   totalVenta: number;
@@ -48,18 +49,27 @@ const ProductosEstadistica = () => {
         if (!resp.ok) throw new Error("Error al consultar pedidos entregados");
         const pedidos: PedidoResponseDTO[] = await resp.json();
 
+        // LOG: pedidos completos
+        console.log("Pedidos recibidos:", JSON.parse(JSON.stringify(pedidos)));
+
         // Filtra por fecha si corresponde
         let pedidosFiltrados = pedidos;
         if (fechaDesde) pedidosFiltrados = pedidosFiltrados.filter(p => p.fecha >= fechaDesde);
         if (fechaHasta) pedidosFiltrados = pedidosFiltrados.filter(p => p.fecha <= fechaHasta);
 
+        console.log("Pedidos filtrados:", pedidosFiltrados);
+
         // Acumula compras por producto (elaborados) y por insumo (no elaborable/bebidas)
         const productosMap: Record<string, ProductoRanking> = {};
         const insumosMap: Record<string, ProductoRanking> = {};
 
-        pedidosFiltrados.forEach(pedido => {
-          pedido.detallePedidos.forEach(detalle => {
+        pedidosFiltrados.forEach((pedido, pedidoIdx) => {
+          console.log(`Analizando pedido #${pedidoIdx} con fecha ${pedido.fecha}:`, pedido);
+          pedido.detallePedidos.forEach((detalle, detalleIdx) => {
+            console.log(`  Detalle #${detalleIdx}:`, detalle);
+
             if (detalle.producto) {
+              console.log("    Es producto directo:", detalle.producto);
               const key = detalle.producto.denominacion;
               if (!productosMap[key]) {
                 productosMap[key] = {
@@ -70,7 +80,9 @@ const ProductosEstadistica = () => {
               }
               productosMap[key].cantidadCompras += detalle.cantidad;
               productosMap[key].importeTotal += Number(detalle.subTotal) || 0;
+              console.log("    Producto agregado/sumado:", productosMap[key]);
             } else if (detalle.insumo) {
+              console.log("    Es insumo directo:", detalle.insumo);
               const key = detalle.insumo.denominacion;
               if (!insumosMap[key]) {
                 insumosMap[key] = {
@@ -81,17 +93,63 @@ const ProductosEstadistica = () => {
               }
               insumosMap[key].cantidadCompras += detalle.cantidad;
               insumosMap[key].importeTotal += Number(detalle.subTotal) || 0;
+              console.log("    Insumo agregado/sumado:", insumosMap[key]);
+            }
+            // LOG: Detalle de promoción (sea cual sea la estructura)
+            if (detalle.promocion) {
+              console.log("    Detalle de promoción encontrado:", detalle.promocion);
+              // AJUSTE: ahora usamos detallePromociones (plural) según tu JSON
+              if (detalle.promocion.detallePromociones) {
+                console.log("    detallePromociones en promo:", detalle.promocion.detallePromociones);
+                detalle.promocion.detallePromociones.forEach((dp, idxPromo) => {
+                  console.log(`      Item en promo #${idxPromo}:`, dp);
+                  // Sumar productos
+                  if (dp.producto) {
+                    const key = dp.producto.denominacion;
+                    if (!productosMap[key]) {
+                      productosMap[key] = {
+                        denominacion: dp.producto.denominacion,
+                        cantidadCompras: 0,
+                        importeTotal: 0,
+                      };
+                    }
+                    productosMap[key].cantidadCompras += detalle.cantidad * dp.cantidad;
+                    // El importeTotal no se suma porque en promos no se reparte el subtotal individual
+                    console.log("      Producto agregado/sumado por promo:", productosMap[key]);
+                  }
+                  // Sumar insumos
+                  if (dp.insumo) {
+                    const key = dp.insumo.denominacion;
+                    if (!insumosMap[key]) {
+                      insumosMap[key] = {
+                        denominacion: dp.insumo.denominacion,
+                        cantidadCompras: 0,
+                        importeTotal: 0,
+                      };
+                    }
+                    insumosMap[key].cantidadCompras += detalle.cantidad * dp.cantidad;
+                    console.log("      Insumo agregado/sumado por promo:", insumosMap[key]);
+                  }
+                });
+              }
             }
           });
         });
+
+        console.log("ProductosMap final:", productosMap);
+        console.log("InsumosMap final:", insumosMap);
 
         // Convierte los maps a arrays y ordena por cantidad/compras descendente
         const productosArray = Object.values(productosMap).sort((a, b) => b.cantidadCompras - a.cantidadCompras);
         const insumosArray = Object.values(insumosMap).sort((a, b) => b.cantidadCompras - a.cantidadCompras);
 
+        console.log("Productos ordenados finales:", productosArray);
+        console.log("Insumos ordenados finales:", insumosArray);
+
         setProductos(productosArray);
         setInsumos(insumosArray);
       } catch (e) {
+        console.log("Error en fetchProductos:", e);
         setProductos([]);
         setInsumos([]);
       } finally {
@@ -165,7 +223,7 @@ const ProductosEstadistica = () => {
     // Estilos Productos
     wsProductos.getRow(1).eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }}; // mismo color de la 1era página
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
       cell.alignment = { vertical: "middle", horizontal: "center" };
       cell.border = { bottom: {style: 'thin'} };
     });
@@ -193,7 +251,7 @@ const ProductosEstadistica = () => {
     // Fondo igual que productos para uniformidad
     wsInsumos.getRow(1).eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }}; // mismo color
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
       cell.alignment = { vertical: "middle", horizontal: "center" };
       cell.border = { bottom: {style: 'thin'} };
     });

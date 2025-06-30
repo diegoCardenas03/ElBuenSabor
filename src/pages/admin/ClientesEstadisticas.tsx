@@ -10,6 +10,7 @@ type ProductoPedido = {
   nombre: string;
   cantidad: number;
   precio: number;
+  detallePromo?: { nombre: string; cantidad: number }[];
 };
 
 type PedidoCliente = {
@@ -59,7 +60,6 @@ const PedidoDetalleModal = ({ pedido, onClose }: PedidoDetalleModalProps) => {
       return;
     }
     try {
-      // Ajusta la URL según tu backend, normalmente: /api/facturas/pdf/{pedidoId}
       const res = await fetch(`${API_BASE}/api/facturas/pdf/${pedido.id}`);
       if (!res.ok) {
         alert("No se pudo descargar la factura.");
@@ -87,18 +87,32 @@ const PedidoDetalleModal = ({ pedido, onClose }: PedidoDetalleModalProps) => {
         {pedido.direccionEntrega && <div className="mb-2"><b>Dirección de Entrega:</b> {pedido.direccionEntrega}</div>}
         <div className="mb-2"><b>Productos:</b></div>
         <ul className="list-disc ml-5 mt-1">
-          {(pedido.productos || []).map((prod, i) => (
-            <li key={i}>
-              {prod.nombre} x{prod.cantidad} - {formatPrecio(prod.precio)}
-            </li>
-          ))}
+          {(pedido.productos || []).map((prod, i) =>
+            prod.detallePromo ? (
+              <li key={i} style={{ marginBottom: 8 }}>
+                <span>
+                  <b>{prod.nombre}</b> (x{prod.cantidad}) - {formatPrecio(prod.precio)}
+                </span>
+                <ul className="ml-4 mt-1 list-circle text-gray-700">
+                  {prod.detallePromo.map((item, idx) => (
+                    <li key={idx}>
+                      {item.nombre} x{item.cantidad}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ) : (
+              <li key={i}>
+                {prod.nombre} x{prod.cantidad} - {formatPrecio(prod.precio)}
+              </li>
+            )
+          )}
         </ul>
         <div className="mt-3 border-t pt-2 text-sm text-gray-600">
           <div><b>Subtotal productos:</b> {formatPrecio(subtotalProductos)}</div>
           {pedido.costoEnvio ? <div><b>Costo de envío:</b> {formatPrecio(pedido.costoEnvio)}</div> : null}
           <div><b>Total del pedido:</b> {formatPrecio(pedido.importeTotal)}</div>
         </div>
-        {/* --- BOTÓN DESCARGAR FACTURA --- */}
         <div className="mt-4 flex justify-end">
           <button
             onClick={handleDescargarFactura}
@@ -122,13 +136,11 @@ const ClientesEstadisticas = () => {
   const [clienteNombre, setClienteNombre] = useState<string>("");
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState<PedidoCliente | null>(null);
 
-  // Filtros
   const [fechaDesde, setFechaDesde] = useState<string>("");
   const [fechaHasta, setFechaHasta] = useState<string>("");
 
   useEffect(() => {
     if (!clienteId) return;
-    // Datos cliente
     fetch(`${API_BASE}/api/clientes/${clienteId}`)
       .then(async res => {
         const text = await res.text();
@@ -141,7 +153,6 @@ const ClientesEstadisticas = () => {
       })
       .catch(() => setClienteNombre(""));
 
-    // Pedidos
     let pedidosUrl = `${API_BASE}/api/pedidos/cliente/${clienteId}`;
     const params: string[] = [];
     if (fechaDesde) params.push(`fechaDesde=${fechaDesde}`);
@@ -154,33 +165,62 @@ const ClientesEstadisticas = () => {
         try {
           const data = JSON.parse(text);
           if (!Array.isArray(data)) { setPedidos([]); return; }
-          let mapped: PedidoCliente[] = data.map((pedido: any) => ({
-            id: pedido.id,
-            fecha: pedido.fecha,
-            hora: pedido.hora,
-            numeroPedido: pedido.codigo,
-            importeTotal: pedido.totalVenta,
-            estado: pedido.estado,
-            tipoEnvio: pedido.tipoEnvio,
-            formaPago: pedido.formaPago,
-            direccionEntrega: pedido.domicilio
-              ? `${pedido.domicilio.calle} ${pedido.domicilio.numero}, ${pedido.domicilio.localidad}`
-              : "",
-            costoEnvio: pedido.costoEnvio,
-            productos: Array.isArray(pedido.detallePedidos)
-              ? pedido.detallePedidos.map((detalle: any) => ({
-                  nombre: detalle.producto
-                    ? detalle.producto.denominacion
-                    : detalle.insumo
-                    ? detalle.insumo.denominacion
-                    : "Producto/insumo desconocido",
-                  cantidad: detalle.cantidad,
-                  precio: detalle.subTotal ?? (detalle.cantidad * (detalle.producto?.precioVenta || detalle.insumo?.precioVenta || 0)),
-                }))
-              : []
-          }));
+          let mapped: PedidoCliente[] = data.map((pedido: any) => {
+            const productos: ProductoPedido[] = [];
+            if (Array.isArray(pedido.detallePedidos)) {
+              pedido.detallePedidos.forEach((detalle: any) => {
+                if (detalle.producto) {
+                  productos.push({
+                    nombre: detalle.producto.denominacion,
+                    cantidad: detalle.cantidad,
+                    precio: detalle.subTotal ?? (detalle.cantidad * (detalle.producto?.precioVenta || 0)),
+                  });
+                } else if (detalle.insumo) {
+                  productos.push({
+                    nombre: detalle.insumo.denominacion,
+                    cantidad: detalle.cantidad,
+                    precio: detalle.subTotal ?? (detalle.cantidad * (detalle.insumo?.precioVenta || 0)),
+                  });
+                } else if (detalle.promocion && detalle.promocion.detallePromociones) {
+                  const detallePromo = detalle.promocion.detallePromociones.map((dp: any) =>
+                    dp.producto
+                      ? { nombre: dp.producto.denominacion, cantidad: detalle.cantidad * dp.cantidad }
+                      : dp.insumo
+                      ? { nombre: dp.insumo.denominacion, cantidad: detalle.cantidad * dp.cantidad }
+                      : { nombre: "Producto/insumo desconocido", cantidad: detalle.cantidad }
+                  );
+                  productos.push({
+                    nombre: detalle.promocion.denominacion,
+                    cantidad: detalle.cantidad,
+                    precio: detalle.subTotal ?? 0,
+                    detallePromo,
+                  });
+                } else {
+                  productos.push({
+                    nombre: "Producto/insumo desconocido",
+                    cantidad: detalle.cantidad,
+                    precio: detalle.subTotal ?? 0,
+                  });
+                }
+              });
+            }
+            return {
+              id: pedido.id,
+              fecha: pedido.fecha,
+              hora: pedido.hora,
+              numeroPedido: pedido.codigo,
+              importeTotal: pedido.totalVenta,
+              estado: pedido.estado,
+              tipoEnvio: pedido.tipoEnvio,
+              formaPago: pedido.formaPago,
+              direccionEntrega: pedido.domicilio
+                ? `${pedido.domicilio.calle} ${pedido.domicilio.numero}, ${pedido.domicilio.localidad}`
+                : "",
+              costoEnvio: pedido.costoEnvio,
+              productos
+            };
+          });
 
-          // Filtro frontend extra
           if (fechaDesde) mapped = mapped.filter(p => p.fecha >= fechaDesde);
           if (fechaHasta) mapped = mapped.filter(p => p.fecha <= fechaHasta);
 
@@ -212,17 +252,14 @@ const ClientesEstadisticas = () => {
   // --- EXPORTAR EXCEL ---
   const handleExportarExcel = async () => {
     const wb = new ExcelJS.Workbook();
-    // Hoja pedidos
     const ws = wb.addWorksheet("Pedidos del cliente");
 
-    // Encabezado
     const encabezado = [
       "N° Pedido", "Fecha", "Hora", "Estado", "Forma de Pago",
       "Tipo Envío", "Dirección Entrega", "Costo Envío", "Importe Total", "Productos"
     ];
     ws.addRow(encabezado);
 
-    // Estilo encabezado
     ws.getRow(1).eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
@@ -231,23 +268,17 @@ const ClientesEstadisticas = () => {
     });
 
     ws.columns = [
-      { width: 14 }, // N° Pedido
-      { width: 12 }, // Fecha
-      { width: 8 },  // Hora
-      { width: 14 }, // Estado
-      { width: 18 }, // Forma de Pago
-      { width: 14 }, // Tipo Envío
-      { width: 30 }, // Dirección Entrega
-      { width: 12 }, // Costo Envío
-      { width: 16, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } }, // Importe Total
-      { width: 40 } // Productos
+      { width: 14 }, { width: 12 }, { width: 8 }, { width: 14 }, { width: 18 },
+      { width: 14 }, { width: 30 }, { width: 12 }, { width: 16, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } }, { width: 40 }
     ];
 
-    // Agregar pedidos
     pedidos.forEach(pedido => {
       const productosStr = (pedido.productos || [])
-        .map(p => `${p.nombre} (x${p.cantidad}) - ${formatPrecio(p.precio)}`)
-        .join("; ");
+        .map(p =>
+          p.detallePromo
+            ? `${p.nombre} (x${p.cantidad}) - ${formatPrecio(p.precio)} [${p.detallePromo.map(x => `${x.nombre} x${x.cantidad}`).join(", ")}]`
+            : `${p.nombre} (x${p.cantidad}) - ${formatPrecio(p.precio)}`
+        ).join("; ");
       ws.addRow([
         pedido.numeroPedido,
         pedido.fecha,
@@ -262,11 +293,9 @@ const ClientesEstadisticas = () => {
       ]);
     });
 
-    // Formato moneda para columna "Costo Envío" e "Importe Total"
     ws.getColumn(8).numFmt = '"$"#,##0.00;[Red]\\-"$"#,##0.00';
     ws.getColumn(9).numFmt = '"$"#,##0.00;[Red]\\-"$"#,##0.00';
 
-    // Hoja info
     if (clienteNombre) {
       const wsInfo = wb.addWorksheet("Info cliente");
       wsInfo.addRow(["Cliente", clienteNombre]);
@@ -277,7 +306,6 @@ const ClientesEstadisticas = () => {
       wsInfo.columns = [{ width: 12 }, { width: 35 }];
     }
 
-    // Descargar
     const buffer = await wb.xlsx.writeBuffer();
     saveAs(new Blob([buffer], { type: "application/octet-stream" }), `pedidos_cliente_${clienteNombre || clienteId}.xlsx`);
   };
