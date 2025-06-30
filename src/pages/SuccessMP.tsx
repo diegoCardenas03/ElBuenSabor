@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { useAppDispatch } from "../hooks/redux";
 import { vaciarCarrito } from "../hooks/redux/slices/CarritoReducer";
 import { useNavigate } from "react-router-dom";
 import pizzaImg from '../assets/pizza-roja.png';

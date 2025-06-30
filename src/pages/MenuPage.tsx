@@ -105,14 +105,16 @@ export const MenuPage: React.FC = () => {
         onSearch={(term) => dispatch(setSearchTerm(term))}
         onFiltersChange={(f) => dispatch(setFilters(f))}
       >
-        <div className="flex flex-col items-center">
-          <h3 className='text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase'>Promociones Vigentes</h3>
-          <ProductCards
-            products={promociones}
-            onCardClick={handleCardClick}
-            showBadges={true}
-          />
-        </div>
+        {!searchTerm && (
+          <div className="flex flex-col items-center">
+            <h3 className='text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase'>Promociones Vigentes</h3>
+            <ProductCards
+              products={promociones}
+              onCardClick={handleCardClick}
+              showBadges={true}
+            />
+          </div>
+        )}
         <div className="flex flex-col items-center mt-8">
           {/* Categorías */}
           <h3 className="text-4xl font-tertiary text-[#FF9D3A] text-center mb-4 uppercase">
@@ -153,4 +155,4 @@ export const MenuPage: React.FC = () => {
   );
 };
 
-export default MenuPage; 
+export default MenuPage;
