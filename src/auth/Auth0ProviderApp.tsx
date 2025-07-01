@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 const VITE_AUTH0_DOMAIN = import.meta.env.VITE_AUTH0_DOMAIN;
 const VITE_AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID;
 // Ya no necesitas VITE_AUTH0_CALLBACK_URL para popup
-const VITE_AUTH0_CALLBACK_URL = import.meta.env.VITE_AUTH0_CALLBACK_URL;
+// const VITE_AUTH0_CALLBACK_URL = import.meta.env.VITE_AUTH0_CALLBACK_URL;gi
 const VITE_AUTH0_AUDIENCE = import.meta.env.VITE_AUTH0_AUDIENCE;
 
 type Props = {
@@ -29,8 +29,8 @@ export const Auth0ProviderApp: FC<Props> = ({ children }) => {
       authorizationParams={{
         audience: VITE_AUTH0_AUDIENCE,
         // Cambiamos redirect_uri por el origin actual
-        // redirect_uri: `${window.location.origin}/callback`,
-        redirect_uri: `${VITE_AUTH0_CALLBACK_URL}/callback`,
+        redirect_uri: `${window.location.origin}/callback`,
+        // redirect_uri: `${VITE_AUTH0_CALLBACK_URL}/callback`,
       }}
       onRedirectCallback={onRedirectCallback}
     >
