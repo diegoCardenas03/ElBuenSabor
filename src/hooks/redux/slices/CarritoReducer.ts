@@ -54,7 +54,7 @@ const carritoReducer = createSlice({
     agregarProducto: (state, action: PayloadAction<CarritoItemType>) => {
       const id = obtenerId(action.payload);
       const index = state.items.findIndex((i) => obtenerId(i.item) === id);
-
+      
       if (index >= 0) {
         state.items[index].cant += 1;
       } else {

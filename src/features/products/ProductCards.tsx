@@ -3,54 +3,56 @@ import { useDispatch } from "react-redux";
 import { agregarProducto } from "../../hooks/redux/slices/CarritoReducer";
 import { PromocionResponseDTO } from '../../types/Promocion/PromocionResponseDTO';
 import Swal from 'sweetalert2';
+import { useAuth0 } from '@auth0/auth0-react';
 
- 
+
 interface ProductCardsProps {
   products: ProductoUnificado[];
   onCardClick?: (product: ProductoUnificado) => void;
   showBadges?: boolean;
 }
 
-export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick}) => {
+export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClick }) => {
   const dispatch = useDispatch();
+  const { user } = useAuth0();
 
- const handleAgregar = (product: ProductoUnificado) => {
-  const result = dispatch(agregarProducto(product)); 
+  const handleAgregar = (product: ProductoUnificado) => {
+    const result = dispatch(agregarProducto(product));
 
-  const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
+    const isPromo = 'fechaDesde' in product && 'fechaHasta' in product;
 
-  if (result && isPromo) {
-    Swal.fire({
-      position: "bottom-end",
-      icon: "success",
-      text: "Promoción agregada al carrito",
-      timer: 1000,
-      showConfirmButton: false,
-      width: "20em"
-    });
-    return;
-  }
+    if (result && isPromo) {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        text: "Promoción agregada al carrito",
+        timer: 1000,
+        showConfirmButton: false,
+        width: "20em"
+      });
+      return;
+    }
 
-  if (result) {
-    Swal.fire({
-      position: "bottom-end",
-      icon: "success",
-      text: "Producto agregado correctamente",
-      showConfirmButton: false,
-      timer: 1000,
-      width: "20em"
-    });
-  } else {
-    Swal.fire({
-      position: "bottom-end",
-      icon: "error",
-      text: "El producto no se pudo agregar al carrito",
-      showConfirmButton: false,
-      timer: 1000,
-      width: "20em"
-    });
-  }
-};
+    if (result) {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "success",
+        text: "Producto agregado correctamente",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    } else {
+      Swal.fire({
+        position: "bottom-end",
+        icon: "error",
+        text: "El producto no se pudo agregar al carrito",
+        showConfirmButton: false,
+        timer: 1000,
+        width: "20em"
+      });
+    }
+  };
 
 
   return (
@@ -96,12 +98,15 @@ export const ProductCards: React.FC<ProductCardsProps> = ({ products, onCardClic
                 ${price.toFixed(2)}
               </p>
             </div>
-            <button
-              className="mt-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer"
-              onClick={() => handleAgregar(product)}
-            >
-              Añadir
-            </button>
+            {user && (
+              <button
+                className="mt-auto bg-orange-400 hover:bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-semibold cursor-pointer"
+                onClick={() => handleAgregar(product)}
+              >
+                Añadir
+              </button>
+            )}
+
           </div>
         );
       })}
