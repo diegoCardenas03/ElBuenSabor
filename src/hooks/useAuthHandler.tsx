@@ -240,16 +240,25 @@ export const useAuthHandler = () => {
         saveToSession('user_picture', user?.picture || "");
 
         try {
-          const response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
-          const nombreCompleto = response.data?.nombreCompleto || user?.email?.split('@')[0] || "Usuario";
-          saveToSession('user_name', nombreCompleto);
-          saveToSession('user_id_db', response.data?.id);
+          if (rol === 'Cliente') {
+            const response = await interceptorApiClient.get(`/api/clientes/email/${user.email}`);
+            const nombreCompleto = response.data?.nombreCompleto || user?.email?.split('@')[0] || "Usuario";
+            saveToSession('user_name', nombreCompleto);
+            saveToSession('user_id_db', response.data?.id);
+          }
+          else {
+            const response = await interceptorApiClient.get(`/api/empleados/email/${user.email}`);
+            const nombreCompleto = response.data?.nombreCompleto || user?.email?.split('@')[0] || "Usuario";
+            saveToSession('user_name', nombreCompleto);
+            saveToSession('user_id_db', response.data?.id);
+          }
+
         } catch (e) {
           // Si falla, usar el email como fallback
           saveToSession('user_name', user?.email?.split('@')[0] || "Usuario");
-          
+
         }
-        
+
         processedUserRef.current = user.sub;
         setAuthStatus('completed');
         // console.log("[useAuthHandler] Rol desde Auth0, acceso directo");
