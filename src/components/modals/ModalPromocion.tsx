@@ -61,18 +61,41 @@ export const ModalPromocion = ({
       .catch(() => setInsumos([]));
   }, []);
 
-  const initialValues: PromocionDTO =
-    elementActive && "denominacion" in elementActive
-      ? (elementActive as PromocionDTO)
-      : {
-          denominacion: "",
-          urlImagen: "",
-          fechaDesde: "",
-          fechaHasta: "",
-          descuento: 0,
-          detallePromociones: [],
-          descripcion: "",
-        };
+  function isPromocion(obj: any): obj is PromocionDTO {
+  return (
+    obj &&
+    typeof obj === "object" &&
+    "denominacion" in obj &&
+    "descripcion" in obj &&
+    "fechaDesde" in obj &&
+    "fechaHasta" in obj &&
+    "descuento" in obj &&
+    "detallePromociones" in obj &&
+    "activo" in obj
+  );
+}
+
+  const initialValues: PromocionDTO = isPromocion(elementActive)
+  ? {
+      denominacion: elementActive.denominacion,
+      urlImagen: elementActive.urlImagen,
+      fechaDesde: elementActive.fechaDesde,
+      fechaHasta: elementActive.fechaHasta,
+      descuento: elementActive.descuento,
+      detallePromociones: elementActive.detallePromociones ?? [],
+      descripcion: elementActive.descripcion,
+      activo: elementActive.activo,
+    }
+  : {
+      denominacion: "",
+      urlImagen: "",
+      fechaDesde: "",
+      fechaHasta: "",
+      descuento: 0,
+      detallePromociones: [],
+      descripcion: "",
+      activo: true,
+    };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -141,9 +164,9 @@ export const ModalPromocion = ({
                     .required(),
                 })
               ),
-              descripcion: Yup.string()
-                .required("Campo requerido")
-                .max(500, "La descripción no puede exceder los 500 caracteres"),
+            descripcion: Yup.string()
+              .required("Campo requerido")
+              .max(500, "La descripción no puede exceder los 500 caracteres"),
 
           })}
           enableReinitialize
@@ -165,7 +188,7 @@ export const ModalPromocion = ({
                 imageUrl = data.secure_url;
               }
 
-              const detallePromociones = values.detallePromociones
+              const detallePromociones: DetallePromocionDTO[] = values.detallePromociones
                 .map((detalle: any) => {
                   let productoId =
                     detalle.productoId ??
@@ -252,6 +275,7 @@ export const ModalPromocion = ({
                     label="Fecha hasta:"
                     name="fechaHasta"
                     type="date"
+
                   />
 
                   <TextFieldValue
@@ -267,7 +291,7 @@ export const ModalPromocion = ({
                     placeholder="Ingrese una descripción"
                   />
                 </div>
-                
+
 
                 {/* Columna derecha */}
                 <div className="input-col">
@@ -325,36 +349,25 @@ export const ModalPromocion = ({
                         placeholder="Cantidad"
                       />
                       <Button
+                        type="submit"
                         variant="contained"
-                        color="primary"
-                        onClick={() => {
-                          // Solo uno de los dos debe estar seleccionado
-                          if (
-                            ((productoId && !insumoId) ||
-                              (!productoId && insumoId)) &&
-                            cantidad > 0 &&
-                            !values.detallePromociones.some(
-                              (d: DetallePromocionDTO) =>
-                                d.productoId === productoId &&
-                                d.insumoId === insumoId
-                            )
-                          ) {
-                            setFieldValue("detallePromociones", [
-                              ...values.detallePromociones,
-                              { productoId, insumoId, cantidad },
-                            ]);
-                            setProductoId(0);
-                            setInsumoId(0);
-                            setCantidad(1);
-                          }
+                        sx={{
+                          backgroundColor: "#f9a825",
+                          color: "white",
+                          fontWeight: "bold",
+                          "&:hover": { backgroundColor: "#f57f17" },
+                          px: 4,
+                          borderRadius: "25px",
                         }}
                         disabled={
-                          (!productoId && !insumoId) ||
-                          (productoId && insumoId) ||
-                          cantidad <= 0
+                          !isValid ||
+                          !dirty ||
+                          isSubmitting ||
+                          values.detallePromociones.length === 0 ||
+                          (!previewUrl && !values.urlImagen)
                         }
                       >
-                        Agregar
+                        Guardar
                       </Button>
                     </div>
                     {/* Lista de productos/insumos agregados */}
@@ -389,8 +402,8 @@ export const ModalPromocion = ({
                                 {producto
                                   ? `Producto: ${producto.denominacion}`
                                   : insumo
-                                  ? `Insumo: ${insumo.denominacion}`
-                                  : "Item"}
+                                    ? `Insumo: ${insumo.denominacion}`
+                                    : "Item"}
                               </span>
                               <input
                                 type="number"

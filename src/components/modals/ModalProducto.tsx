@@ -84,31 +84,36 @@ export const ModalProducto = ({
   }, []);
 
   const initialValues: ProductoDTO =
-    elementActive && "descripcion" in elementActive && "tiempoEstimadoPreparacion" in elementActive
-      ? {
-          id: elementActive.id,
-          denominacion: elementActive.denominacion,
-          descripcion: elementActive.descripcion,
-          tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
-          precioVenta: elementActive.precioVenta,
-          urlImagen: elementActive.urlImagen,
-          activo: elementActive.activo,
-          rubroId: elementActive.rubro?.id ?? 0,
-          margenGanancia: elementActive.margenGanancia ?? 0, 
-          detalleProductos: elementActive.detalleProductos ?? [],
-        }
-      : {
-          id: 0,
-          denominacion: "",
-          descripcion: "",
-          tiempoEstimadoPreparacion: 0,
-          precioVenta: 0,
-          urlImagen: "",
-          activo: true,
-          rubroId: 0,
-          margenGanancia: 0,
-          detalleProductos: [],
-        };
+  elementActive && "descripcion" in elementActive && "tiempoEstimadoPreparacion" in elementActive
+    ? {
+        id: elementActive.id,
+        denominacion: elementActive.denominacion,
+        descripcion: elementActive.descripcion,
+        tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
+        precioVenta: elementActive.precioVenta,
+        urlImagen: elementActive.urlImagen,
+        activo: elementActive.activo,
+        rubroId: elementActive.rubro?.id ?? 0,
+        margenGanancia: elementActive.margenGanancia ?? 0,
+        detalleProductos: Array.isArray(elementActive.detalleProductos)
+          ? elementActive.detalleProductos.map((detalle: any) => ({
+              insumoId: detalle.insumo?.id ?? detalle.insumoId ?? 0,
+              cantidad: detalle.cantidad ?? 0,
+            }))
+          : [],
+      }
+    : {
+        id: 0,
+        denominacion: "",
+        descripcion: "",
+        tiempoEstimadoPreparacion: 0,
+        precioVenta: 0,
+        urlImagen: "",
+        activo: true,
+        rubroId: 0,
+        margenGanancia: 0,
+        detalleProductos: [],
+      };
 
   const handleClose = () => {
     setOpenModal(false);

@@ -262,7 +262,7 @@ const ClientesEstadisticas = () => {
     ];
     ws.addRow(encabezado);
 
-    ws.getRow(1).eachCell(cell => {
+    ws.getRow(1).eachCell((cell: any) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
       cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -301,7 +301,7 @@ const ClientesEstadisticas = () => {
     if (clienteNombre) {
       const wsInfo = wb.addWorksheet("Info cliente");
       wsInfo.addRow(["Cliente", clienteNombre]);
-      wsInfo.getRow(1).eachCell(cell => {
+      wsInfo.getRow(1).eachCell((cell: any) => {
         cell.font = { bold: true };
         cell.alignment = { vertical: "middle", horizontal: "left" };
       });

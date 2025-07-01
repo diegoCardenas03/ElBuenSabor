@@ -7,7 +7,7 @@ interface props {
   id?: string;
   name: string; // Nombre del campo
   type: string; // Tipo de campo (text, number, etc.)
-  placeholder: string; // Placeholder del campo
+  placeholder?: string; // Placeholder del campo
 }
 
 // Componente TextFieldValue
