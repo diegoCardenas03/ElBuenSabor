@@ -24,7 +24,7 @@ type FiltroState = {
 
 };
 
-const generarNotaCreditoPDF = (pedido) => {
+const generarNotaCreditoPDF = (pedido: PedidoResponseDTO) => {
   const doc = new jsPDF();
 
   doc.setFontSize(18);
@@ -132,7 +132,7 @@ const MisPedidos = () => {
           >
             <MdOutlineFileDownload size={23} />
           </button>
-        ) : null
+        ) : '--'
       ),
     }
   ];
