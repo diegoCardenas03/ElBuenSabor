@@ -18,23 +18,23 @@ export const LoginRedirect = () => {
 
     // Si no está autenticado, redirigir al login
     if (!isAuthenticated && authStatus === 'completed') {
-    // Esperar 3 segundos y volver a chequear antes de mostrar el error
-    const timeout = setTimeout(() => {
-      if (!isAuthenticated) {
-        // console.log("[LoginRedirect] No autenticado tras reintento, redirigiendo a login");
-        Swal.fire({
-          title: "¡Error!",
-          text: "Error al autenticarse, redirigiendo al home...",
-          icon: "error",
-          confirmButtonText: "Aceptar",
-        });
-        clearSession();
-        navigate("/");
-      }
-    }, 3000); // 3 segundos
+      // Esperar 3 segundos y volver a chequear antes de mostrar el error
+      const timeout = setTimeout(() => {
+        if (!isAuthenticated) {
+          // console.log("[LoginRedirect] No autenticado tras reintento, redirigiendo a login");
+          Swal.fire({
+            title: "¡Error!",
+            text: "Error al autenticarse, redirigiendo al home...",
+            icon: "error",
+            confirmButtonText: "Aceptar",
+          });
+          clearSession();
+          navigate("/");
+        }
+      }, 3000); // 3 segundos
 
-    return () => clearTimeout(timeout);
-  }
+      return () => clearTimeout(timeout);
+    }
 
     // Si la autenticación está completa y exitosa
     if (authStatus === 'completed' && isAuthenticated) {
@@ -68,10 +68,9 @@ export const LoginRedirect = () => {
             {authStatus === 'creating-user' && "Creando perfil de usuario..."}
             {isProcessing && authStatus === 'idle' && "Procesando autenticación..."}
           </h2>
-          <p className="text-sm text-gray-500 mt-2">
+          <div className="text-sm text-gray-500 mt-2">
             <Loader message="Por favor espera un momento" />
-
-          </p>
+          </div>
         </div>
       </div>
     );
