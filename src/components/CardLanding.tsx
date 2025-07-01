@@ -82,7 +82,7 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
                   px-1 xs:px-2 md:px-4 transition-transform duration-300 border-2 cursor-pointer
                   ${
                     isMiddle
-                      ? "scale-110 bg-[#D32F2F] text-white border-[#FF9D3A] z-10"
+                      ? "bg-[#D32F2F] text-white border-[#FF9D3A] z-10"
                       : "bg-white text-[#D32F2F] border-[#D32F2F] opacity-80 hover:opacity-100"
                   }
                   hover:shadow-xl`}
@@ -99,9 +99,8 @@ const CardLanding: React.FC<CarruselProps> = ({ items }) => {
                     ${isMiddle ? "font-bold" : "font-normal"}
                     text-xs xs:text-sm sm:text-base
                     uppercase text-center tracking-wider select-none leading-tight 
-                    break-all
-                    whitespace-pre-line
-                    max-w-[80px] sm:max-w-[110px] md:max-w-[150px]
+                    break-all whitespace-pre-line md:break-normal md:whitespace-nowrap
+                    max-w-[80px] sm:max-w-[110px] md:max-w-[180px] md:truncate
                     overflow-hidden
                   `}
                 >

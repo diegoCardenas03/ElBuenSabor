@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <Link to={"/"}>
           {showBackButton && (
-            <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+            <div className="md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
               <img src={logo} alt="Logo El Buen Sabor" className="h-20 w-auto" />
             </div>
           )}
@@ -181,7 +181,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Derecha - Usuario y carrito */}
 
-      <div className="flex-shrink-0 flex items-center space-x-3 z-10">
+      <div className="flex-shrink-0 flex items-center space-x-3">
         {isAuthenticated ? <span
           className={`font-secondary text-base cursor-pointer max-w-[120px] truncate ${whiteUserBar ? "text-white" : "text-black"}`}
           onClick={handleUserClick}

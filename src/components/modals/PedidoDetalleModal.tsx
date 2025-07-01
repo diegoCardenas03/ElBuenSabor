@@ -17,7 +17,7 @@ const PedidoDetalleModal = ({ pedido, open, onClose }: PedidoDetalleModalProps) 
 
   return (
     
-    <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[1050]'>
+    <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[9999]'>
       <div className='relative bg-white p-5 rounded-[20px] shadow-lg w-[90%] sm:w-[65%] lg:w-[40%]'>
         <button
           className="absolute top-3 right-4 cursor-pointer font-bold text-gray-500 hover:text-gray-800 text-2xl"
