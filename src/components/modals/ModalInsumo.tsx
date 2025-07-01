@@ -8,7 +8,7 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-import { Formik, Form, Field, ErrorMessage, FormikHelpers, FieldProps } from "formik";
+import { Formik, Form, Field, ErrorMessage,FieldProps } from "formik";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { removeElementActive } from "../../hooks/redux/slices/TableReducer";
 import { UnidadMedida } from "../../types/enums/UnidadMedida";
