@@ -14,7 +14,7 @@ export abstract class BackendClient<RequestType, ResponseType> extends AbstractB
 
   async getAll(token?: string): Promise<ResponseType[]> {
     const response = await fetch(`${this.baseUrl}`, {
-      headers: buildHeaders(token, undefined),
+      headers: buildHeaders(token),
     });
     const data = await response.json();
     return data as ResponseType[];

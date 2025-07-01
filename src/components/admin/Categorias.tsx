@@ -65,9 +65,11 @@ const Categorias = () => {
 
   // Función para cargar rubros desde el backend usando los servicios
   const cargarRubros = useCallback(async () => {
+    const token = sessionStorage.getItem("auth_token");
+    
     // Traer todos los Rubros Insumo
     try {
-      const data = await rubroInsumoService.getAll();
+      const data = await rubroInsumoService.getAll(token || undefined);
       function mapRubroInsumo(dto: any): RubroInsumo {
         return {
           id: dto.id,
@@ -95,7 +97,7 @@ const Categorias = () => {
 
     // Traer todos los Rubros Producto
     try {
-      const data = await rubroProductoService.getAll();
+      const data = await rubroProductoService.getAll(token || undefined);
       setRubrosProductos(
         data.map(dto => ({
           id: Number(dto.id),
@@ -158,11 +160,13 @@ const Categorias = () => {
 
   // ACTIVAR/DESACTIVAR rubro usando updateEstado del service
   const handleActivarDesactivar = async (rubro: Rubro) => {
+    const token = sessionStorage.getItem("auth_token");
+    
     try {
       if (rubro.tipo === "Insumo") {
-        await rubroInsumoService.updateEstado(rubro.id);
+        await rubroInsumoService.updateEstado(rubro.id, token || undefined);
       } else {
-        await rubroProductoService.updateEstado(rubro.id);
+        await rubroProductoService.updateEstado(rubro.id, token || undefined);
       }
       await cargarRubros();
       Swal.fire({
