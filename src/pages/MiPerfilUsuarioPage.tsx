@@ -8,7 +8,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { ClienteDTO } from "../types/Cliente/ClienteDTO";
 import { ClienteResponseDTO } from "../types/Cliente/ClienteResponseDTO";
-
+import { Link } from "react-router-dom";
 type PerfilForm = {
   nombre: string;
   telefono: string;
@@ -195,9 +195,12 @@ export const MiPerfilUsuarioPage = () => {
   return (
     <MiPerfilUsuarioLayout>
       <div className="w-full max-w-2xl flex flex-col md:flex-row items-start justify-center gap-8 relative px-2">
-        <button className="absolute top-2 right-2 bg-[#d32f2f] hover:bg-[#962020] text-white px-4 py-2 rounded-full font-semibold text-sm cursor-pointer">
+       <Link to="/MisPedidos" className="absolute top-2 right-2 bg-[#d32f2f] hover:bg-[#962020] text-white px-4 py-2 rounded-full font-semibold text-sm cursor-pointer">
+         Historial Pedidos
+        </Link>
+        {/* <button className="absolute top-2 right-2 bg-[#d32f2f] hover:bg-[#962020] text-white px-4 py-2 rounded-full font-semibold text-sm cursor-pointer">
           Historial Pedidos
-        </button>
+        </button> */}
         <div className="flex-shrink-0 flex flex-col items-center w-full md:w-auto pt-8">
           <img
             src={fotoUsuario}

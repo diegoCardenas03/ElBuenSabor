@@ -53,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  // ✅ AGREGAR: Función para manejar clics en enlaces
+  // Función para manejar clics en enlaces
   const handleLinkClick = () => {
     onClose(); // Cerrar el navbar antes de navegar
   };
@@ -117,12 +117,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               {tipoModal === 'login' ? (
                 <ModalLogin
                   onClose={cerrarModal}
-                  onSwitchToRegister={cambiarARegister} // ✅ AGREGAR
+                  onSwitchToRegister={cambiarARegister} 
                 />
               ) : (
                 <ModalRegister
                   onClose={cerrarModal}
-                  onSwitchToLogin={cambiarALogin} // ✅ AGREGAR
+                  onSwitchToLogin={cambiarALogin} 
                 />
               )}
               <FaTimes stroke='4' onClick={cerrarModal} className="w-6 h-6 absolute top-4 right-4 cursor-pointer" />
@@ -163,7 +163,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 to={link.to}
                 key={index}
                 className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
-                onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
+                onClick={handleLinkClick} // Cerrar navbar al hacer clic
               >
                 {link.icon}
                 <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>
@@ -177,7 +177,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 to={link.to}
                 key={index}
                 className={`flex items-center gap-2 w-50 m-auto mb-4 mt-4 ${whiteUserBar ? "text-white" : "text-black"}`}
-                onClick={handleLinkClick} // ✅ AGREGAR: Cerrar navbar al hacer clic
+                onClick={handleLinkClick} //  Cerrar navbar al hacer clic
               >
                 {link.icon}
                 <p className={whiteUserBar ? "text-white" : "text-black"}>{link.texto}</p>

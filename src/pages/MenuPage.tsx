@@ -28,7 +28,7 @@ export const MenuPage: React.FC = () => {
   const { loading: rubrosLoading } = useAppSelector((state) => state.rubros);
   const carritoAbierto = useAppSelector((state) => state.carritoUI.abierto);
 
-  // Usar el hook personalizado para categorías
+  //hook personalizado para categorías
   const {
     categories,
     selectedCategories,

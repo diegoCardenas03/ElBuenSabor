@@ -143,7 +143,7 @@ export const ModalProducto = ({
             denominacion: Yup.string().required("Campo requerido"),
             margenGanancia: Yup.number()
               .min(0, "Debe ser 0 o mayor")
-              .max(100, "Máximo 100")
+              
               .required("Campo requerido"),
             rubroId: Yup.number()
               .min(1, "Seleccione una categoría")

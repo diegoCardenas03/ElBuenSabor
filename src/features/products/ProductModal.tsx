@@ -17,7 +17,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onC
     ? product.total
     : product.precioVenta;
 
-  const description = isInsumo(product) ? `${product.denominacion} - Insumo vendible` : product.descripcion;
+  const description = isInsumo(product) ? `${product.denominacion}` : product.descripcion;
   const imageUrl = product.urlImagen || 'src\\assets\\bebida.png';
   const { user } = useAuth0();
 

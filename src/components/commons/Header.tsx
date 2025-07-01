@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
   const handleUserClick = () => setNavbarOpen(true);
   const handleCloseNavbar = () => setNavbarOpen(false);
 
-  // ✅ CORREGIDO: Usar la variable combinada de loading
+  //  Usar la variable combinada de loading
   if (isAppLoading) {
     return (
       <header className={`fixed top-0 left-0 right-0 flex items-center justify-between h-20 px-7 z-50 ${backgroundColor}`}>
@@ -156,7 +156,11 @@ export const Header: React.FC<HeaderProps> = ({
                 ></div>
                 <span
                   key={pedidoEnCurso.id}
-                  className="font-secondary text-base cursor-pointer max-w-[120px] truncate text-secondary"
+                  className="font-secondary text-base cursor-pointer max-w-[120px] truncate text-secondary transition-transform 
+                  duration-300 
+                  ease-in-out 
+                  hover:scale-110 
+                  active:scale-90"
                   onClick={() => setModalPedidoEnCurso(true)}
                 >
                   Ver pedido
@@ -203,7 +207,11 @@ export const Header: React.FC<HeaderProps> = ({
         {isAuthenticated &&
 
           <FaShoppingCart
-            className="flex-shrink-0 cursor-pointer"
+            className="flex-shrink-0 cursor-pointer  transition-transform 
+              duration-300 
+              ease-in-out 
+              hover:scale-110 
+              active:scale-90"
             fill={whiteUserBar ? "white" : ""}
             color={whiteUserBar ? "white" : "black"}
             onClick={() => carrito.length === 0 ?

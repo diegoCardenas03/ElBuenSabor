@@ -34,7 +34,7 @@ const generarNotaCreditoPDF = (pedido: PedidoResponseDTO) => {
   doc.text(`Código de pedido: ${pedido.codigo}`, 20, 40);
   doc.text(`Cliente: ${pedido.cliente?.nombreCompleto ?? "Sin nombre"}`, 20, 50);
   doc.text(`Total devuelto: $${pedido.totalVenta?.toFixed(2) ?? 0}`, 20, 60);
-  doc.text(`Fecha de cancelación: ${new Date().toLocaleDateString()}`, 20, 70);
+  doc.text(`Fecha de cancelación: ${pedido.fecha}`, 20, 70);
   doc.text(`Motivo: Cancelación de pedido pagado por Mercado Pago`, 20, 80);
 
   doc.save(`nota-credito-${pedido.codigo}.pdf`);
