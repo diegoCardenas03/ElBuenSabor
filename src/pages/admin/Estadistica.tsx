@@ -362,14 +362,14 @@ const Estadistica = () => {
           <div className="flex flex-col w-full md:w-2/3 gap-5">
             {/* KPIs arriba */}
             <div className="flex flex-col md:flex-row items-center justify-around w-full gap-4">
-              <div className="h-40 shadow-md gap-4 w-40 bg-white flex flex-col items-center justify-center rounded-3xl px-3">
+              <div className="h-40 shadow-md gap-4 w-auto bg-white flex flex-col items-center justify-center rounded-3xl px-3">
                 <span className="text-lg text-secondary font-bold">Pedidos</span>
                 <h3 className="font-bold px-2 text-4xl">
                   {loading ? "..." : pedidos}
                 </h3>
                 <span className="font-bold px-2 text-md">CONCRETADOS</span>
               </div>
-              <div className="h-40 shadow-md gap-4 w-40 bg-white flex flex-col items-center justify-center rounded-3xl px-3">
+              <div className="h-40 shadow-md gap-4 w-auto bg-white flex flex-col items-center justify-center rounded-3xl px-3">
                 <span className="text-lg text-secondary font-bold">Ganancias</span>
                 <h3 className="font-bold text-3xl">
                   {loading
