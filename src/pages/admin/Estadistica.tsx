@@ -55,7 +55,7 @@ const Estadistica = () => {
   const [fechaHasta, setFechaHasta] = useState<string>("");
   const [topProductos, setTopProductos] = useState<ProductoResponseDTO[]>([]);
   const [pedidos, setPedidos] = useState<number>(0);
-  const [ganancias, setGanancias] = useState<number>(0);
+  
   const [ingresosEgresosData, setIngresosEgresosData] = useState<IngresosEgresosData>({ingresos: 0, egresos: 0, ganancias: 0});
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingTopProductos, setLoadingTopProductos] = useState<boolean>(true);
@@ -98,11 +98,8 @@ const Estadistica = () => {
 
         setPedidos(pedidosFiltrados.length);
 
-        const totalGanancias = pedidosFiltrados.reduce(
-          (acum: number, pedido: PedidoResponseDTO) => acum + (pedido.totalVenta || 0),
-          0
-        );
-        setGanancias(totalGanancias);
+        
+        
 
         // Agrupar pedidos por cliente para la tabla - USANDO ID
         const clientesMap: Record<number, { nombre: string; cantidad: number; importe: number }> = {};
@@ -155,7 +152,7 @@ const Estadistica = () => {
       } catch (error: any) {
         setError("No se pudieron cargar los datos de la estadística general.");
         setPedidos(0);
-        setGanancias(0);
+      
         setClientes([]);
         setIngresosEgresosData({ ingresos: 0, egresos: 0, ganancias: 0 });
       } finally {

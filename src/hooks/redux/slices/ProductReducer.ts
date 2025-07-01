@@ -121,26 +121,26 @@ const productSlice = createSlice({
       let filtered = allItems.filter((item) => {
         let itemRubroId: number | undefined;
         let itemName: string;
-        let itemPrice: number;
+        
         let isActive: boolean;
         let itemType: 'producto' | 'insumo';
 
         if (isInsumo(item)) {
           itemRubroId = item.rubro?.id;
           itemName = item.denominacion;
-          itemPrice = item.precioVenta;
+         
           isActive = item.activo;
           itemType = 'insumo';
         } else if ('rubro' in item && item.rubro) {
           itemRubroId = item.rubro.id;
           itemName = item.denominacion;
-          itemPrice = item.precioVenta;
+          
           isActive = item.activo;
           itemType = 'producto';
         } else {
           itemRubroId = undefined;
           itemName = item.denominacion;
-          itemPrice = item.precioVenta;
+          
           isActive = item.activo;
           itemType = 'producto';
         }
