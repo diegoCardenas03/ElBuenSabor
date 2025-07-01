@@ -2,6 +2,8 @@ import { FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { RubroInsumoDTO } from '../../types/RubroInsumo/RubroInsumoDTO';
 import { RubroProductoDTO } from '../../types/RubroProducto/RubroProductoDTO';
+import { RubroInsumoService } from "../../services/RubroInsumoService";
+import { RubroProductoService } from "../../services/RubroProductoService";
 
 type RubroInsumo = RubroInsumoDTO & {
   id: number;
@@ -43,6 +45,9 @@ const CategoriaModal = ({
   handleCerrarModal,
   cargarRubros
 }: CategoriaModalProps) => {
+  const rubroInsumoService = new RubroInsumoService();
+  const rubroProductoService = new RubroProductoService();
+  const token = sessionStorage.getItem('auth_token');
 
   // ACTUALIZADO: ahora usa los endpoints nuevos para editar y crear
   const crearRubro = async (e: React.FormEvent) => {
@@ -58,12 +63,8 @@ const CategoriaModal = ({
             rubroPadreId: rubroPadreSeleccionado ? Number(rubroPadreSeleccionado) : undefined,
             tipo: "Insumo"
           };
-          const res = await fetch(`http://localhost:8080/api/rubroinsumos/update/${rubroEditando.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(rubroEditado)
-          });
-          if (!res.ok) throw new Error('Error en PUT rubro insumo');
+
+          await rubroInsumoService.updateRubroInsumo(rubroEditando.id, rubroEditado, token!);
           
           // Recargar datos después de editar
           await cargarRubros();
@@ -81,12 +82,8 @@ const CategoriaModal = ({
             denominacion: nombreRubro,
             activo: true,
           };
-          const res = await fetch(`http://localhost:8080/api/rubroproductos/update/${rubroEditando.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(rubroEditado)
-          });
-          if (!res.ok) throw new Error('Error en PUT rubro producto');
+          
+          await rubroProductoService.updateRubroProducto(rubroEditando.id, rubroEditado, token!);
           
           // Recargar datos después de editar
           await cargarRubros();
@@ -108,12 +105,8 @@ const CategoriaModal = ({
             rubroPadreId: rubroPadreSeleccionado ? Number(rubroPadreSeleccionado) : undefined,
             tipo: "Insumo"
           };
-          const res = await fetch("http://localhost:8080/api/rubroinsumos/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(nuevoRubro)
-          });
-          if (!res.ok) throw new Error('Error en POST rubro insumo');
+
+          await rubroInsumoService.post(nuevoRubro, token!);
           
           // Recargar datos después de crear
           await cargarRubros();
@@ -131,12 +124,8 @@ const CategoriaModal = ({
             denominacion: nombreRubro,
             activo: true,
           };
-          const res = await fetch("http://localhost:8080/api/rubroproductos/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(nuevoProducto)
-          });
-          if (!res.ok) throw new Error('Error en POST rubro producto');
+          
+          await rubroProductoService.post(nuevoProducto, token!);
           
           // Recargar datos después de crear
           await cargarRubros();

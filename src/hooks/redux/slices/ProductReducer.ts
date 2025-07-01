@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { ProductoResponseDTO } from '../../../types/Producto/ProductoResponseDTO';
 import { InsumoResponseDTO } from '../../../types/Insumo/InsumoResponseDTO';
 import { ProductoUnificado, isInsumo, isProducto } from '../../../types/ProductoUnificado/ProductoUnificado';
+import { ProductoService } from '../../../services/ProductoService';
+import { InsumoService } from '../../../services/InsumoService';
 
 interface ProductState {
   products: ProductoResponseDTO[];
@@ -30,15 +32,15 @@ const initialState: ProductState = {
   rubrosConInsumosVendibles: []
 };
 
+const token = sessionStorage.getItem('auth_token');
+const productoService = new ProductoService();
+const insumoService = new InsumoService();
+
 // Thunk para traer productos del backend
 export const fetchProducts = createAsyncThunk<ProductoResponseDTO[]>(
   'products/fetchProducts',
   async () => {
-    const response = await fetch('http://localhost:8080/api/productos');
-    if (!response.ok) {
-      throw new Error('Error al cargar productos');
-    }
-    const data: ProductoResponseDTO[] = await response.json();
+    const data: ProductoResponseDTO[] = await productoService.getAll(token!);
     return data;
   }
 );
@@ -47,11 +49,7 @@ export const fetchProducts = createAsyncThunk<ProductoResponseDTO[]>(
 export const fetchInsumosVendibles = createAsyncThunk<InsumoResponseDTO[]>(
   'products/fetchInsumosVendibles',
   async () => {
-    const response = await fetch('http://localhost:8080/api/insumos');
-    if (!response.ok) {
-      throw new Error('Error al cargar insumos');
-    }
-    const data: InsumoResponseDTO[] = await response.json();
+    const data: InsumoResponseDTO[] = await insumoService.getAll(token!);
     return data.filter(insumo => !insumo.esParaElaborar && insumo.activo);
   }
 );

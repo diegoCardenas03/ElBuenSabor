@@ -3,6 +3,8 @@ import { AdminHeader } from "../../components/admin/AdminHeader";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
 import * as ExcelJS from "exceljs/dist/exceljs.min.js";
 import { saveAs } from "file-saver";
+import { Estado } from "../../types/enums/Estado";
+import { PedidosService } from "../../services/PedidosService";
 
 // Tipo para Producto o Insumo
 type ProductoOInsumo = {
@@ -40,14 +42,15 @@ const ProductosEstadistica = () => {
   const [paginaInsumos, setPaginaInsumos] = useState<number>(1);
   const filasPorPagina = 10;
 
+  const pedidoService = new PedidosService();
+  const token = sessionStorage.getItem('auth_token');
+
   useEffect(() => {
     const fetchProductos = async () => {
       setLoading(true);
       try {
-        let url = "http://localhost:8080/api/pedidos/estado?estado=ENTREGADO";
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error("Error al consultar pedidos entregados");
-        const pedidos: PedidoResponseDTO[] = await resp.json();
+        const nuevoEstado = Estado.ENTREGADO;
+        const pedidos: PedidoResponseDTO[] = await pedidoService.getPedidoByEstado(nuevoEstado, token!);
 
         // LOG: pedidos completos
         // console.log("Pedidos recibidos:", JSON.parse(JSON.stringify(pedidos)));
@@ -223,9 +226,9 @@ const ProductosEstadistica = () => {
     // Estilos Productos
     wsProductos.getRow(1).eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
       cell.alignment = { vertical: "middle", horizontal: "center" };
-      cell.border = { bottom: {style: 'thin'} };
+      cell.border = { bottom: { style: 'thin' } };
     });
     wsProductos.columns = [
       { width: 10 },
@@ -251,9 +254,9 @@ const ProductosEstadistica = () => {
     // Fondo igual que productos para uniformidad
     wsInsumos.getRow(1).eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
       cell.alignment = { vertical: "middle", horizontal: "center" };
-      cell.border = { bottom: {style: 'thin'} };
+      cell.border = { bottom: { style: 'thin' } };
     });
     wsInsumos.columns = [
       { width: 10 },
@@ -274,7 +277,7 @@ const ProductosEstadistica = () => {
 
     // Descargar
     const buffer = await wb.xlsx.writeBuffer();
-    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `ranking_productos_insumos_${periodo.replace(/\//g,"-")}.xlsx`);
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `ranking_productos_insumos_${periodo.replace(/\//g, "-")}.xlsx`);
   };
 
   return (

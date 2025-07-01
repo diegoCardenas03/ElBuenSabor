@@ -18,8 +18,10 @@ import { ClientesTable, ClienteTabla } from "../../components/admin/ClientesTabl
 import React from "react";
 import ExcelJS from "exceljs/dist/exceljs.min.js";
 import { saveAs } from "file-saver";
+import { PedidosService } from "../../services/PedidosService";
+import { Estado } from "../../types/enums/Estado";
 
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error?: any}> {
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error?: any }> {
   constructor(props: any) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -29,7 +31,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
   render() {
     if (this.state.hasError) {
-      return <div style={{color: "red", padding: 24}}>Error: {this.state.error?.message || "Ocurrió un error"}</div>
+      return <div style={{ color: "red", padding: 24 }}>Error: {this.state.error?.message || "Ocurrió un error"}</div>
     }
     return this.props.children;
   }
@@ -56,7 +58,7 @@ const Estadistica = () => {
   const [topProductos, setTopProductos] = useState<ProductoResponseDTO[]>([]);
   const [pedidos, setPedidos] = useState<number>(0);
   const [ganancias, setGanancias] = useState<number>(0);
-  const [ingresosEgresosData, setIngresosEgresosData] = useState<IngresosEgresosData>({ingresos: 0, egresos: 0, ganancias: 0});
+  const [ingresosEgresosData, setIngresosEgresosData] = useState<IngresosEgresosData>({ ingresos: 0, egresos: 0, ganancias: 0 });
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingTopProductos, setLoadingTopProductos] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +72,8 @@ const Estadistica = () => {
   const [evolucionIE, setEvolucionIE] = useState<IngresosEgresosMensualDTO[]>([]);
   const [loadingEvolucionIE, setLoadingEvolucionIE] = useState<boolean>(true);
   const [errorEvolucionIE, setErrorEvolucionIE] = useState<string | null>(null);
+  const pedidoService = new PedidosService();
+  const token = sessionStorage.getItem('auth_token');
 
   useEffect(() => {
     let cancelado = false;
@@ -77,13 +81,8 @@ const Estadistica = () => {
       setLoading(true);
       setError(null);
       try {
-        const pedidosResponse = await fetch(
-          "http://localhost:8080/api/pedidos/estado?estado=ENTREGADO"
-        );
-        if (!pedidosResponse.ok)
-          throw new Error("Error al consultar pedidos entregados");
-        const pedidosData: PedidoResponseDTO[] = await pedidosResponse.json();
-
+        const nuevoEstado = Estado.ENTREGADO;
+        const pedidosData: PedidoResponseDTO[] = await pedidoService.getPedidoByEstado(nuevoEstado, token!);
         let pedidosFiltrados = pedidosData;
         if (fechaDesde) {
           pedidosFiltrados = pedidosFiltrados.filter(
@@ -136,7 +135,12 @@ const Estadistica = () => {
         if (fechaDesde) urlIE += `?fechaDesde=${fechaDesde}`;
         if (fechaHasta)
           urlIE += (fechaDesde ? `&` : `?`) + `fechaHasta=${fechaHasta}`;
-        const respIE = await fetch(urlIE);
+        const respIE = await fetch(urlIE, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!respIE.ok)
           throw new Error("Error al consultar ingresos y egresos");
         const datosIE: IngresosEgresosMensualDTO[] = await respIE.json();
@@ -150,7 +154,7 @@ const Estadistica = () => {
           }
         }
         if (!cancelado) {
-          setIngresosEgresosData({ingresos, egresos, ganancias});
+          setIngresosEgresosData({ ingresos, egresos, ganancias });
         }
       } catch (error: any) {
         setError("No se pudieron cargar los datos de la estadística general.");
@@ -169,7 +173,12 @@ const Estadistica = () => {
         let url = `http://localhost:8080/api/estadisticas/top-ventas/productos?limite=5`;
         if (fechaDesde) url += `&fechaDesde=${fechaDesde}`;
         if (fechaHasta) url += `&fechaHasta=${fechaHasta}`;
-        const resp = await fetch(url);
+        const resp = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!resp.ok)
           throw new Error("Error al consultar productos más vendidos");
         const productos: ProductoResponseDTO[] = await resp.json();
@@ -188,7 +197,12 @@ const Estadistica = () => {
         let url = "http://localhost:8080/api/estadisticas/ingresos-egresos";
         if (fechaDesde) url += `?fechaDesde=${fechaDesde}`;
         if (fechaHasta) url += (fechaDesde ? `&` : `?`) + `fechaHasta=${fechaHasta}`;
-        const resp = await fetch(url);
+        const resp = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!resp.ok) throw new Error("Error al consultar evolución ingresos/egresos");
         const data: IngresosEgresosMensualDTO[] = await resp.json();
         setEvolucionIE(Array.isArray(data) ? data : []);
@@ -254,15 +268,15 @@ const Estadistica = () => {
     resumenRows.forEach(row => wsResumen.addRow(row));
     wsResumen.getRow(1).eachCell(cell => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
       cell.alignment = { vertical: "middle", horizontal: "center" };
-      cell.border = { bottom: {style: 'thin'} };
+      cell.border = { bottom: { style: 'thin' } };
     });
     wsResumen.columns = [
       { width: 18 },
-      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
-      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
-      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } },
+      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } },
+      { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } },
       { width: 20 }
     ];
 
@@ -272,21 +286,21 @@ const Estadistica = () => {
       detalleEvolucionRows.forEach(row => wsEvol.addRow(row));
       wsEvol.getRow(1).eachCell(cell => {
         cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' }};
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4373B9' } };
         cell.alignment = { vertical: "middle", horizontal: "center" };
-        cell.border = { bottom: {style: 'thin'} };
+        cell.border = { bottom: { style: 'thin' } };
       });
       wsEvol.columns = [
         { width: 10 },
-        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
-        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
-        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' }},
+        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } },
+        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } },
+        { width: 12, style: { numFmt: '"$"#,##0.00;[Red]\\-"$"#,##0.00' } },
       ];
     }
 
     // Descargar
     const buffer = await wb.xlsx.writeBuffer();
-    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `estadisticas_${periodo.replace(/\//g,"-")}.xlsx`);
+    saveAs(new Blob([buffer], { type: "application/octet-stream" }), `estadisticas_${periodo.replace(/\//g, "-")}.xlsx`);
   };
   // --- FIN EXPORTAR A EXCEL ---
 
@@ -378,8 +392,8 @@ const Estadistica = () => {
                   {loading
                     ? "..."
                     : `$${ganancia.toLocaleString("es-AR", {
-                        minimumFractionDigits: 2,
-                      })}`}
+                      minimumFractionDigits: 2,
+                    })}`}
                 </h3>
               </div>
             </div>

@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RubroProductoResponseDTO } from '../../../types/RubroProducto/RubroProductoResponseDTO';
 import { RubroInsumoResponseDTO } from '../../../types/RubroInsumo/RubroInsumoResponseDTO';
+import { RubroInsumoService } from '../../../services/RubroInsumoService';
+import { RubroProductoService } from '../../../services/RubroProductoService';
 
 interface RubroState {
   rubros: RubroProductoResponseDTO[];
@@ -16,15 +18,15 @@ const initialState: RubroState = {
   error: null,
 };
 
+const token = sessionStorage.getItem('auth_token');
+const rubroInsumoService = new RubroInsumoService();
+const rubroProductoService = new RubroProductoService();
+
 // Thunk para traer rubros de productos del backend
 export const fetchRubrosProductos = createAsyncThunk<RubroProductoResponseDTO[]>(
   'rubros/fetchRubrosProductos',
   async () => {
-    const response = await fetch('http://localhost:8080/api/rubroproductos');
-    if (!response.ok) {
-      throw new Error('Error al cargar rubros de productos');
-    }
-    const data: RubroProductoResponseDTO[] = await response.json();
+    const data: RubroProductoResponseDTO[] = await rubroProductoService.getAll(token!);
     return data;
   }
 );
@@ -33,11 +35,7 @@ export const fetchRubrosProductos = createAsyncThunk<RubroProductoResponseDTO[]>
 export const fetchRubrosInsumos = createAsyncThunk<RubroInsumoResponseDTO[]>(
   'rubros/fetchRubrosInsumos',
   async () => {
-    const response = await fetch('http://localhost:8080/api/rubroinsumos');
-    if (!response.ok) {
-      throw new Error('Error al cargar rubros de insumos');
-    }
-    const data: RubroInsumoResponseDTO[] = await response.json();
+    const data: RubroInsumoResponseDTO[] = await rubroInsumoService.getAll(token!);
     return data;
   }
 );

@@ -19,6 +19,8 @@ import { PromocionService } from "../../services/PromocionService";
 import { FaTimes } from "react-icons/fa";
 import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
 import Swal from "sweetalert2";
+import { ProductoService } from "../../services/ProductoService";
+import { InsumoService } from "../../services/InsumoService";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env
   .VITE_API_CLOUDINARY_UPLOAD_PRESET;
@@ -39,7 +41,8 @@ export const ModalPromocion = ({
     (state) => state.tablaReducer.elementActive
   );
   const token = sessionStorage.getItem('auth_token');
-
+  const productoService = new ProductoService();
+  const insumoService = new InsumoService();
   const apiPromocion = new PromocionService();
   const [productos, setProductos] = useState<ProductoResponseDTO[]>([]);
   const [insumos, setInsumos] = useState<InsumoResponseDTO[]>([]);
@@ -52,14 +55,21 @@ export const ModalPromocion = ({
   const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/productos")
-      .then((res) => res.json())
-      .then((data) => setProductos(Array.isArray(data) ? data : []))
-      .catch(() => setProductos([]));
-    fetch("http://localhost:8080/api/insumos")
-      .then((res) => res.json())
-      .then((data) => setInsumos(Array.isArray(data) ? data : []))
-      .catch(() => setInsumos([]));
+    const fetchData = async () => {
+      try {
+        const productosData = await productoService.getAll(token!);
+        setProductos(Array.isArray(productosData) ? productosData : []);
+      } catch {
+        setProductos([]);
+      }
+      try {
+        const insumosData = await insumoService.getAll(token!);
+        setInsumos(Array.isArray(insumosData) ? insumosData : []);
+      } catch {
+        setInsumos([]);
+      }
+    };
+    fetchData();
   }, []);
 
   const initialValues: PromocionDTO =

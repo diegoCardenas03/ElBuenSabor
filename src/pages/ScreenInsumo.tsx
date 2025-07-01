@@ -10,6 +10,7 @@ import { setDataTable } from "../hooks/redux/slices/TableReducer";
 import Swal from "sweetalert2";
 import { AdminHeader } from "../components/admin/AdminHeader";
 import { IoFilterSharp } from "react-icons/io5";
+
 export const ScreenInsumo = () => {
   const [loading, setLoading] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -96,7 +97,7 @@ export const ScreenInsumo = () => {
           checked={insumo.activo}
           onChange={async () => {
             try {
-              await insumoService.updateEstado(insumo.id);
+              await insumoService.updateEstado(insumo.id, token!);
               getInsumos();
             } catch (error) {
               Swal.fire(
@@ -130,7 +131,7 @@ export const ScreenInsumo = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        insumoService.delete(id).then(() => {
+        insumoService.delete(id, token!).then(() => {
           getInsumos();
         });
       }

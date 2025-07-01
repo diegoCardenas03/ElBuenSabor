@@ -5,8 +5,8 @@ import { RubroProductoDTO } from '../../types/RubroProducto/RubroProductoDTO';
 import Swal from "sweetalert2";
 import CategoriasLista from "./CategoriasLista";
 import CategoriaModal from "./CategoriaModal";
-import { RubroInsumoClient } from "../../services/RubroInsumoClient";
-import { RubroProductoClient } from "../../services/RubroProductoClient";
+import { RubroInsumoService } from '../../services/RubroInsumoService';
+import { RubroProductoService } from '../../services/RubroProductoService';
 
 // Tipos internos para el manejo en frontend
 type RubroInsumo = RubroInsumoDTO & {
@@ -45,8 +45,8 @@ const obtenerTodosRubrosUnicosAnidados = (rubros: RubroInsumo[], depth = 0, visi
   return result;
 };
 
-const rubroInsumoClient = new RubroInsumoClient();
-const rubroProductoClient = new RubroProductoClient();
+const rubroInsumoService = new RubroInsumoService();
+const rubroProductoService = new RubroProductoService();
 
 const Categorias = () => {
   const [modalAbierto, setModalAbierto] = useState<boolean>(false);
@@ -67,7 +67,7 @@ const Categorias = () => {
   const cargarRubros = useCallback(async () => {
     // Traer todos los Rubros Insumo
     try {
-      const data = await rubroInsumoClient.getAll();
+      const data = await rubroInsumoService.getAll();
       function mapRubroInsumo(dto: any): RubroInsumo {
         return {
           id: dto.id,
@@ -90,13 +90,12 @@ const Categorias = () => {
           timer: 1000,
           width: "20em"
         });
-        console.error("Error fetch rubros insumo", error);
       }
     }
 
     // Traer todos los Rubros Producto
     try {
-      const data = await rubroProductoClient.getAll();
+      const data = await rubroProductoService.getAll();
       setRubrosProductos(
         data.map(dto => ({
           id: Number(dto.id),
@@ -114,7 +113,6 @@ const Categorias = () => {
         timer: 1000,
         width: "20em"
       });
-      console.error("Error fetch rubros producto", error);
     }
   }, []);
 
@@ -162,9 +160,9 @@ const Categorias = () => {
   const handleActivarDesactivar = async (rubro: Rubro) => {
     try {
       if (rubro.tipo === "Insumo") {
-        await rubroInsumoClient.updateEstado(rubro.id);
+        await rubroInsumoService.updateEstado(rubro.id);
       } else {
-        await rubroProductoClient.updateEstado(rubro.id);
+        await rubroProductoService.updateEstado(rubro.id);
       }
       await cargarRubros();
       Swal.fire({

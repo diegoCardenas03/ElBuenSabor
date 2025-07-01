@@ -4,6 +4,8 @@ import { TfiAngleUp } from "react-icons/tfi";
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { PedidosService } from "../../services/PedidosService";
+import { Estado } from "../../types/enums/Estado";
 
 const markerIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -21,6 +23,8 @@ const Delivery = () => {
   const [desplegableAbierto, setDesplegableAbierto] = useState<{ [key: number]: boolean }>({});
   // Para que no se haga doble loading al actualizar estado y cambiar filtro
   const isUpdatingPedido = useRef(false);
+  const pedidoService = new PedidosService();
+  const token = sessionStorage.getItem('auth_token');
 
   const elegirOpcionPrincipal = (op: "Retirar" | "Curso") => {
     setOpcionPrincipal(op);
@@ -33,8 +37,8 @@ const Delivery = () => {
   // Fetch para cada filtro, se ejecutan siempre al cambiar filtro o tras actualizar
   const fetchPedidosRetirar = async () => {
     try {
-      const resp = await fetch(`http://localhost:8080/api/pedidos/estado?estado=TERMINADO`);
-      const data = await resp.json();
+      const nuevoEstado = Estado.TERMINADO;
+      const data = await pedidoService.getPedidoByEstado(nuevoEstado, token!);
       const filtrados = Array.isArray(data)
         ? data.filter(p => p.tipoEnvio === "DELIVERY")
         : [];
@@ -48,8 +52,8 @@ const Delivery = () => {
 
   const fetchPedidosCurso = async () => {
     try {
-      const resp = await fetch(`http://localhost:8080/api/pedidos/estado?estado=EN_CAMINO`);
-      const data = await resp.json();
+      const nuevoEstado = Estado.EN_CAMINO;
+      const data = await pedidoService.getPedidoByEstado(nuevoEstado, token!);
       const filtrados = Array.isArray(data)
         ? data.filter(p => p.tipoEnvio === "DELIVERY")
         : [];
@@ -78,12 +82,16 @@ const Delivery = () => {
   const actualizarEstadoPedido = async (pedidoId: number, nuevoEstado: string) => {
     setLoading(true); setError(null);
     isUpdatingPedido.current = true;
+
+    let estadoEnum: Estado = "" as Estado;
+    if (nuevoEstado == "EN_CAMINO") {
+      estadoEnum = Estado.EN_CAMINO;
+    } else if (nuevoEstado == "ENTREGADO") {
+      estadoEnum = Estado.ENTREGADO;
+    }
+
     try {
-      const resp = await fetch(
-        `http://localhost:8080/api/pedidos/actualizar-estado/${pedidoId}?estado=${nuevoEstado}`,
-        { method: 'PUT' }
-      );
-      if (!resp.ok) throw new Error();
+      await pedidoService.updateEstadoPedido(pedidoId, estadoEnum, token!);
       // Refresca ambas listas tras cambiar estado
       await fetchAllPedidos();
     } catch (e) {
@@ -175,12 +183,12 @@ const Delivery = () => {
 
                   {opcionPrincipal === "Retirar" ? (
                     <button className="self-end mr-2 w-30 font-medium py-1 bg-secondary text-white rounded-2xl hover:bg-red-500"
-                      onClick={() => actualizarEstadoPedido(pedido.id, "EN_CAMINO")}>
+                      onClick={() => actualizarEstadoPedido(pedido.id, 'EN_CAMINO')}>
                       Tomar Pedido
                     </button>
                   ) : (
                     <button className="self-end mr-2 w-30 font-medium py-1 bg-secondary text-white rounded-2xl hover:bg-red-500"
-                      onClick={() => actualizarEstadoPedido(pedido.id, "ENTREGADO")}>
+                      onClick={() => actualizarEstadoPedido(pedido.id, 'ENTREGADO')}>
                       Entregado
                     </button>
                   )}

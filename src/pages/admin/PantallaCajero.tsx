@@ -158,10 +158,7 @@ export const PantallaCajero = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-
-          await fetch(`http://localhost:8080/api/pedidos/agregar-min/${pedido.id}?minutos=5`, {
-            method: "PUT",
-          });
+          await pedidoService.agregarTiempo(pedido.id, token!);
           getPedidos();
           Swal.fire("¡Listo!", "Se agregaron 5 minutos.", "success");
         } catch (error) {

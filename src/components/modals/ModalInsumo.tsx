@@ -23,6 +23,7 @@ import { FaTimes } from "react-icons/fa";
 import AddImageIcon from "../../assets/img/SVGRepo_iconCarrier.png";
 import Swal from "sweetalert2";
 import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
+import { RubroInsumoService } from "../../services/RubroInsumoService";
 
 interface IModalInsumo {
   getInsumos: () => void;
@@ -55,18 +56,12 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
     rubro: rubros[0] || { id: 0, denominacion: "", subRubros: [] },
     descripcion: "",
   });
+  const rubroInsumoService = new RubroInsumoService();
 
   useEffect(() => {
     const fetchRubros = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/rubroinsumos", {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
+        const data = await rubroInsumoService.getAll(token!);
         setRubros(data);
       } catch (error) {
         console.error("Error al cargar rubros:", error);

@@ -24,6 +24,8 @@ import Swal from "sweetalert2";
 const API_CLOUDINARY_URL = import.meta.env.VITE_API_CLOUDINARY_URL;
 const API_CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_API_CLOUDINARY_UPLOAD_PRESET;
 import { InsumoResponseDTO } from "../../types/Insumo/InsumoResponseDTO";
+import { RubroProductoService } from "../../services/RubroProductoService";
+import { InsumoService } from "../../services/InsumoService";
 
 interface IModalProducto {
   getProductos: () => void;
@@ -52,14 +54,14 @@ export const ModalProducto = ({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovering, setIsHovering] = useState(false);
-
   const token = sessionStorage.getItem('auth_token');
+  const rubroProductoService = new RubroProductoService();
+  const insumoService = new InsumoService();
 
   useEffect(() => {
     const fetchRubros = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/rubroproductos");
-        const data = await response.json();
+        const data = await rubroProductoService.getAll(token!);
         setRubros(data);
       } catch (error) {
         console.error("Error al cargar rubros:", error);
@@ -70,47 +72,45 @@ export const ModalProducto = ({
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/insumos")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setInsumos(data);
-        } else {
-          setInsumos([]);
-        }
-      })
-      .catch((err) => {
+    const fetchInsumos = async () => {
+      try {
+        const data = await insumoService.getAll(token!);
+        setInsumos(Array.isArray(data) ? data : []);
+      } catch (err) {
         console.error("Error al cargar insumos:", err);
         setInsumos([]);
-      });
+      }
+    };
+
+    fetchInsumos();
   }, []);
 
   const initialValues: ProductoDTO =
     elementActive && "descripcion" in elementActive && "tiempoEstimadoPreparacion" in elementActive
       ? {
-          id: elementActive.id,
-          denominacion: elementActive.denominacion,
-          descripcion: elementActive.descripcion,
-          tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
-          precioVenta: elementActive.precioVenta,
-          urlImagen: elementActive.urlImagen,
-          activo: elementActive.activo,
-          rubroId: elementActive.rubro?.id ?? 0,
-          margenGanancia: elementActive.margenGanancia ?? 0, 
-          detalleProductos: elementActive.detalleProductos ?? [],
-        }
+        id: elementActive.id,
+        denominacion: elementActive.denominacion,
+        descripcion: elementActive.descripcion,
+        tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
+        precioVenta: elementActive.precioVenta,
+        urlImagen: elementActive.urlImagen,
+        activo: elementActive.activo,
+        rubroId: elementActive.rubro?.id ?? 0,
+        margenGanancia: elementActive.margenGanancia ?? 0,
+        detalleProductos: elementActive.detalleProductos ?? [],
+      }
       : {
-          id: 0,
-          denominacion: "",
-          descripcion: "",
-          tiempoEstimadoPreparacion: 0,
-          precioVenta: 0,
-          urlImagen: "",
-          activo: true,
-          rubroId: 0,
-          margenGanancia: 0,
-          detalleProductos: [],
-        };
+        id: 0,
+        denominacion: "",
+        descripcion: "",
+        tiempoEstimadoPreparacion: 0,
+        precioVenta: 0,
+        urlImagen: "",
+        activo: true,
+        rubroId: 0,
+        margenGanancia: 0,
+        detalleProductos: [],
+      };
 
   const handleClose = () => {
     setOpenModal(false);

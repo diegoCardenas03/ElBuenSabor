@@ -10,6 +10,8 @@ import { AdminHeader } from "../components/admin/AdminHeader";
 import { IoFilterSharp } from "react-icons/io5";
 import { truncar } from "../utils/Utils";
 import { ProductoResponseDTO } from "../types/Producto/ProductoResponseDTO";
+import { RubroProductoService } from "../services/RubroProductoService";
+import { RubroProductoResponseDTO } from "../types/RubroProducto/RubroProductoResponseDTO";
 
 export const ScreenProducto = () => {
   const [loading, setLoading] = useState(false);
@@ -17,7 +19,7 @@ export const ScreenProducto = () => {
   const [modalFilters, setModalFilters] = useState(false);
   const [filtros, setFiltros] = useState({ searchTerm: "", soloActivos: false });
   const [filtroSeleccionado, setFiltroSeleccionado] = useState({ searchTerm: "", soloActivos: false });
-
+  const rubroProductoService = new RubroProductoService();
   const productoService = new ProductoService();
   const dispatch = useAppDispatch();
   const token = sessionStorage.getItem('auth_token');
@@ -166,12 +168,11 @@ export const ScreenProducto = () => {
   useEffect(() => {
     const fetchRubros = async () => {
       try {
-        const res = await fetch('http://localhost:8080/api/rubroproductos');
-        const data = await res.json();
+        const data = await rubroProductoService.getAll(token!);
         setRubrosProductos(
-          data.map((r: { id: number; denominacion: string }) => ({
-            id: r.id,
-            denominacion: r.denominacion
+          data.map((r: RubroProductoResponseDTO) => ({
+            id: r.id ?? 0,
+            denominacion: r.denominacion ?? ""
           }))
         );
       } catch {
