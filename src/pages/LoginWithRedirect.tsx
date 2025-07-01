@@ -68,10 +68,10 @@ export const LoginRedirect = () => {
             {authStatus === 'creating-user' && "Creando perfil de usuario..."}
             {isProcessing && authStatus === 'idle' && "Procesando autenticación..."}
           </h2>
-          <p className="text-sm text-gray-500 mt-2">
+          <div className="text-sm text-gray-500 mt-2">
             <Loader message="Por favor espera un momento" />
 
-          </p>
+          </div>
         </div>
       </div>
     );
