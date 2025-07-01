@@ -38,6 +38,7 @@ export const ModalCompra = ({
     { insumoId: 0, cantidad: 1, precioCosto: 0 },
   ]);
   const api = new InsumoService();
+  const token = sessionStorage.getItem('auth_token');
 
   const handleChange = (index: number, field: keyof CompraItem, value: string | number) => {
     const nuevos = [...items];
@@ -73,7 +74,7 @@ export const ModalCompra = ({
           unidadMedida: insumo.unidadMedida,
           rubroId: Number(insumo.rubro.id),
           descripcion: insumo.descripcion,
-        });
+        }, token!);
       }
       Swal.fire("¡Compra registrada!", "El stock fue actualizado.", "success");
       handleClose();

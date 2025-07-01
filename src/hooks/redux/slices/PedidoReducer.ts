@@ -19,12 +19,13 @@ const initialState: PedidoState = {
 };
 
 const pedidosService = new PedidosService();
+const token = sessionStorage.getItem('auth_token');
 
 export const updateEstadoPedidoThunk = createAsyncThunk<PedidoResponseDTO, { pedidoId: number; nuevoEstado: Estado }>(
   "pedido/updateEstadoPedido",
   async ({ pedidoId, nuevoEstado }, { rejectWithValue }) => {
     try {
-      return await pedidosService.updateEstadoPedido(pedidoId, nuevoEstado);
+      return await pedidosService.updateEstadoPedido(pedidoId, nuevoEstado, token!);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -35,7 +36,7 @@ export const enviarPedidoThunk = createAsyncThunk<PedidoResponseDTO, PedidoDTO>(
   "pedido/enviarPedido",
   async (pedidoDTO, { rejectWithValue }) => {
     try {
-      return await pedidosService.post(pedidoDTO);
+      return await pedidosService.post(pedidoDTO, token!);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -46,7 +47,7 @@ export const fetchPedidosByUsuario = createAsyncThunk<PedidoResponseDTO[], numbe
   "pedido/fetchPedidosByUsuario",
   async (clienteId, { rejectWithValue }) => {
     try {
-      const pedidoPorId = await pedidosService.getPedidosByUsuario(clienteId);
+      const pedidoPorId = await pedidosService.getPedidosByUsuario(clienteId, token!);
       // console.log("Pedidos del usuario:", pedidoPorId);
       return pedidoPorId;
     } catch (error: any) {

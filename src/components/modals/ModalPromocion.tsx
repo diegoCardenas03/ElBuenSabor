@@ -38,6 +38,7 @@ export const ModalPromocion = ({
   const elementActive = useAppSelector(
     (state) => state.tablaReducer.elementActive
   );
+  const token = sessionStorage.getItem('auth_token');
 
   const apiPromocion = new PromocionService();
   const [productos, setProductos] = useState<ProductoResponseDTO[]>([]);
@@ -198,14 +199,14 @@ export const ModalPromocion = ({
               };
 
               if (elementActive?.id) {
-                await apiPromocion.patch(elementActive.id, payload);
+                await apiPromocion.patch(elementActive.id, payload, token!);
                 Swal.fire({
                   title: "Promoción actualizada",
                   text: "La promoción se ha actualizado correctamente.",
                   icon: "success",
                 });
               } else {
-                await apiPromocion.post(payload);
+                await apiPromocion.post(payload, token!);
                 Swal.fire({
                   title: "Promoción creada",
                   text: "La promoción se ha creado correctamente.",

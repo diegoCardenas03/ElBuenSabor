@@ -22,6 +22,7 @@ const Clientes = () => {
     const [filtroSeleccionado, setFiltroSeleccionado] = useState<FiltroState>({ estado: "TODOS", searchTerm: "", });
     const resetFiltros = () => { setFiltros({ estado: "TODOS", searchTerm: "" }); setFiltroSeleccionado({ estado: "TODOS", searchTerm: "" }); };
     const clientesService = new ClientesService();
+    const token = sessionStorage.getItem('auth_token');
     const dispatch = useAppDispatch();
 
     const ColumnsTableClientes = [
@@ -50,7 +51,7 @@ const Clientes = () => {
                     checked={cliente.activo}
                     onChange={async () => {
                         try {
-                            await clientesService.updateEstado(cliente.id)
+                            await clientesService.updateEstado(cliente.id, token!)
                             getClientes();
                         } catch (error) {
                             Swal.fire(
@@ -88,7 +89,7 @@ const Clientes = () => {
 
     const getClientes = async () => {
         try {
-            const clienteData = await clientesService.getAll();
+            const clienteData = await clientesService.getAll(token!);
             const clientesDTO = clienteData.map((c) => ({
                 id: c.id,
                 nombreCompleto: c.nombreCompleto,

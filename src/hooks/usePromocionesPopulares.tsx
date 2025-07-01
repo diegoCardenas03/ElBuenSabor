@@ -5,6 +5,7 @@ import { PromocionResponseDTO } from "../types/Promocion/PromocionResponseDTO";
 export const usePromocionesPopulares = () => {
   const [promociones, setPromociones] = useState<PromocionResponseDTO[]>([]);
 
+
   useEffect(() => {
     const promocionService = new PromocionService();
     promocionService.getAll().then((data) => {

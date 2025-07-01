@@ -11,7 +11,7 @@ import { EmpleadoResponseDTO } from "../../types/Empleado/EmpleadoResponseDTO";
 import { EmpleadosService } from "../../services/EmpleadosService";
 import { BiSolidPencil } from "react-icons/bi";
 import { ModalEmpleado } from "../../components/modals/ModalEmpleado";
-import { useAuth0 } from "@auth0/auth0-react";
+// import { useAuth0 } from "@auth0/auth0-react";
 
 type FiltroState = {
     estado: "TODOS" | "ACTIVO" | "INACTIVO";
@@ -36,6 +36,7 @@ const Empleados = () => {
     const [openModalEmpleado, setOpenModalEmpleado] = useState(false);
     const [empleadoEditar, setEmpleadoEditar] = useState<EmpleadoResponseDTO | null>(null);
     const usuarioActualEmail = sessionStorage.getItem('user_email');
+    const token = sessionStorage.getItem('auth_token');
 
 
 
@@ -69,7 +70,7 @@ const Empleados = () => {
                         checked={empleado.activo}
                         onChange={async () => {
                             try {
-                                await empleadosService.updateEstado(empleado.id)
+                                await empleadosService.updateEstado(empleado.id, token!)
                                 getEmpleados();
                             } catch (error) {
                                 Swal.fire(
@@ -126,7 +127,7 @@ const Empleados = () => {
 
     const getEmpleados = async () => {
         try {
-            const empleadoData = await empleadosService.getAll();
+            const empleadoData = await empleadosService.getAll(token!);
             const empleadosDTO = empleadoData.map((e) => ({
                 id: e.id,
                 nombreCompleto: e.nombreCompleto,

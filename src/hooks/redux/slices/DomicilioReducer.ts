@@ -22,11 +22,13 @@ const initialState: DomicilioState = {
     direccionSeleccionada: null,
 };
 
+const token = sessionStorage.getItem('auth_token');
+
 export const fetchDirecciones = createAsyncThunk(
     'domicilios/fetchDirecciones',
     async (_, { rejectWithValue }) => {
         try {
-            const todas = await domicilioService.getByClienteId(Number(sessionStorage.getItem('user_id_db')));
+            const todas = await domicilioService.getByClienteId(Number(sessionStorage.getItem('user_id_db')), token!);
             const activas = todas.filter((d: DomicilioResponseDTO) => d.activo === true);
             return activas;
         } catch (error) {
@@ -38,7 +40,7 @@ export const crearDireccion = createAsyncThunk(
     'domicilios/crearDireccion',
     async (data: DetalleDomicilioDTO, { dispatch, rejectWithValue }) => {
         try {
-            await detalleDomicilioService.post(data);
+            await detalleDomicilioService.post(data, token!);
             dispatch(fetchDirecciones());
         } catch (error) {
             return rejectWithValue('Error al crear dirección');
@@ -50,7 +52,7 @@ export const editarDireccion = createAsyncThunk(
     'domicilios/editarDireccion',
     async ({ id, data }: { id: number; data: DomicilioDTO }, { dispatch, rejectWithValue }) => {
         try {
-            await domicilioService.patch(id, data);
+            await domicilioService.patch(id, data, token!);
             dispatch(fetchDirecciones());
         } catch (error) {
             return rejectWithValue('Error al editar dirección');
@@ -62,7 +64,7 @@ export const eliminarDireccion = createAsyncThunk(
     'domicilios/eliminarDireccion',
     async (id: number, { rejectWithValue }) => {
         try {
-            await domicilioService.delete(id);
+            await domicilioService.delete(id, token!);
             return id;
         } catch (error) {
             return rejectWithValue('Error al eliminar dirección');

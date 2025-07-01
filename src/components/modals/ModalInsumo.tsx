@@ -34,7 +34,7 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
   const dispatch = useAppDispatch();
   const elementActive = useAppSelector((state) => state.tablaReducer.elementActive);
   const apiInsumo = new InsumoService();
-
+  const token = sessionStorage.getItem('auth_token');
   const [rubros, setRubros] = useState<RubroInsumoResponseDTO[]>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -59,7 +59,13 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
   useEffect(() => {
     const fetchRubros = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/rubroinsumos");
+        const response = await fetch("http://localhost:8080/api/rubroinsumos", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
         const data = await response.json();
         setRubros(data);
       } catch (error) {
@@ -205,14 +211,14 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
             const payload = {
               ...values,
               urlImagen: imageUrl,
-              rubroId: selectedRubros.at(-1)?.id ?? values.rubroId ?? 0 
+              rubroId: selectedRubros.at(-1)?.id ?? values.rubroId ?? 0
             };
 
             if (elementActive?.id) {
-              await apiInsumo.patch(elementActive.id, payload);
+              await apiInsumo.patch(elementActive.id, payload, token!);
               Swal.fire({ title: "¡Éxito!", text: "Insumo actualizado correctamente.", icon: "success" });
             } else {
-              await apiInsumo.post(payload);
+              await apiInsumo.post(payload, token!);
               Swal.fire({ title: "¡Éxito!", text: "Insumo creado correctamente.", icon: "success" });
             }
 

@@ -53,6 +53,8 @@ export const ModalProducto = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovering, setIsHovering] = useState(false);
 
+  const token = sessionStorage.getItem('auth_token');
+
   useEffect(() => {
     const fetchRubros = async () => {
       try {
@@ -196,14 +198,14 @@ export const ModalProducto = ({
               };
 
               if (elementActive?.id) {
-                await apiProducto.patch(elementActive.id, payload);
+                await apiProducto.patch(elementActive.id, payload, token!);
                 Swal.fire({
                   title: "Producto actualizado",
                   text: "El producto se ha actualizado correctamente.",
                   icon: "success",
                 });
               } else {
-                await apiProducto.post(payload);
+                await apiProducto.post(payload, token!);
                 Swal.fire({
                   title: "Producto creado",
                   text: "El producto se ha creado correctamente.",

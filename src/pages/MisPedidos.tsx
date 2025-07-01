@@ -50,7 +50,8 @@ const MisPedidos = () => {
   const resetFiltros = () => { setFiltros({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "" }); setFiltroSeleccionado({ tipoEnvio: "TODOS", fechaDesde: "", fechaHasta: "", searchTerm: "" }); };
   const misPedidosService = new PedidosService();
   const dispatch = useAppDispatch();
-
+  const token = sessionStorage.getItem('auth_token');
+  
   const ColumnsTablePedido = [
     {
       label: "Orden",
@@ -163,7 +164,7 @@ const MisPedidos = () => {
 
   const getPedidos = async () => {
     try {
-      const pedidoData = await misPedidosService.getPedidosByUsuario(Number(sessionStorage.getItem("user_id_db") || 0));
+      const pedidoData = await misPedidosService.getPedidosByUsuario(Number(sessionStorage.getItem("user_id_db") || 0), token!);
       // Mapeo PedidoResponseDTO a PedidoDTO
       const pedidosDTO = pedidoData.map((p) => ({
         id: p.id,

@@ -21,6 +21,8 @@ export const ScreenInsumo = () => {
 
   const insumoService = new InsumoService();
   const dispatch = useAppDispatch();
+  const token = sessionStorage.getItem('auth_token');
+
 
   const cargarInsumos = async () => {
     const api = new InsumoService();
@@ -28,9 +30,10 @@ export const ScreenInsumo = () => {
     setInsumos(data);
   };
 
+
   const getInsumos = async () => {
     setLoading(true);
-    const insumoData = await insumoService.getAll();
+    const insumoData = await insumoService.getAll(token!);
     let filtrados = [...insumoData];
 
     if (filtros.searchTerm.trim() !== "") {

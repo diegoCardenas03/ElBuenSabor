@@ -12,6 +12,7 @@ const Roles = () => {
   const [error, setError] = useState<string | null>(null);
   const [expandedRole, setExpandedRole] = useState<number | null>(null);
   const [reloadRoles, setReloadRoles] = useState(0);
+  const token = sessionStorage.getItem('auth_token');
 
   // Guardar cambios del rol
   const handleGuardarRol = async (data: { nombre: string; descripcion: string }) => {
@@ -22,7 +23,7 @@ const Roles = () => {
         await rolesService.putByAuth0Id(rolSeleccionado.auth0RolId, {
           nombre: data.nombre,
           descripcion: data.descripcion,
-        });
+        }, token!);
         Swal.fire("¡Éxito!", "Rol actualizado correctamente.", "success");
         setReloadRoles(prev => prev + 1);
       } catch (error) {
@@ -35,7 +36,7 @@ const Roles = () => {
         const nuevoRol = await rolesService.post({
           nombre: data.nombre,
           descripcion: data.descripcion,
-        });
+        }, token!);
         Swal.fire({
           title: "¡Éxito!",
           text: "Rol creado correctamente!.",
@@ -56,7 +57,7 @@ const Roles = () => {
       try {
         setLoading(true);
         const rolesService = new RolService();
-        const rolesData = await rolesService.getAll();
+        const rolesData = await rolesService.getAll(token!);
         setRoles(rolesData);
         setError(null);
       } catch (error) {
@@ -118,7 +119,7 @@ const Roles = () => {
     if (confirm.isConfirmed) {
       try {
         const rolesService = new RolService();
-        await rolesService.deletePhysicalByAuth0Id(rol.auth0RolId);
+        await rolesService.deletePhysicalByAuth0Id(rol.auth0RolId, token!);
         Swal.fire("Eliminado", "El rol fue eliminado correctamente.", "success");
         setReloadRoles(prev => prev + 1);
       } catch (error) {

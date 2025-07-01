@@ -41,6 +41,7 @@ export const ModalEmpleado = ({
     const [rolesDisponibles, setRolesDisponibles] = useState<RolResponseDTO[]>([]);
     const [rolAAgregar, setRolAAgregar] = useState<string>("");
     const [showPassword, setShowPassword] = useState(false);
+    const token = sessionStorage.getItem('auth_token');
 
     // Traer roles disponibles al abrir el modal
     useEffect(() => {
@@ -48,7 +49,7 @@ export const ModalEmpleado = ({
             const fetchRoles = async () => {
                 try {
                     const service = new RolService();
-                    const roles = await service.getAll();
+                    const roles = await service.getAll(token!);
 
                     setRolesDisponibles(roles.filter((rol) => rol.nombre !== 'Cliente'));
                 } catch {
@@ -140,10 +141,10 @@ export const ModalEmpleado = ({
         try {
             // console.log('values: ', values)
             if (empleado) {
-                await empleadosService.patch(empleado.id, values);
+                await empleadosService.patch(empleado.id, values, token!);
                 Swal.fire("¡Éxito!", "Empleado actualizado correctamente.", "success");
             } else {
-                await empleadosService.post(values);
+                await empleadosService.post(values, token!);
                 Swal.fire("¡Éxito!", "Empleado creado correctamente.", "success");
             }
             getEmpleados();

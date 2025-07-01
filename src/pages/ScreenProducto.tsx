@@ -20,6 +20,7 @@ export const ScreenProducto = () => {
 
   const productoService = new ProductoService();
   const dispatch = useAppDispatch();
+  const token = sessionStorage.getItem('auth_token');
 
   // Estado para los rubros productos
   const [rubrosProductos, setRubrosProductos] = useState<{ id: number; denominacion: string }[]>([]);
@@ -82,7 +83,7 @@ export const ScreenProducto = () => {
           checked={producto.activo}
           onChange={async () => {
             try {
-              await productoService.updateEstado(producto.id);
+              await productoService.updateEstado(producto.id, token!);
               getProductos();
             } catch (error) {
               Swal.fire(
@@ -115,7 +116,7 @@ export const ScreenProducto = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        productoService.delete(id).then(() => {
+        productoService.delete(id, token!).then(() => {
           getProductos();
         });
       }
@@ -125,7 +126,7 @@ export const ScreenProducto = () => {
   // Función para obtener los productos
   const getProductos = async () => {
     setLoading(true);
-    await productoService.getAll().then((productoData) => {
+    await productoService.getAll(token!).then((productoData) => {
       let productosDTO = productoData.map((p) => ({
         id: p.id,
         denominacion: p.denominacion,

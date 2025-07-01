@@ -34,6 +34,7 @@ export const PantallaCajero = () => {
 
   const pedidoService = new PedidosService();
   const dispatch = useAppDispatch();
+  const token = sessionStorage.getItem('auth_token');
 
   const ColumnsTablePedido = [
     {
@@ -131,7 +132,7 @@ export const PantallaCajero = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        pedidoService.delete(id).then(() => {
+        pedidoService.delete(id, token!).then(() => {
           getPedidos();
         });
       }
@@ -140,7 +141,7 @@ export const PantallaCajero = () => {
 
   const getPedidos = async () => {
     setLoading(true);
-    await pedidoService.getAll().then((pedidoData) => {
+    await pedidoService.getAll(token!).then((pedidoData) => {
       setAllPedidos(pedidoData);
       setLoading(false);
     });

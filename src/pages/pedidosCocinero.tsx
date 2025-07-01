@@ -41,10 +41,11 @@ const PedidosCocinero: React.FC = () => {
         setRowsPerPagePreparacion(+event.target.value);
         setPagePreparacion(0);
     };
+    const token = sessionStorage.getItem('auth_token');
 
     const obtenerPedidos = async () => {
         try {
-            const data = await pedidosService.getAll();
+            const data = await pedidosService.getAll(token!);
             setPedidos(data);
             setComandas(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.SOLICITADO));
             setEnPreparacion(data.filter((pedido: PedidoResponseDTO) => pedido.estado === Estado.EN_PREPARACION));
