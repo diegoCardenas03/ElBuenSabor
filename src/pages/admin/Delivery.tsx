@@ -165,7 +165,6 @@ const Delivery = () => {
                           style={{ height: '200px', width: '100%', borderRadius: '10px', marginTop: '0.5rem' }}
                         >
                           <TileLayer
-                            attribution='&copy; OpenStreetMap contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                           />
                           <Marker position={[pedido.domicilio.latitud, pedido.domicilio.longitud]} icon={markerIcon} />

@@ -103,11 +103,13 @@ export const PantallaCajero = () => {
         if (pedido.estado === Estado.TERMINADO) {
           if (pedido.tipoEnvio === TipoEnvio.RETIRO_LOCAL) {
             texto = "Entregar"
+          } else if (pedido.tipoEnvio === TipoEnvio.DELIVERY) {
+            texto = "--";
           }
         }
         return (
           <button
-            {...texto == "" ? { className: "" } : { className: "bg-secondary text-white rounded-full px-1 py-1 w-[70%] cursor-pointer hover:scale-105 transition-transform" }}
+            {...texto == "" || texto == "--" ? { className: "" } : { className: "bg-secondary text-white rounded-full px-1 py-1 w-[70%] cursor-pointer hover:scale-105 transition-transform" }}
             onClick={() => cambiarEstado(pedido)}
           >
             {texto}
