@@ -16,7 +16,7 @@ import { PedidoResponseDTO } from "../../types/Pedido/PedidoResponseDTO";
 import { ProductoResponseDTO } from "../../types/Producto/ProductoResponseDTO";
 import { ClientesTable, ClienteTabla } from "../../components/admin/ClientesTable";
 import React from "react";
-import ExcelJS from "exceljs/dist/exceljs.min.js";
+import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error?: any}> {
