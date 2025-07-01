@@ -60,7 +60,12 @@ const PedidoDetalleModal = ({ pedido, onClose }: PedidoDetalleModalProps) => {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/api/facturas/pdf/${pedido.id}`);
+      const token = sessionStorage.getItem('auth_token');
+      const res = await fetch(`${API_BASE}/api/facturas/pdf/${pedido.id}`, {
+        headers: {
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
       if (!res.ok) {
         alert("No se pudo descargar la factura.");
         return;
@@ -141,7 +146,13 @@ const ClientesEstadisticas = () => {
 
   useEffect(() => {
     if (!clienteId) return;
-    fetch(`${API_BASE}/api/clientes/${clienteId}`)
+    const token = sessionStorage.getItem('auth_token');
+    
+    fetch(`${API_BASE}/api/clientes/${clienteId}`, {
+      headers: {
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      }
+    })
       .then(async res => {
         const text = await res.text();
         try {
@@ -159,7 +170,11 @@ const ClientesEstadisticas = () => {
     if (fechaHasta) params.push(`fechaHasta=${fechaHasta}`);
     if (params.length > 0) pedidosUrl += "?" + params.join("&");
 
-    fetch(pedidosUrl)
+    fetch(pedidosUrl, {
+      headers: {
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      }
+    })
       .then(async res => {
         const text = await res.text();
         try {

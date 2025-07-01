@@ -27,7 +27,7 @@ export const ScreenInsumo = () => {
 
   const cargarInsumos = async () => {
     const api = new InsumoService();
-    const data = await api.getAll();
+    const data = await api.getAll(token!);
     setInsumos(data);
   };
 
