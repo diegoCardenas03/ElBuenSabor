@@ -52,6 +52,7 @@ export const ModalProducto = ({
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const token = sessionStorage.getItem("auth_token");
 
   useEffect(() => {
     const fetchRubros = async () => {
@@ -86,29 +87,29 @@ export const ModalProducto = ({
   const initialValues: ProductoDTO =
     elementActive && "descripcion" in elementActive && "tiempoEstimadoPreparacion" in elementActive
       ? {
-          id: elementActive.id,
-          denominacion: elementActive.denominacion,
-          descripcion: elementActive.descripcion,
-          tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
-          precioVenta: elementActive.precioVenta,
-          urlImagen: elementActive.urlImagen,
-          activo: elementActive.activo,
-          rubroId: elementActive.rubro?.id ?? 0,
-          margenGanancia: elementActive.margenGanancia ?? 0, 
-          detalleProductos: elementActive.detalleProductos ?? [],
-        }
+        id: elementActive.id,
+        denominacion: elementActive.denominacion,
+        descripcion: elementActive.descripcion,
+        tiempoEstimadoPreparacion: elementActive.tiempoEstimadoPreparacion,
+        precioVenta: elementActive.precioVenta,
+        urlImagen: elementActive.urlImagen,
+        activo: elementActive.activo,
+        rubroId: elementActive.rubro?.id ?? 0,
+        margenGanancia: elementActive.margenGanancia ?? 0,
+        detalleProductos: elementActive.detalleProductos ?? [],
+      }
       : {
-          id: 0,
-          denominacion: "",
-          descripcion: "",
-          tiempoEstimadoPreparacion: 0,
-          precioVenta: 0,
-          urlImagen: "",
-          activo: true,
-          rubroId: 0,
-          margenGanancia: 0,
-          detalleProductos: [],
-        };
+        id: 0,
+        denominacion: "",
+        descripcion: "",
+        tiempoEstimadoPreparacion: 0,
+        precioVenta: 0,
+        urlImagen: "",
+        activo: true,
+        rubroId: 0,
+        margenGanancia: 0,
+        detalleProductos: [],
+      };
 
   const handleClose = () => {
     setOpenModal(false);
@@ -143,7 +144,7 @@ export const ModalProducto = ({
             denominacion: Yup.string().required("Campo requerido"),
             margenGanancia: Yup.number()
               .min(0, "Debe ser 0 o mayor")
-              
+
               .required("Campo requerido"),
             rubroId: Yup.number()
               .min(1, "Seleccione una categoría")
@@ -169,20 +170,50 @@ export const ModalProducto = ({
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             try {
               let imageUrl = values.urlImagen;
+              if (
+                selectedImage &&
+                elementActive &&
+                "urlImagen" in elementActive &&
+                typeof elementActive.urlImagen === "string" &&
+                elementActive.urlImagen
+              ) {
+                // Reutiliza la función de ModalInsumo
+                const getCloudinaryPublicId = (url: string): string | null => {
+                  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z]+$/);
+                  return match ? match[1] : null;
+                };
+                const publicId = getCloudinaryPublicId(elementActive.urlImagen);
+                console.log("Intentando eliminar imagen anterior de Cloudinary");
+                console.log("URL anterior:", elementActive.urlImagen);
+                console.log("publicId extraído:", publicId);
+
+                if (publicId) {
+                  const deleteUrl = `http://localhost:8080/api/cloudinary/eliminar?publicId=${publicId}`;
+                  console.log("Llamando endpoint de borrado:", deleteUrl);
+                  const res = await fetch(deleteUrl, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                  });
+                  const result = await res.json().catch(() => ({}));
+                  console.log("Respuesta del backend al borrar imagen:", result, "Status:", res.status);
+                } else {
+                  console.warn("No se pudo extraer el publicId de la imagen anterior.");
+                }
+              }
+
+              // Subir la nueva imagen si corresponde
               if (selectedImage) {
                 const formData = new FormData();
                 formData.append("file", selectedImage);
                 formData.append("upload_preset", `${API_CLOUDINARY_UPLOAD_PRESET}`);
-                const res = await fetch(
-                  `${API_CLOUDINARY_URL}`,
-                  {
-                    method: "POST",
-                    body: formData,
-                  }
-                );
+                const res = await fetch(`${API_CLOUDINARY_URL}`, {
+                  method: "POST",
+                  body: formData,
+                });
                 const data = await res.json();
                 imageUrl = data.secure_url;
               }
+
 
               const detalleProductos = values.detalleProductos.map((detalle: DetalleProductoDTO) => ({
                 insumoId: detalle.insumoId,
