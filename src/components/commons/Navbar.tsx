@@ -24,7 +24,7 @@ const navbarLinks = [
 
 const navbarLinks2 = [
   { icon: <FaUtensils className="w-6 h-6" />, texto: 'Menu', to: '/Menu' },
-  { icon: <FaUser stroke='1' className="w-6 h-6" />, texto: 'Contactanos', to: '' }
+  { icon: <FaUser stroke='1' className="w-6 h-6" />, texto: 'Contactanos', to: '/Contactanos' }
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({

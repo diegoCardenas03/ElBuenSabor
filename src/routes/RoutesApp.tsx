@@ -13,7 +13,6 @@ import MisDirecciones from '../pages/misDirecciones';
 import SuccessMP from '../pages/SuccessMP';
 import FailureMP from '../pages/FailureMP';
 import Delivery from '../pages/admin/Delivery';
-import EstadisticaWithBoundary from '../pages/admin/Estadistica';
 import ProductosEstadistica from '../pages/admin/ProductosEstadistica';
 import  Estadistica  from '../pages/admin/Estadistica';
 
@@ -28,6 +27,7 @@ import { LoginRedirect } from '../pages/LoginWithRedirect';
 import { MiPerfilEmpleadoPage } from '../pages/MiPerfilEmpleadoPage';
 import { PublicRoute } from './PublicRoute';
 import { PaginaNoExiste } from '../pages/PaginaNoExiste';
+import Contactanos from '../pages/Contactanos';
 
 const RoutesApp = () => {
   return (
@@ -39,6 +39,9 @@ const RoutesApp = () => {
       <Route path="/Menu" element={<PublicRoute><Menu /></PublicRoute>} />
       <Route path="/callback" element={<PublicRoute><CallbackPage /></PublicRoute>} />
       <Route path="/login-redirect" element={<PublicRoute><LoginRedirect /></PublicRoute>} />
+      <Route path="/Contactanos" element={<PublicRoute><Contactanos /></PublicRoute>} />
+
+      {/* Rutas públicas para clientes */}
 
       {/* Rutas privadas para clientes */}
       <Route
