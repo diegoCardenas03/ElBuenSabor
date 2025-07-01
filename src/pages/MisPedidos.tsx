@@ -132,7 +132,7 @@ const MisPedidos = () => {
           >
             <MdOutlineFileDownload size={23} />
           </button>
-        ) : null
+        ) : '--'
       ),
     }
   ];

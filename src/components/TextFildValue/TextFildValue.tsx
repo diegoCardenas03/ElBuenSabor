@@ -38,14 +38,23 @@ const TextFieldValue = ({ label, name, id, type, placeholder }: props) => {
       </div>
 
       {/* Campo de entrada del formulario */}
-      <Field
-        className={`form-control  mb-3  input-formulario `}
-        placeholder={placeholder}
-        id={id ?? name}
-        name={name}
-        type={type}
-        autoComplete="off"
-      />
+      <Field name={name}>
+        {({ field }: any) => (
+          <input
+            {...field}
+            className={`form-control  mb-3  input-formulario `}
+            placeholder={placeholder}
+            id={id ?? name}
+            type={type}
+            autoComplete="off"
+            value={
+              type === "number" && (field.value === 0 || field.value === "0")
+                ? ""
+                : field.value
+            }
+          />
+        )}
+      </Field>
 
       {/* Mensaje de error para el campo */}
       <ErrorMessage component="div" name={name} className="error" />

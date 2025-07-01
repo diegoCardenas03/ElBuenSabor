@@ -8,7 +8,7 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers, FieldProps } from "formik";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { removeElementActive } from "../../hooks/redux/slices/TableReducer";
 import { UnidadMedida } from "../../types/enums/UnidadMedida";
@@ -41,7 +41,8 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
   const [isHovering, setIsHovering] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedRubros, setSelectedRubros] = useState<RubroInsumoResponseDTO[]>([]);
-  const [formInitialValues, setFormInitialValues] = useState<InsumoResponseDTO>({
+  const [formInitialValues, setFormInitialValues] = useState<InsumoResponseDTO & { rubroId?: number }>({
+    id: 0,
     denominacion: "",
     urlImagen: "",
     precioCosto: 0,
@@ -50,8 +51,8 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
     stockMinimo: 0,
     esParaElaborar: false,
     activo: true,
-    unidadMedida: "",
-    rubroId: 0,
+    unidadMedida: "" as UnidadMedida,
+    rubro: rubros[0] || { id: 0, denominacion: "", subRubros: [] },
     descripcion: "",
   });
 
@@ -74,12 +75,12 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
       setSelectedRubros([]);
       return;
     }
-    if (!elementActive || !elementActive.rubro) {
+    if (!elementActive || !("rubro" in elementActive) || !elementActive.rubro.id) {
       setSelectedRubros([]);
       return;
     }
 
-    const findRubroPath = (rubrosList, rubroId, path = []) => {
+    const findRubroPath = (rubrosList: RubroInsumoResponseDTO[], rubroId: number, path: RubroInsumoResponseDTO[] = []): RubroInsumoResponseDTO[] | null => {
       for (const rubro of rubrosList) {
         if (rubro.id === rubroId) {
           return [...path, rubro];
@@ -93,14 +94,19 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
     };
 
     if (rubros.length > 0) {
+      console.log("elementActive.rubro.id:", elementActive.rubro.id);
+      console.log("rubros:", rubros);
       const rubroPath = findRubroPath(rubros, elementActive.rubro.id);
+      console.log("rubroPath:", rubroPath);
       setSelectedRubros(rubroPath || []);
+
     }
   }, [openModal, elementActive, rubros]);
 
   useEffect(() => {
-    if (openModal && elementActive && "precioCosto" in elementActive) {
+    if (openModal && elementActive && "precioCosto" in elementActive && "stockActual" in elementActive) {
       setFormInitialValues({
+        id: elementActive.id || 0,
         denominacion: elementActive.denominacion || "",
         urlImagen: elementActive.urlImagen || "",
         precioCosto: elementActive.precioCosto || 0,
@@ -110,11 +116,13 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
         esParaElaborar: elementActive.esParaElaborar || false,
         activo: elementActive.activo || true,
         unidadMedida: elementActive.unidadMedida || "",
-        rubroId: elementActive.rubro?.id || 0,
+        rubro: elementActive.rubro || { id: 0, denominacion: "", subRubros: [] },
+        rubroId: elementActive.rubro?.id ?? 0,
         descripcion: elementActive.descripcion || "",
       });
     } else if (openModal) {
       setFormInitialValues({
+        id: 0,
         denominacion: "",
         urlImagen: "",
         precioCosto: 0,
@@ -123,8 +131,9 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
         stockMinimo: 0,
         esParaElaborar: false,
         activo: true,
-        unidadMedida: "",
-        rubroId: 0,
+        unidadMedida: "" as UnidadMedida,
+        rubro: rubros[0] || { id: 0, denominacion: "", subRubros: [] },
+        rubroId: rubros[0]?.id ?? 0,
         descripcion: "",
       });
     }
@@ -138,24 +147,24 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
   };
 
   const unidadMedidaOptions = Object.values(UnidadMedida).map((value) => ({ value, label: value }));
-const handleRubroSelect = (
-  nivel: number,
-  rubroId: number,
-  setFieldValue: (field: string, value: any) => void
-) => {
-  const options = nivel === 0 ? rubros : selectedRubros[nivel - 1]?.subRubros || [];
-  const rubro = options.find((r) => r.id === rubroId);
-  if (!rubro) return;
+  const handleRubroSelect = (
+    nivel: number,
+    rubroId: number,
+    setFieldValue: (field: string, value: any) => void
+  ) => {
+    const options = nivel === 0 ? rubros : selectedRubros[nivel - 1]?.subRubros || [];
+    const rubro = options.find((r) => r.id === rubroId);
+    if (!rubro) return;
 
-  const nuevosSeleccionados = [...selectedRubros.slice(0, nivel), rubro];
-  setSelectedRubros(nuevosSeleccionados);
+    const nuevosSeleccionados = [...selectedRubros.slice(0, nivel), rubro];
+    setSelectedRubros(nuevosSeleccionados);
 
-  if (!rubro.subRubros || rubro.subRubros.length === 0) {
-    setFieldValue("rubroId", rubro.id);
-  } else {
-    setFieldValue("rubroId", ""); // Limpiar hasta que elija el último rubro
-  }
-};
+    if (!rubro.subRubros || rubro.subRubros.length === 0) {
+      setFieldValue("rubroId", rubro.id);
+    } else {
+      setFieldValue("rubroId", ""); // Limpiar hasta que elija el último rubro
+    }
+  };
 
   return (
     <Dialog open={openModal} onClose={handleClose} fullWidth maxWidth="md">
@@ -174,10 +183,10 @@ const handleRubroSelect = (
           validationSchema={Yup.object({
             denominacion: Yup.string().required("Campo requerido"),
             urlImagen: Yup.string().required("Debe seleccionar una imagen"),
-            precioCosto: Yup.number().min(0, "Debe ser positivo").required("Campo requerido"),
+            precioCosto: Yup.number().moreThan(0, "El precio debe ser mayor a 0").moreThan(0, "El precio debe ser mayor a 0").required("Campo requerido"),
             precioVenta: Yup.number().min(0, "Debe ser positivo"),
             stockActual: Yup.number().min(0).required("Campo requerido"),
-            stockMinimo: Yup.number().min(0),
+            stockMinimo: Yup.number().min(0).required("Campo requerido"),
             rubroId: Yup.number().required("Campo requerido"),
             unidadMedida: Yup.string().required("Campo requerido"),
             descripcion: Yup.string().required("Campo requerido"),
@@ -193,7 +202,11 @@ const handleRubroSelect = (
               imageUrl = data.secure_url;
             }
 
-            const payload = { ...values, urlImagen: imageUrl };
+            const payload = {
+              ...values,
+              urlImagen: imageUrl,
+              rubroId: selectedRubros.at(-1)?.id ?? values.rubroId ?? 0 
+            };
 
             if (elementActive?.id) {
               await apiInsumo.patch(elementActive.id, payload);
@@ -215,7 +228,7 @@ const handleRubroSelect = (
                   <TextFieldValue label="Nombre del insumo:" name="denominacion" id="denominacion" type="text" placeholder="Ingrese el nombre" />
                   <label htmlFor="rubroId" style={{ fontWeight: "bold" }}>Categoría:</label>
                   <Field name="rubroId">
-                    {({ form: { setFieldValue } }) => {
+                    {({ form: { setFieldValue } }: FieldProps) => {
                       const allChildIds = rubros.flatMap((r) => r.subRubros?.map((sr) => sr.id) || []);
                       const parentRubros = rubros.filter((r) => !allChildIds.includes(r.id));
                       const selects = [];
@@ -250,7 +263,7 @@ const handleRubroSelect = (
                   </Field>
                   <ErrorMessage name="unidadMedida" component="div" className="error" />
                   <Field name="urlImagen">
-                    {({ field, form: { setFieldValue } }) => (
+                    {({ field, form: { setFieldValue } }: FieldProps) => (
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px" }}>
                         <div className="image-upload-area" style={{ width: "100px", height: "100px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: "10px", position: "relative", overflow: "hidden" }} onClick={() => fileInputRef.current?.click()} onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
                           {previewUrl || field.value ? (
