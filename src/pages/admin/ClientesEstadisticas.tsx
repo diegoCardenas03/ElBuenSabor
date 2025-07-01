@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
-import ExcelJS from "exceljs/dist/exceljs.min.js";
+import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 // --- Tipos ---

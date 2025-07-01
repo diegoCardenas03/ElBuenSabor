@@ -1,7 +1,7 @@
 import { useEffect, useState, ChangeEvent } from "react";
 import { AdminHeader } from "../../components/admin/AdminHeader";
 import { PiMicrosoftExcelLogo } from "react-icons/pi";
-import * as ExcelJS from "exceljs/dist/exceljs.min.js";
+import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
 // Tipo para Producto o Insumo
