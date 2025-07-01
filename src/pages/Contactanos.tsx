@@ -50,7 +50,7 @@ export default function Contactanos() {
         </div>
 
         {/* Formulario */}
-        <div className="p-8 bg-primary">
+        <div className="p-8 bg-white">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Envianos tu mensaje</h3>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input

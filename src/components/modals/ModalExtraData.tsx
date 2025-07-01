@@ -176,7 +176,7 @@ export const ModalUserExtraData: React.FC<ModalUserExtraDataProps> = ({
 
   return (
     <div className="fixed inset-0 z-30 flex items-center rounded-xl justify-center bg-primary">
-      <section className="py-5 px-6 rounded-xl w-72 sm:w-96 bg-primary m-auto font-primary shadow-xl/30">
+      <section className="py-5 px-6 rounded-xl w-72 sm:w-96 bg-white m-auto font-primary shadow-xl/30">
         <h2 className="text-lg font-extrabold mb-4 text-center text-secondary">¡Bienvenido!</h2>
         <p className="mb-4 text-tertiary text-center">
           Por favor, completa tus datos para continuar.
