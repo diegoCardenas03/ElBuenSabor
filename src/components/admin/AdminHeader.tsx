@@ -175,7 +175,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     <>
       {/* Navbar lateral */}
       {navbarOpen && (
-        <div className="fixed inset-0 z-40">
+        <div className="fixed inset-0 z-[9999]">
           <div className="absolute left-0 top-0 h-full w-64 bg-secondary shadow-lg flex flex-col">
             <div className="p-4 flex justify-end">
               <FaTimes className="w-6 h-6 text-white cursor-pointer" onClick={toggleNavbar} />

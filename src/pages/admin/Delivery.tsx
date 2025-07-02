@@ -162,7 +162,8 @@ const Delivery = () => {
                           zoom={15}
                           scrollWheelZoom={false}
                           dragging={false}
-                          style={{ height: '200px', width: '100%', borderRadius: '10px', marginTop: '0.5rem' }}
+                          zoomControl={false}
+                          style={{ height: '200px', width: '100%', borderRadius: '10px', marginTop: '0.5rem', zIndex: 1 }}
                         >
                           <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
