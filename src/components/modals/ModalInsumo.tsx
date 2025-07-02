@@ -55,6 +55,13 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
     rubro: rubros[0] || { id: 0, denominacion: "", subRubros: [] },
     descripcion: "",
   });
+  const token = sessionStorage.getItem("auth_token");
+
+  function getCloudinaryPublicId(url: string): string | null {
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-zA-Z]+$/);
+    return match ? match[1] : null;
+  }
+
 
   useEffect(() => {
     const fetchRubros = async () => {
@@ -193,6 +200,32 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
           })}
           onSubmit={async (values, { setSubmitting }) => {
             let imageUrl = values.urlImagen;
+            if (
+              selectedImage &&
+              elementActive &&
+              "urlImagen" in elementActive &&
+              typeof elementActive.urlImagen === "string" &&
+              elementActive.urlImagen
+            ) {
+              const publicId = getCloudinaryPublicId(elementActive.urlImagen);
+              console.log("Intentando eliminar imagen anterior de Cloudinary");
+              console.log("URL anterior:", elementActive.urlImagen);
+              console.log("publicId extraído:", publicId);
+
+              if (publicId) {
+                const deleteUrl = `http://localhost:8080/api/cloudinary/eliminar?publicId=${publicId}`;
+                console.log("Llamando endpoint de borrado:", deleteUrl);
+                const res = await fetch(deleteUrl, {
+                  method: "DELETE",
+                  headers: { "Authorization": `Bearer ${token}` }
+                });
+                const result = await res.json().catch(() => ({}));
+                console.log("Respuesta del backend al borrar imagen:", result, "Status:", res.status);
+              } else {
+                console.warn("No se pudo extraer el publicId de la imagen anterior.");
+              }
+            }
+
             if (selectedImage) {
               const formData = new FormData();
               formData.append("file", selectedImage);
@@ -202,10 +235,11 @@ export const ModalInsumo = ({ getInsumos, openModal, setOpenModal }: IModalInsum
               imageUrl = data.secure_url;
             }
 
+
             const payload = {
               ...values,
               urlImagen: imageUrl,
-              rubroId: selectedRubros.at(-1)?.id ?? values.rubroId ?? 0 
+              rubroId: selectedRubros.at(-1)?.id ?? values.rubroId ?? 0
             };
 
             if (elementActive?.id) {
