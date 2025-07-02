@@ -129,7 +129,7 @@ const CarritoLateral: React.FC<Props> = ({ onClose }) => {
   }
 
   return (
-    <div className="right-0 top-0 h-screen w-96 bg-primary shadow-lg p-6 rounded-xl z-9999 absolute flex flex-col transition-transform duration-300">
+    <div className="fixed right-0 top-0 h-screen w-96 bg-primary shadow-lg p-6 rounded-xl z-9999 flex flex-col transition-transform duration-300">
       <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-xl cursor-pointer">✕</button>
       <h2 className="text-2xl font-bold text-gray-800 mb-2">MI ORDEN</h2>
 
