@@ -4,6 +4,8 @@ import { clearSession, useAuthHandler } from "../hooks/useAuthHandler";
 import { Loader } from "../components/commons/Loader";
 import ModalUserExtraData from "../components/modals/ModalExtraData";
 import Swal from "sweetalert2";
+import { useAppDispatch } from "../hooks/redux";
+import { setClienteId } from "../hooks/redux/slices/CarritoReducer";
 
 
 export const LoginRedirect = () => {
@@ -11,6 +13,7 @@ export const LoginRedirect = () => {
   const { authStatus, isAuthenticated, isProcessing } = useAuthHandler();
   const [showExtraDataModal, setShowExtraDataModal] = useState(false);
   const userRole = sessionStorage.getItem('user_role');
+  const dispatch = useAppDispatch();
 
 
   useEffect(() => {
@@ -38,8 +41,9 @@ export const LoginRedirect = () => {
 
     // Si la autenticación está completa y exitosa
     if (authStatus === 'completed' && isAuthenticated) {
+      const clienteNuevo = sessionStorage.getItem('user_id_db');
+      dispatch(setClienteId(clienteNuevo));
       // console.log("[LoginRedirect] Autenticación completada exitosamente");
-
       // Solo mostrar el modal si el usuario fue recién creado
       const needsExtraData = sessionStorage.getItem('user_needs_extra_data');
       if (userRole === "Cliente" && needsExtraData === 'true') {

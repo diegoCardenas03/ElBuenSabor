@@ -13,6 +13,7 @@ interface CarritoItem {
 }
 
 type CarritoState = {
+  clienteId: string | null;
   items: CarritoItem[];
   tipoEntrega: TipoEnvio | null;
   direccion: DomicilioDTO | null;
@@ -20,11 +21,17 @@ type CarritoState = {
   metodoPago: FormaPago | null;
 };
 
-const LOCALSTORAGE_KEY = 'carritoState';
+const initialClienteId = sessionStorage.getItem('user_id_db');
+const initialState = loadCarritoState(initialClienteId);
+initialState.clienteId = initialClienteId;
 
-function loadCarritoState(): CarritoState {
+function getCarritoKey(clienteId: string | null) {
+  return `carritoState_${clienteId}`;
+}
+
+function loadCarritoState(clienteId: string | null): CarritoState {
   try {
-    const serialized = localStorage.getItem(LOCALSTORAGE_KEY);
+    const serialized = localStorage.getItem(getCarritoKey(clienteId));
     if (serialized) {
       return JSON.parse(serialized);
     }
@@ -32,6 +39,7 @@ function loadCarritoState(): CarritoState {
     console.error("Error al cargar el carrito desde localStorage:", error);
   }
   return {
+    clienteId: null,
     items: [],
     tipoEntrega: null,
     direccion: null,
@@ -47,23 +55,44 @@ export const obtenerId = (item: CarritoItemType): string => {
   throw new Error("Tipo de ítem desconocido");
 };
 
+function saveCarritoState(clienteId: string | null, state: CarritoState) {
+  try {
+    localStorage.setItem(getCarritoKey(clienteId), JSON.stringify(state));
+  } catch (error) {
+    console.error("Error al guardar el carrito en localStorage:", error);
+  }
+}
+
 const carritoReducer = createSlice({
   name: 'carrito',
-  initialState: loadCarritoState(),
+  initialState,
   reducers: {
+    setClienteId: (state, action: PayloadAction<string | null>) => {
+      state.clienteId = action.payload;
+      const nuevo = loadCarritoState(action.payload);
+      state.items = nuevo.items;
+      state.tipoEntrega = nuevo.tipoEntrega;
+      state.direccion = nuevo.direccion;
+      state.comentario = nuevo.comentario;
+      state.metodoPago = nuevo.metodoPago;
+    },
+
     agregarProducto: (state, action: PayloadAction<CarritoItemType>) => {
       const id = obtenerId(action.payload);
       const index = state.items.findIndex((i) => obtenerId(i.item) === id);
-      
+
       if (index >= 0) {
         state.items[index].cant += 1;
       } else {
         state.items.push({ item: action.payload, cant: 1 });
       }
+
+      saveCarritoState(state.clienteId, state);
     },
 
     quitarProducto: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((i) => obtenerId(i.item) !== action.payload);
+      saveCarritoState(state.clienteId, state);
     },
 
     cambiarCantidad: (state, action: PayloadAction<{ id: string; cantidad: number }>) => {
@@ -72,6 +101,7 @@ const carritoReducer = createSlice({
       if (item && cantidad > 0) {
         item.cant = cantidad;
       }
+      saveCarritoState(state.clienteId, state);
     },
 
     vaciarCarrito: (state) => {
@@ -80,22 +110,27 @@ const carritoReducer = createSlice({
       state.tipoEntrega = null;
       state.comentario = '';
       state.metodoPago = null;
+      saveCarritoState(state.clienteId, state);
     },
 
     setTipoEntrega: (state, action: PayloadAction<TipoEnvio | null>) => {
       state.tipoEntrega = action.payload;
+      saveCarritoState(state.clienteId, state);
     },
 
     setDireccion: (state, action: PayloadAction<DomicilioDTO | null>) => {
       state.direccion = action.payload;
+      saveCarritoState(state.clienteId, state);
     },
 
     setComentario: (state, action: PayloadAction<string>) => {
       state.comentario = action.payload;
+      saveCarritoState(state.clienteId, state);
     },
 
     setMetodoPago: (state, action: PayloadAction<FormaPago>) => {
       state.metodoPago = action.payload;
+      saveCarritoState(state.clienteId, state);
     },
   },
 });
@@ -109,6 +144,7 @@ export const {
   setDireccion,
   setComentario,
   setMetodoPago,
+  setClienteId,
 } = carritoReducer.actions;
 
 export default carritoReducer.reducer;
