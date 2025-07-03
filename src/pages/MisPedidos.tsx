@@ -16,6 +16,7 @@ import PedidoDetalleModal from '../components/modals/PedidoDetalleModal';
 import Swal from 'sweetalert2';
 import { jsPDF } from "jspdf";
 import { FormaPago } from '../types/enums/FormaPago';
+import { Footer } from '../components/commons/Footer';
 type FiltroState = {
   tipoEnvio: "TODOS" | "LOCAL" | "DELIVERY" | "FECHA";
   fechaDesde: string;
@@ -360,6 +361,7 @@ const MisPedidos = () => {
           </div>
         </div>
       )}
+      <Footer/>
     </>
   )
 }
